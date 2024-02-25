@@ -1,7 +1,7 @@
 # FindWhat
 FindWhat is a Qt-powered program that provides tools for users to create paths or methods to extract changing values from a series of PDF files (such as numbers within different bills) and output them to a CSV file in any desired order.
 
-This program is currently under construction and some functionalities may not work as intended, but it already fulfills its main purpose. Currently, I am working on serialization so that the created Esquemes do not need to be recreated each time.
+THIS PROGRAM IS CURRENTLY UNDER CONSTRUCTION and some functionalities may not work as intended, but it already fulfills its main purpose. Currently, I am working on serialization so that the created Esquemes do not need to be recreated each time. Also, keep in mind that this is my first time using QT and I'm learning on the spot.
 
 *This program is part of a larger application that first allows users to extract data from PDFs (using FindWhat), and then sort this data to create customized .rtf and .pdf bills, and send them to a list of email addresses. I am currently using both programs for a housing cooperative. We receive 32 monthly utility bills from different companies and need to extract various values from them to create 24 bills, one for each house, and send them via email. The program that creates the bills is still not flexible and is only usable for our specific case. In the future, I intend to make it more flexible, similar to what I've done with FindWhat, and publicly post it on GitHub so that other housing cooperatives or anyone in need can use it for free.
 
@@ -34,6 +34,17 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - Go to "Parse Document", add a page, and link it to the Esquema with the combo box. Then, underneath in the text edit, write "NIF,Total" and drag and drop every bill that matches these specifications (for example, drop 20 PDF files you received from the same company, which are all the same except for the Total amount of the bill and some other numbers).
 
 - You'll get a .csv file with 20 rows, each with 2 cells, stating "F12345" and "Whatever-Total-was-extracted-from-the-pdf".
+
+# Future updates
+- Serialization to store the esquemas created
+- A way to rename the pdf files parsed to some name that can insert the values extracted (for example "$date_$companyName_etc.pdf") for easy storing and archiving, and also move the files to another folder if needed.
+- A way to rename the extracted .csv and store it in a given location
+- More functions
+- A way to check if the variables extracted are (or at least seem) correct and notify the user otherwise
+- A better way to define the structure of the csv instead of the current user-error-prone string
+- Other small functionality
+- Tooltips, text placeholders, and other ways to lear to navigate through the program
+- The code still needs more cleaning, reorganizing and documenting
 
 # Licencing
 Copyright (c) 2024 Ignasi Camps
