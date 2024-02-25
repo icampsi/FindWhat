@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>esquemaPage</class>
+ <widget class="QWidget" name="esquemaPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>846</width>
+    <height>691</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QFrame" name="frame_esquema">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_10">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="pushButton_addFormula">
+        <property name="text">
+         <string>Add Formula</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" rowspan="2" colspan="2">
+       <widget class="WEsquemaTreeView" name="treeView_Esquema">
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="autoScrollMargin">
+         <number>16</number>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::NoDragDrop</enum>
+        </property>
+        <property name="itemsExpandable">
+         <bool>false</bool>
+        </property>
+        <property name="animated">
+         <bool>false</bool>
+        </property>
+        <property name="headerHidden">
+         <bool>false</bool>
+        </property>
+        <property name="expandsOnDoubleClick">
+         <bool>false</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="pushButton_addStaticData">
+        <property name="text">
+         <string>Add static data</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" rowspan="3">
+       <widget class="QStackedWidget" name="stackedWidget_general">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="BLANK"/>
+        <widget class="QWidget" name="ENABLED">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QLabel" name="label_dataName">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Data Name</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QStackedWidget" name="stackedWidget_dataOrFormula">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="Data">
+             <widget class="QPlainTextEdit" name="plainTextEdit_staticDataString">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>30</y>
+                <width>371</width>
+                <height>71</height>
+               </rect>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="Formula">
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="2" column="0" rowspan="2" colspan="2">
+               <widget class="QFrame" name="frame_editFunction">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_9">
+                 <item row="2" column="3">
+                  <widget class="QLabel" name="label_finalResult">
+                   <property name="text">
+                    <string>Final result</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QPushButton" name="btn_newFunction">
+                   <property name="text">
+                    <string>Add Function</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2" colspan="2">
+                  <widget class="QLineEdit" name="lineEdit_functionName">
+                   <property name="maxLength">
+                    <number>20</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="3" colspan="2">
+                  <widget class="QTextEdit" name="textEdit_finalResult">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>100</height>
+                    </size>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1" colspan="2">
+                  <widget class="QPlainTextEdit" name="plainTextEdit_resultToSelectedFunction">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>100</height>
+                    </size>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QPushButton" name="pushButton_deleteFunctin">
+                   <property name="text">
+                    <string>Delete Function</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1" colspan="2">
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Result up to selected function</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1" colspan="4">
+                  <widget class="QStackedWidget" name="stacked_editFunction">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::Box</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <widget class="QWidget" name="NewFunction">
+                    <layout class="QGridLayout" name="gridLayout_8"/>
+                   </widget>
+                   <widget class="QWidget" name="Find">
+                    <layout class="QGridLayout" name="gridLayout_7">
+                     <item row="6" column="0">
+                      <spacer name="verticalSpacer_4">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QComboBox" name="comboBox_setIndexAt">
+                       <item>
+                        <property name="text">
+                         <string>End String</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Begin String</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QLabel" name="label_setIndexAt">
+                       <property name="text">
+                        <string>Set index at</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0" colspan="3">
+                      <widget class="QLineEdit" name="lineEdit_textToFind"/>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_textToFind">
+                       <property name="text">
+                        <string>Text to Find</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="2">
+                      <spacer name="horizontalSpacer_4">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_FindString">
+                       <property name="text">
+                        <string>FIND STRING</string>
+                       </property>
+                       <property name="textFormat">
+                        <enum>Qt::AutoText</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="StartFrom">
+                       <property name="text">
+                        <string>Strat from</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QComboBox" name="comboBox_startFrom">
+                       <property name="minimumSize">
+                        <size>
+                         <width>120</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string>Current index</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Begin Text</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="MoveIndex">
+                    <layout class="QGridLayout" name="gridLayout_3">
+                     <item row="2" column="2">
+                      <spacer name="horizontalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="3" column="1">
+                      <spacer name="verticalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QSpinBox" name="spinBox_moveIndex">
+                       <property name="minimum">
+                        <number>-9999</number>
+                       </property>
+                       <property name="maximum">
+                        <number>9999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_moveIndex">
+                       <property name="text">
+                        <string>Move Index</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_moveIndex_2">
+                       <property name="text">
+                        <string>MOVE INDEX</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="MoveLine">
+                    <layout class="QGridLayout" name="gridLayout_6">
+                     <item row="5" column="0">
+                      <spacer name="verticalSpacer_3">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="2" column="2">
+                      <spacer name="horizontalSpacer_5">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_linesToMove">
+                       <property name="text">
+                        <string>Lines to move</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_moveLines">
+                       <property name="text">
+                        <string>MOVE LINES</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QSpinBox" name="spinBox_moveLinesNum">
+                       <property name="minimum">
+                        <number>-1000</number>
+                       </property>
+                       <property name="maximum">
+                        <number>1000</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QComboBox" name="comboBox_placeInLine">
+                       <item>
+                        <property name="text">
+                         <string>Beninging of line</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>End of Line</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_PlaceIndexAt">
+                       <property name="text">
+                        <string>Place index at</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="AppendString">
+                    <layout class="QGridLayout" name="gridLayout_5">
+                     <item row="2" column="3">
+                      <widget class="QRadioButton" name="radioButton_preppend">
+                       <property name="text">
+                        <string>Prepend</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <spacer name="verticalSpacer_2">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QRadioButton" name="radioButton_append">
+                       <property name="text">
+                        <string>Append</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_string">
+                       <property name="text">
+                        <string>String</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0" colspan="2">
+                      <widget class="QLabel" name="label_appendString">
+                       <property name="text">
+                        <string>APPEND STRING</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineEdit_stringToAppend"/>
+                     </item>
+                     <item row="1" column="2">
+                      <spacer name="horizontalSpacer_2">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="1" column="4">
+                      <spacer name="horizontalSpacer_3">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="ExtractData">
+                    <layout class="QGridLayout" name="gridLayout_4">
+                     <item row="0" column="3">
+                      <widget class="QLabel" name="label_getOnly">
+                       <property name="text">
+                        <string>Get only</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="label_extractedData">
+                       <property name="text">
+                        <string>Extracted Data</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="2" rowspan="2">
+                      <widget class="QComboBox" name="comboBox_readDirection">
+                       <item>
+                        <property name="text">
+                         <string>Forward</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Backward</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="1" column="1" rowspan="2" colspan="2">
+                      <widget class="QLineEdit" name="lineEdit_endingString">
+                       <property name="toolTip">
+                        <string/>
+                       </property>
+                       <property name="statusTip">
+                        <string/>
+                       </property>
+                       <property name="whatsThis">
+                        <string/>
+                       </property>
+                       <property name="accessibleName">
+                        <string/>
+                       </property>
+                       <property name="accessibleDescription">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_endingString">
+                       <property name="text">
+                        <string>Ending String</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="2" colspan="4">
+                      <widget class="QTextEdit" name="textEdit_extractedData">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0" colspan="2">
+                      <widget class="QLabel" name="label_extractData">
+                       <property name="text">
+                        <string>EXTRACT DATA</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0" colspan="2">
+                      <widget class="QLabel" name="label_readDirection">
+                       <property name="text">
+                        <string>Read Direction</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="4">
+                      <widget class="QComboBox" name="comboBox_typeOfData">
+                       <item>
+                        <property name="text">
+                         <string>All</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Numbers</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Letters</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QLabel" name="label_allow">
+                       <property name="text">
+                        <string>Allow</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="4">
+                      <widget class="QLineEdit" name="lineEdit_charsToAllow"/>
+                     </item>
+                     <item row="3" column="3">
+                      <widget class="QLabel" name="label_avoid">
+                       <property name="text">
+                        <string>Avoid</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="4">
+                      <widget class="QLineEdit" name="lineEdit_charsToAvoid"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_functionName">
+                   <property name="text">
+                    <string>Function Name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" rowspan="3">
+                  <widget class="QListWidget" name="listWidget_formula">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>40</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::NoEditTriggers</set>
+                   </property>
+                   <property name="dragDropMode">
+                    <enum>QAbstractItemView::InternalMove</enum>
+                   </property>
+                   <property name="defaultDropAction">
+                    <enum>Qt::MoveAction</enum>
+                   </property>
+                   <property name="alternatingRowColors">
+                    <bool>true</bool>
+                   </property>
+                   <property name="movement">
+                    <enum>QListView::Snap</enum>
+                   </property>
+                   <property name="flow">
+                    <enum>QListView::TopToBottom</enum>
+                   </property>
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="selectionRectVisible">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WEsquemaTreeView</class>
+   <extends>QTreeView</extends>
+   <header>wesquematreeview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
