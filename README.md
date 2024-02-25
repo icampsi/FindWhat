@@ -23,7 +23,7 @@ The program is not yet intuitive and does not provide much guidance on how to us
 # Example usage:
 - Create an Esquema named "esquemaName".
 
-- Add static Data named "NIF" with the value "F12345".
+- Add static Data named "NIF" with the value "F12345". (When added the data will be "Unnamed data". You can rename it by double clicking on it, or delete it by pressing "delete" key while the item is selected.)
 
 - Add a formula named "Total" and write a path to find the total amount of the bill. For example, add a function "Find" to locate the text in the upper line, then add "move line" to move one line down, followed by "Extract Data" up until the end of the line (\n, or until a space " ", etc.), and finally, perhaps append " €" at the end of the extracted string.
 
@@ -36,14 +36,16 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 2 cells, stating "F12345" and "Whatever-Total-was-extracted-from-the-pdf".
 
 # Future updates
-- Serialization to store the created Esquemas.
+- Serialization to store the created Esquemas and functionality to delete created ones or reorder them.
 - A feature to rename the parsed PDF files to a custom format that includes extracted values (e.g., "$date_$companyName_etc.pdf") for easier archiving and relocation to another folder.
 - Functionality to rename the extracted CSV files and specify a destination location.
+- Functionality to ensure that no two formulas or static data have the same name (right now it's a mess of you do that).
 - Additional functions to enhance capabilities related to extracting variables from the pdf.
 - Implementation of a verification mechanism to ensure the accuracy of extracted variables, with user notification for possible discrepancies.
 - Improvement of the CSV structure definition method to mitigate user errors.
 - Integration of tooltips, text placeholders, and other user-friendly navigation aids.
 - Continued code refinement, reorganization, and documentation for enhanced clarity and maintainability.
+- Visual enchancing
 
 # Licencing
 Copyright (c) 2024 Ignasi Camps
