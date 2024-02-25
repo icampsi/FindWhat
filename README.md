@@ -6,8 +6,8 @@ THIS PROGRAM IS CURRENTLY UNDER CONSTRUCTION and some functionalities may not wo
 *This program is part of a larger application that initially allows users to extract data from PDFs (using FindWhat), followed by sorting this data to generate customized .rtf and .pdf bills, which are then sent to a list of email addresses. Currently, I am utilizing both programs for a housing cooperative. We receive 32 monthly utility bills from various companies and need to extract diverse values from them to create 24 bills, one for each house, and subsequently send them via email. The bill creation program is currently inflexible and tailored specifically to our case. However, I plan to enhance its flexibility, like I'm doing with FindWhat, and eventually make it publicly available on GitHub. This would enable other housing cooperatives or individuals with similar needs to utilize it freely.
 
 # Dependencies:
-- Poppler (for converting PDF files into text)
-- QT
+- Poppler (for converting PDF files into text)  -  https://poppler.freedesktop.org/
+- QT                                            -  https://www.qt.io
 
 # How to use
 The program is not yet intuitive and does not provide much guidance on how to use it. To get started, experiment with it and keep the following points in mind:
