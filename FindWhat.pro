@@ -35,6 +35,7 @@ SOURCES += \
     ui/WToolBarEsquema.cpp \
     ui/WToolbarPreview.cpp \
     ui/dialogs/NewEsquema_dlg.cpp \
+    ui/dialogs/exportCSVProgressBar_dlg.cpp \
     ui/dockspreadsheet.cpp \
     ui/mainwindow.cpp \
     utils/CTextExtractor.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     ui/WToolBarEsquema.h \
     ui/WToolbarPreview.h \
     ui/dialogs/NewEsquema_dlg.h \
+    ui/dialogs/exportCSVProgressBar_dlg.h \
     ui/dockspreadsheet.h \
     ui/mainWindow.h \
     ui/wesquematreeview.h \
@@ -77,12 +79,12 @@ INCLUDEPATH += \
 
 # Form files
 FORMS += \
-    exportcsvprogressbar_dlg.ui \
     ui/PEsquemaPage.ui \
     ui/WDockPreview.ui \
     ui/WFormExpToolBoxPage.ui \
     ui/WLoadedEsquemes.ui \
     ui/WMainEsquemaUI.ui \
+    ui/dialogs/ExportCSVProgressBar_dlg.ui \
     ui/dialogs/NewEsquema_dlg.ui \
     ui/dockspreadsheet.ui \
     ui/mainwindow.ui \
