@@ -71,7 +71,7 @@ HEADERS += \
 
 # Include paths
 INCLUDEPATH += \
-    "C:/Users/brams/source/Libs/vcpkg/installed/x64-windows/include"
+    "poppler/include"
 
 # Form files
 FORMS += \
@@ -85,13 +85,27 @@ FORMS += \
     ui/mainwindow.ui \
     ui/prova.ui
 
+# Define the source directory for Poppler
+POPLLER_SOURCE_DIR = $$PWD/poppler
+
+# Define the destination directory for Poppler in the build directory
+POPLLER_BUILD_DIR = $$OUT_PWD/poppler
+
+# Create the destination directory if it doesn't exist
+exists($$POPLLER_BUILD_DIR) {
+    system(mkdir $$POPLLER_BUILD_DIR)
+}
+
+# Copy the Poppler files into the build directory
+QMAKE_PRE_LINK += $$POPLLER_SOURCE_DIR/* $$POPLLER_BUILD_DIR/
+
 # Debug and Release library linking
 debug {
-    LIBS += -L"C:/Users/brams/source/Libs/vcpkg/installed/x64-windows/debug/lib" \
+    LIBS += -L$$POPLLER_BUILD_DIR/debug/lib \
             -lpoppler \
             -lpoppler-cpp
 } else {
-    LIBS += -L"C:/Users/brams/source/Libs/vcpkg/installed/x64-windows/lib" \
+    LIBS += -L$$POPLLER_BUILD_DIR/lib \
             -lpoppler \
             -lpoppler-cpp
 }

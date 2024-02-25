@@ -23,6 +23,11 @@
  * as published by the Free Software Foundation. See https://www.qt.io/licensing/ for more information.
 */
 
+/*
+ * This program uses poppler for pdf to text conversion, which is available under the terms of the GNU General Public License (GPL) version 3,
+ * as published by the Free Software Foundation. See https://poppler.freedesktop.org/ for more information.
+*/
+
 #include "ui/mainwindow.h"
 #include <QApplication>
 

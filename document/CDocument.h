@@ -17,7 +17,7 @@ protected:
 
 public:
     // Getters and setters
-    QString getDocName() { return m_docName; }
+    QString getDocName()             { return m_docName; }
     void setDocName(QString docName) { m_docName = docName; }
 };
 

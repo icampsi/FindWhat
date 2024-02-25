@@ -33,7 +33,7 @@ void CTextExtractor::PDFToTextPoppler(const QString& inName, QString& text) {
     }
 
     bool previousSpace  = false; // Flag to track if the current character is the first in the line
-    bool firstChar      = true; // Flag to track if the previous character was a space
+    bool firstChar      = true;  // Flag to track if the previous character was a space
 
     for (int i = 0; i < line.length(); ++i) {
         QChar c = line.at(i);        // Check for newline characters (CR or LF)
