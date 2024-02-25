@@ -58,21 +58,37 @@ void WMainEsquemaUI::on_pushButton_clicked() {
     std::vector<std::vector<CData*>> xsvStructure;
     // Get all the loaded exportCSV as a vector
     std::vector<CExportCSV*> exportCSVs = CMDoc::getMDoc().getExportPathDoc().getExportCSVs();
-    std::vector<std::vector<CData*>> newData;
-    for (CExportCSV* it : exportCSVs) {
-        // Pass the string taken from the textedit in the WFormExpToolBoxPage to the selected esquema
-        it->getAsocEsquemaDoc()->getEsquema()->setCsvFormatFormula(it->getCSVFormat(), '\"',',');
-        // Build the structure
-        newData = it->buildXSVStructure();
-        // Append it to the global file structure
-        xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
-    }
-    // Create .csv File from the structure
-    CMDoc::getMDoc().getExportPathDoc().xsvm_structureToFile("prova.csv", xsvStructure, ',');
-    ui->pushButton->setEnabled(true);
-    QMessageBox::information(this,"Succes!", ".csv file created succesfully");
-}
 
+    // Checks the ammount of work that will be needed to set up the progress bar dialog (and to check if actually anything is needed)
+    int fileCount = 0;
+    for (CExportCSV* it : exportCSVs) {
+        fileCount += it->getFilePaths().size();
+    }
+    // Creates a progressBar dialog and sets its progress bar range to match fileCount
+    if(fileCount > 0) {
+        exportCSVProgressBar_dlg *progressDlg = new exportCSVProgressBar_dlg(fileCount, this);
+        progressDlg->show();
+        // Process pending events to update the UI
+        QCoreApplication::processEvents();
+
+        std::vector<std::vector<CData*>> newData;
+        for (CExportCSV* it : exportCSVs) {
+            // Pass the string taken from the textedit in the WFormExpToolBoxPage to the selected esquema
+            it->getAsocEsquemaDoc()->getEsquema()->setCsvFormatFormula(it->getCSVFormat(), '\"',',');
+            // Build the structure
+            newData = it->buildXSVStructure(progressDlg);
+            // Append it to the global xsvm structure
+            xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
+        }
+        // Create .csv File from the structure
+        CMDoc::getMDoc().getExportPathDoc().xsvm_structureToFile("extractedText.csv", xsvStructure, ',');
+        // Delete progress dialog for closing
+        delete progressDlg;
+        progressDlg = nullptr;
+    }
+
+    ui->pushButton->setEnabled(true);
+}
 
 void WMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
     dynamic_cast<EsquemaPage*>(ui->stackedWidget_esquemaPage->currentWidget())->updateFunctionProcess();

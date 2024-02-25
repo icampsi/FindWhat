@@ -104,6 +104,7 @@ public:
             }
             out << '\n';
         }
+        QMessageBox::information(nullptr, "Succes!", ".csv file created succesfully");
     }
 };
 #endif // CESQUEMADOC_H

@@ -57,7 +57,6 @@ void CTextExtractor::PDFToTextPoppler(const QString& inName, QString& text) {
             firstChar     = false;
         }
     }
-
     outputFile.close();
     delete doc;
 }

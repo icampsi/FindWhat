@@ -2,6 +2,7 @@
 #define CEXPORTCSV_H
 
 #include <QString>
+#include "exportCSVProgressBar_dlg.h"
 #include "src/CData.h"
 
 class CEsquemaDoc;
@@ -19,7 +20,8 @@ protected:
 
 public:
     // Functions to add and delete PDF file paths
-    void addPdfFile(const QString& path) { m_pdfFilePaths.push_back(path); }
+    void addPdfFile(const QString& path)             { m_pdfFilePaths.push_back(path); }
+    const std::vector<QString>& getFilePaths() const { return m_pdfFilePaths; }
     void deletePdfFile(int index);
 
     // Function to reorder files inside the vector
@@ -39,7 +41,7 @@ public:
     }
 
     // Public function to build XSV structure
-    std::vector<std::vector<CData*>> buildXSVStructure();
+    std::vector<std::vector<CData*>> buildXSVStructure(exportCSVProgressBar_dlg *progressDialog = nullptr);
 };
 
 #endif // CEXPORTCSV_H

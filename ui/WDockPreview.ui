@@ -36,7 +36,14 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QPlainTextEdit" name="TextDisplayer"/>
+             <widget class="QPlainTextEdit" name="TextDisplayer">
+              <property name="lineWrapMode">
+               <enum>QPlainTextEdit::NoWrap</enum>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

@@ -1,10 +1,11 @@
 #include "CExportCSV.h"
+#include "qcoreapplication.h"
 #include "src/CEsquema.h"
 #include "utils/CTextExtractor.h"
 #include "CDocumentSubclasses.h"
 
 
-std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure() {
+std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure(exportCSVProgressBar_dlg *progressDialog) {
     std::vector<std::vector<CData*>> xsvStructure;
     QString text;
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
@@ -15,6 +16,8 @@ std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure() {
         for(auto& j : esquema->getXSVStructureResult()) {
             xsvStructure.push_back(j);
         }
+        QCoreApplication::processEvents();
+        progressDialog->updateProgress();
     }
 
     return xsvStructure;

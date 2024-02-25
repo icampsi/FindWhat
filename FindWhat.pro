@@ -15,6 +15,7 @@ SOURCES += \
     document/CDocumentSubclasses.cpp \
     document/CExportCSV.cpp \
     document/CMDoc.cpp \
+    exportCSVProgressBar_dlg.cpp \
     src/CData.cpp \
     src/CEsquema.cpp \
     src/CFormula.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     document/CDocumentSubclasses.h \
     document/CExportCSV.h \
     document/CMDoc.h \
+    exportCSVProgressBar_dlg.h \
     src/CData.h \
     src/CEsquema.h \
     src/CFormula.h \
@@ -75,6 +77,7 @@ INCLUDEPATH += \
 
 # Form files
 FORMS += \
+    exportcsvprogressbar_dlg.ui \
     ui/PEsquemaPage.ui \
     ui/WDockPreview.ui \
     ui/WFormExpToolBoxPage.ui \
@@ -85,27 +88,13 @@ FORMS += \
     ui/mainwindow.ui \
     ui/prova.ui
 
-# Define the source directory for Poppler
-POPLLER_SOURCE_DIR = $$PWD/poppler
-
-# Define the destination directory for Poppler in the build directory
-POPLLER_BUILD_DIR = $$OUT_PWD/poppler
-
-# Create the destination directory if it doesn't exist
-exists($$POPLLER_BUILD_DIR) {
-    system(mkdir $$POPLLER_BUILD_DIR)
-}
-
-# Copy the Poppler files into the build directory
-QMAKE_PRE_LINK += $$POPLLER_SOURCE_DIR/* $$POPLLER_BUILD_DIR/
-
 # Debug and Release library linking
 debug {
-    LIBS += -L$$POPLLER_BUILD_DIR/debug/lib \
+    LIBS += -L"./poppler/debug/lib" \
             -lpoppler \
             -lpoppler-cpp
 } else {
-    LIBS += -L$$POPLLER_BUILD_DIR/lib \
+    LIBS += -L"./poppler/lib" \
             -lpoppler \
             -lpoppler-cpp
 }
