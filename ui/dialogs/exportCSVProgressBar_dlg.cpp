@@ -1,4 +1,4 @@
-#include "exportCSVProgressBar_dlg.h"
+#include "ExportCSVProgressBar_dlg.h"
 #include "ui_ExportCSVProgressBar_dlg.h"
 
 exportCSVProgressBar_dlg::exportCSVProgressBar_dlg(int progressSize, QWidget *parent)

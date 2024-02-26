@@ -15,7 +15,6 @@ SOURCES += \
     document/CDocumentSubclasses.cpp \
     document/CExportCSV.cpp \
     document/CMDoc.cpp \
-    exportCSVProgressBar_dlg.cpp \
     src/CData.cpp \
     src/CEsquema.cpp \
     src/CFormula.cpp \
@@ -35,8 +34,7 @@ SOURCES += \
     ui/WToolBarEsquema.cpp \
     ui/WToolbarPreview.cpp \
     ui/dialogs/NewEsquema_dlg.cpp \
-    ui/dialogs/exportCSVProgressBar_dlg.cpp \
-    ui/dockspreadsheet.cpp \
+    ui/dialogs/ExportCSVProgressBar_dlg.cpp \
     ui/mainwindow.cpp \
     utils/CTextExtractor.cpp \
     utils/GeneralFunctions.cpp
@@ -48,7 +46,6 @@ HEADERS += \
     document/CDocumentSubclasses.h \
     document/CExportCSV.h \
     document/CMDoc.h \
-    exportCSVProgressBar_dlg.h \
     src/CData.h \
     src/CEsquema.h \
     src/CFormula.h \
@@ -57,6 +54,7 @@ HEADERS += \
     ui/QCItemDelegateFormulaTreeView.h \
     ui/WBrowserTreeView.h \
     ui/WDockPreview.h \
+    ui/WEsquemaTreeView.h \
     ui/WFormExpToolBoxPage.h \
     ui/WLoadedEsquemes.h \
     ui/WLoadedFilesTreeView.h \
@@ -65,11 +63,9 @@ HEADERS += \
     ui/WSpreadSheetTableModel.h \
     ui/WToolBarEsquema.h \
     ui/WToolbarPreview.h \
+    ui/dialogs/ExportCSVProgressBar_dlg.h \
     ui/dialogs/NewEsquema_dlg.h \
-    ui/dialogs/exportCSVProgressBar_dlg.h \
-    ui/dockspreadsheet.h \
     ui/mainWindow.h \
-    ui/wesquematreeview.h \
     utils/CTextExtractor.h \
     utils/GeneralFunctions.h
 
@@ -86,9 +82,7 @@ FORMS += \
     ui/WMainEsquemaUI.ui \
     ui/dialogs/ExportCSVProgressBar_dlg.ui \
     ui/dialogs/NewEsquema_dlg.ui \
-    ui/dockspreadsheet.ui \
-    ui/mainwindow.ui \
-    ui/prova.ui
+    ui/mainwindow.ui
 
 # Debug and Release library linking
 debug {

@@ -2,7 +2,7 @@
 #define CEXPORTCSV_H
 
 #include <QString>
-#include "exportCSVProgressBar_dlg.h"
+#include "ui/dialogs/ExportCSVProgressBar_dlg.h"
 #include "src/CData.h"
 
 class CEsquemaDoc;
