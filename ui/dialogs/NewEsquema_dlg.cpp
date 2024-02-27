@@ -1,9 +1,8 @@
-#include <QAbstractButton>
-
 #include "NewEsquema_dlg.h"
 #include "ui/mainwindow.h"
 #include "ui_NewEsquema_dlg.h"
 
+#include <QAbstractButton>
 #include "qmessagebox.h"
 
 #include "document/CMDoc.h"
@@ -45,7 +44,7 @@ void newEsquema_dlg::on_buttonBox_accepted() {
 
     // Check and loads it to the ui
     if(esquemaDoc && esquema) mainWin->loadEsquema(esquemaDoc);
-    else           qDebug() << "Failed to create CEsquemaDoc.";
+    else                      qDebug() << "Failed to create CEsquemaDoc.";
 
     delete this;
 }

@@ -9,7 +9,6 @@
 
 #include "src/CEsquema.h"
 #include "src/CFormula.h"
-#include "dialogs/NewEsquema_dlg.h"
 #include "document/CDocumentSubclasses.h"
 
 namespace Ui { class esquemaPage; }
@@ -23,25 +22,25 @@ public:
 
     EsquemaPage() = default;
     ~EsquemaPage();
-    QStandardItemModel *model_esquema;
+
     void newFormula();
-    void setMockString(QString mockString) { m_mockString = mockString; }
+
     CEsquemaDoc* getEsquemaDoc() { return m_esquemaDoc; }
 
 protected:
     Ui::esquemaPage *ui;
-
-    QMap<QStandardItem*, CEsquema*>     m_itemEsquemaMap;
-    QMap<QStandardItem*, CFormula*>     m_itemFormulaMap;
+    // Maps for conecting the items in the views with their object
+    QMap<QStandardItem*  , CEsquema* >  m_itemEsquemaMap;
+    QMap<QStandardItem*  , CFormula* >  m_itemFormulaMap;
     QMap<QListWidgetItem*, CFunction*>  m_itemFunctionMap;
-    QMap<QStandardItem*, CData*>        m_itemDataMap;
-    newEsquema_dlg* newEsquemadlg = nullptr;
+    QMap<QStandardItem*  , CData*    >  m_itemDataMap;
 
     CFormula    *m_loadedFormula    = nullptr;
     CData       *m_loadedStaticData = nullptr;
     CFunction   *m_activeFunction   = nullptr;
-    QString      m_mockString;
     CEsquemaDoc *m_esquemaDoc;
+
+    QStandardItemModel *model_esquema; // Pretty sure this should be deleted in the constructor but program crashes when I try it, even with a check for double deletition. I'll check latter
 
     void newStaticData();
     void loadEsquema();
@@ -59,12 +58,16 @@ private slots:
     void on_listWidget_formula_itemSelectionChanged();
     void on_pushButton_addFormula_clicked();
     void on_pushButton_addStaticData_clicked();
+    void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void handleItemEditFinish(const QModelIndex &index, const QString &text);
     // MANAGE FUNCTIONS
     void on_btn_newFunction_clicked();
     void on_lineEdit_functionName_textChanged(const QString &arg1);
     void on_pushButton_deleteFunctin_clicked();
 
     // STACKED BOX UI
+    // STATIC DATA
+    void on_plainTextEdit_staticDataString_textChanged();
     // FIND FUNCTION UI
     void on_lineEdit_textToFind_textChanged(const QString &arg1);
     void on_comboBox_setIndexAt_currentIndexChanged(int index);
@@ -85,11 +88,8 @@ private slots:
     void on_spinBox_moveIndex_valueChanged(int arg1);
     void on_comboBox_typeOfData_currentIndexChanged(int index);
 
+    // Menú actions for the "new function" push button
     void handle_newFunActions(CFunction::FunctionType functionType);
-    void on_plainTextEdit_staticDataString_textChanged();
-
-    void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
-    void handleItemEditFinish(const QModelIndex &index, const QString &text);
 
 signals:
     void functionUpdated(CFormula::IndexPosition index, QString result);

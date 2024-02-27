@@ -10,11 +10,11 @@
 
 class WEsquemaTreeView : public QTreeView {
     Q_OBJECT
-protected:
-    void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting child elements
-
 public:
     WEsquemaTreeView(QWidget *parent = nullptr);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting child elements
 
 signals:
     void itemChanged(const QModelIndex &index, const QString &newText);

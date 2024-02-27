@@ -97,7 +97,7 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget_dataOrFormula">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="Data">
              <widget class="QPlainTextEdit" name="plainTextEdit_staticDataString">

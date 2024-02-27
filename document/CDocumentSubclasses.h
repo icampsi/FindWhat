@@ -30,7 +30,7 @@ class CPdfDoc : public CDocument {
 public:
     //Constructors and destructors
     CPdfDoc(const QString& filePath) : m_filePath{filePath} {
-        PDFToTextPoppler(m_filePath);
+        PDFToTextPoppler();
     }
     ~CPdfDoc() = default;
 
@@ -40,7 +40,7 @@ public:
 
 private:
     // Private Functions
-    void PDFToTextPoppler(const QString& inName);
+    void PDFToTextPoppler();
 
 protected:
     // Members

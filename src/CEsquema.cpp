@@ -1,12 +1,12 @@
 #include "CEsquema.h"
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
-    : m_valorsEstatics(valorsEstatics), m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
-    m_dataForCheck1(), m_dataForCheck2(), m_csvFormatFormula(), m_outputDirectori(), m_fileNameFormula(), m_XSVStructureResult() {}
+    : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_valorsEstatics(valorsEstatics),
+    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNameFormula(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
-    m_dataForCheck1(), m_dataForCheck2(), m_csvFormatFormula(), m_outputDirectori(), m_fileNameFormula(), m_XSVStructureResult() {}
+    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNameFormula(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
@@ -58,7 +58,6 @@ void CEsquema::renameFile(const char* oldName, const char* newName) {
 }
 
 // void CEsquema::createFileName(CFileData& file) {
-
 //     QString tempStr{ "" };
 //     int dataIndex;
 
@@ -82,83 +81,6 @@ void CEsquema::renameFile(const char* oldName, const char* newName) {
 //         if (m_fileNameFormula[i] != '$') { file.m_newFileName.append(m_fileNameFormula.at(i)); }
 //     }
 // }
-
-// void CEsquema::createFileData(QString& text, CFileData& file) {
-//     // VALORS VARIABLES -----------------------------------------------------------------
-
-//     /*
-//     for (int i{0}; i < m_extractDataFormula.size(); i++) {
-//         m_extractDataFormula[i].applyFormula(text, &file.m_extractedFileData);
-//         CData t_data(m_extractDataFormula[i].m_dataName, m_extractDataFormula[i].m_result);
-//         m_extractDataFormula[i].m_result = "";
-//         file.m_extractedFileData.push_back(t_data);
-//     }
-//     */
-
-//     //for (int i{ 0 }; i < m_extractDataFormula.size(); i++) {
-//     //	CData data = extractData(text, m_extractDataFormula[i]);
-//     //	file.m_extractedFileData.push_back(data);
-//     //	if (data.m_error == true) { file.m_error = true; }
-//     //}
-
-//     // CHECK IF "IVA + BI = TOTAL" I CANVIEM NOM DEL PDF ORIGINAL ------------------------
-//     //if (checkData(file)) { file.m_error = true; } // ================================== NO FUNCIONA BÉ!!!!!!!!!!!!!!
-// }
-
-// ============================================================================================================================
-// ============================================================================================================================
-// ============================================================================================================================
-
-// bool CEsquema::checkData(CFileData& file) {
-//      bool error = false;
-//     // {
-//     //     float value1{ file.m_extractedFileData[m_dataForCheck1[0]].m_dataFloat };
-//     //     float value2{ file.m_extractedFileData[m_dataForCheck1[1]].m_dataFloat };
-//     //     float value3{ file.m_extractedFileData[m_dataForCheck1[2]].m_dataFloat };
-
-//     //     float prova = value1 + value2;
-//     //     if (!(value3 < prova + 0.0001 && value3 > prova - 0.0001)) { error = true; }
-//     // }
-
-//     // for (int i{ 0 }; i < file.m_extractedFileData.size(); i++) {
-//     //     if (file.m_extractedFileData[i].m_error) { error = true; }
-//     //     if (file.m_extractedFileData[i].m_dataString.isEmpty()) { error = true; }
-//     // }
-
-//      return error;
-// }
-
-//CData CEsquema::extractData(QString& text, extractDataFormula currentFormula) {   // Extreu els valors variables a partir de les formules
-//	QString extractedString{ "" };
-//
-//	size_t index = text.find(currentFormula.referenceText);
-//	if (index == QString::npos) { std::cout << "No s'ha trobat el text: " + currentFormula.referenceText << std::endl; }
-//	else {
-//		if (currentFormula.beginLine) {
-//			while (index != 0) { // Garanteix que l'index sempre comenci al principi de la línia
-//				index--;
-//				if (text[index] == '\n') {
-//					index++;
-//					break;
-//				}
-//			}
-//		}
-//		else {
-//			if (currentFormula.lineCount == 0) { index += currentFormula.referenceText.length(); }
-//			else { moveLine(currentFormula.lineCount, index, text); }
-//		}
-//
-//		for (index; text[index] != currentFormula.endingChar; index++) {
-//			extractedString += text[index];
-//		}
-//	}
-//
-//	if (currentFormula.DataName == "data") {
-//		formatDate(extractedString);
-//	}
-//	CData data(currentFormula.DataName, extractedString, currentFormula.dataType, "", "");
-//	return data;
-//}
 
 void CEsquema::deleteFormula(int index) {
     if (index >= 0 && index < t_extractDataFormula.size()) {

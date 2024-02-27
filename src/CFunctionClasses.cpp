@@ -42,5 +42,5 @@ CIndexingFunction::CIndexingFunction(const CIndexingFunction &other)
 
 CExtractingFunction::CExtractingFunction(FunctionType name) : CFunction(name) {}
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
-    : CFunction(other.m_functionType), m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid},
-    m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_endingString{other.m_endingString}, m_invertDirection{other.m_invertDirection} {}
+    : CFunction(other.m_functionType), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_endingString{other.m_endingString},
+    m_invertDirection{other.m_invertDirection}, m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid} {}

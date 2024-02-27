@@ -24,6 +24,10 @@ void WLoadedEsquemes::newEsquema(EsquemaPage *page, CEsquema *esquema) {
 // SLOTS
 void WLoadedEsquemes::on_list_esquemes_itemSelectionChanged() {
     QListWidgetItem *item = ui->list_esquemes->selectedItems().front();
-    dynamic_cast<WMainEsquemaUI*>(parentWidget())->changeCurrentPage(m_itemPageMap[item]);
+    if(item) {
+        WMainEsquemaUI *parent = dynamic_cast<WMainEsquemaUI*>(parentWidget());
+        if(parent) {
+            parent->changeCurrentPage(m_itemPageMap[item]);
+        } else qDebug() << "No item selected in list_esquemes";
+    } else qDebug() << "Selected item not found in m_itemPageMap";
 }
-

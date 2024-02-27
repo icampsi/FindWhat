@@ -41,7 +41,6 @@ SOURCES += \
 
 # Header files
 HEADERS += \
-    CFileData.h \
     document/CDocument.h \
     document/CDocumentSubclasses.h \
     document/CExportCSV.h \

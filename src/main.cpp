@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     mainWindow w;
-    w.showMaximized(); // Show the main window in full screen
+    w.showMaximized();
 
     w.show();
     return a.exec();

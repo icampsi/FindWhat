@@ -45,14 +45,11 @@ public:
     // FORMULA FUNCTIONS
     QString applyFormula(QString& text, unsigned int from = 0, int to = -1);
 
-    inline int  findText(QString& text , CIndexingFunction* pFunctionToApply);
-    inline void moveIndex(QString& text, CIndexingFunction* pFunctionToApply) {
-        m_indexPosition.initial += pFunctionToApply->getNum();
-        m_indexPosition.final    = m_indexPosition.initial;
-    }
-    inline void moveLine(QString& text, CIndexingFunction* pFunctionToApply);
-    inline void BeginLine(QString& text); // Col·loca l'index al principi de la línia actual
-    inline void EndLine(QString& text); // Col·loca l'index al final de la línia actual
+    inline int  findText(QString&  text, CIndexingFunction* pFunctionToApply);
+    inline void moveIndex(QString& text, CIndexingFunction* pFunctionToApply);
+    inline void moveLine(QString&  text, CIndexingFunction* pFunctionToApply);
+    inline void BeginLine(QString& text); // Sets index at the begining of current line
+    inline void EndLine(QString&   text); // Sets index at the begining of current line
 
     inline void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends data to m_result
         if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
@@ -70,38 +67,10 @@ public:
         function->setParent(this);
         m_formulaPath.push_back(function);
     }
-    void deleteFunction(int index) {
-        delete m_formulaPath[index];
-        m_formulaPath.erase(m_formulaPath.begin() + index);
-    }
+    void deleteFunction(int index);
 
     // Moves object from one index to another
-    void reorderFunctionPath(int objectToMoveIndex, int destinationIndex) {
-        if (objectToMoveIndex < 0 || objectToMoveIndex >= m_formulaPath.size() ||
-            destinationIndex < 0 || destinationIndex >= m_formulaPath.size()) {
-            qDebug() << "Invalid object index or destination index";
-            return;
-        }
-
-        if (objectToMoveIndex == destinationIndex) {
-            // No need to move if the indices are the same
-            return;
-        }
-
-        if (objectToMoveIndex < destinationIndex) {
-            // Move forward: Move the element at objectToMoveIndex to destinationIndex,
-            // shifting the elements between them to the left
-            std::rotate(m_formulaPath.begin() + objectToMoveIndex,
-                        m_formulaPath.begin() + objectToMoveIndex + 1,
-                        m_formulaPath.begin() + destinationIndex + 1);
-        } else {
-            // Move backward: Move the element at objectToMoveIndex to destinationIndex,
-            // shifting the elements between them to the right
-            std::rotate(m_formulaPath.begin() + destinationIndex,
-                        m_formulaPath.begin() + objectToMoveIndex,
-                        m_formulaPath.begin() + objectToMoveIndex + 1);
-        }
-    }
+    void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);
     void clearPath() { m_formulaPath.clear();}
 };
 

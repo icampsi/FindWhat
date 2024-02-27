@@ -1,4 +1,5 @@
 #include "WMainEsquemaUI.h"
+#include "qtpreprocessorsupport.h"
 #include "ui_WMainEsquemaUI.h"
 #include "PEsquemaPage.h"
 #include "WFormExpToolBoxPage.h"
@@ -89,7 +90,15 @@ void WMainEsquemaUI::on_pushButton_clicked() {
 
     ui->pushButton->setEnabled(true);
 }
-
 void WMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
-    dynamic_cast<EsquemaPage*>(ui->stackedWidget_esquemaPage->currentWidget())->updateFunctionProcess();
+    Q_UNUSED(filePath);
+
+    QWidget *currentWidget   = ui->stackedWidget_esquemaPage->currentWidget();
+    EsquemaPage *esquemaPage = qobject_cast<EsquemaPage*>(currentWidget);
+
+    if (esquemaPage) {
+        esquemaPage->updateFunctionProcess();
+    } else {
+        qDebug() << "Current widget is not an instance of EsquemaPage";
+    }
 }

@@ -1,18 +1,6 @@
 #include "CFormula.h"
 #include <QDebug>
 
-void inline comaToDot(QString& textWithComa, QString& emptyStr) {
-    emptyStr.clear();  // Clear the result string if it contains any previous content
-    emptyStr.reserve(textWithComa.size());  // Reserve memory to avoid reallocations
-    for (unsigned int i{ 0 }; i < textWithComa.size(); i++) {
-        if (textWithComa[i] == ',') {
-            emptyStr += '.';
-        }
-        else {
-            emptyStr += textWithComa[i];
-        }
-    }
-}
 // Copy constructor
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     // Copy simple members
@@ -20,8 +8,8 @@ CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     m_indexPosition = other.m_indexPosition;
 
     // Deep copy of the formula path vector
-    for (CFunction* function : other.m_formulaPath) {
-        CFunction* castedFunction = castedFunction = dynamic_cast<CIndexingFunction*>(function);
+    for (CFunction *function : other.m_formulaPath) {
+        CFunction *castedFunction = castedFunction = dynamic_cast<CIndexingFunction*>(function);
 
         // I am creating a new function for ensuring livespan of it. Probably need to rethink this part when i understand better how QStandarditem works
         if(castedFunction) {
@@ -45,7 +33,6 @@ CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
                 m_formulaPath.push_back(mathFunction);
             }
         }
-
         if(!castedFunction) throw "couldn't cast";
     }
 }
@@ -66,7 +53,7 @@ CFormula& CFormula::operator=(const CFormula& other) {
 
         // Perform deep copy of the formula path from 'other'
         for (CFunction* function : other.m_formulaPath) {
-            // Perform deep copy based on function type (similar to copy constructor)
+            // Perform deep copy based on function type
             CFunction* newFunction = nullptr;
             if (auto indexFunction = dynamic_cast<CIndexingFunction*>(function)) {
                 newFunction = new CIndexingFunction(*indexFunction);
@@ -84,14 +71,9 @@ CFormula& CFormula::operator=(const CFormula& other) {
     return *this;
 }
 
-
-// Destructor to release memory held by m_formulaPath
 CFormula::~CFormula() {
-    // Release memory held by CFunctionContent instances
     for (CFunction* function : m_formulaPath) {
-        if (function) {
-            delete function;
-        }
+        if (function) delete function;
     }
 }
 
@@ -165,6 +147,19 @@ inline int CFormula::findText(QString& text, CIndexingFunction* pFunctionToApply
         qDebug() << "Couldn't find string '" << pFunctionToApply->getText() << "' for: '" << m_data.getDataName() << "'";
         return -1;
     }
+    return 0;
+}
+
+inline void CFormula::moveIndex(QString& text, CIndexingFunction* pFunctionToApply) {
+    int newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
+    // Check if the new index is within bounds
+    if (newIndex >= 0 && newIndex < text.size()) {
+        m_indexPosition.initial = newIndex;
+        m_indexPosition.final   = m_indexPosition.initial;
+    }
+    else {
+        qDebug() << "New index out of bounds";
+    }
 }
 
 void CFormula::moveLine(QString& text, CIndexingFunction* pFunctionToApply) {
@@ -235,6 +230,7 @@ inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vecto
     }
 }
 
+// Functions related to CMathFunction are still unused and not working
 inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer) {
 
     QString sortedVal2;
@@ -435,5 +431,48 @@ void CFormula::extractDataInverted(QString& text, CExtractingFunction* pFunction
 
         allowed = false;
         avoided = false;
+    }
+}
+
+void CFormula::deleteFunction(int index) {
+    // Check if the index is within bounds
+    if (index >= 0 && index < m_formulaPath.size()) {
+        // Check if the pointer at the specified index is valid
+        if (m_formulaPath[index]) {
+            // Delete function from vector
+            delete m_formulaPath[index];
+            m_formulaPath.erase(m_formulaPath.begin() + index);
+        } else {
+            qDebug() << "Pointer at index" << index << "is null";
+        }
+    } else {
+        qDebug() << "Index" << index << "is out of bounds";
+    }
+}
+
+void CFormula::reorderFunctionPath(int objectToMoveIndex, int destinationIndex) {
+    if (objectToMoveIndex < 0 || objectToMoveIndex >= m_formulaPath.size() ||
+        destinationIndex  < 0 || destinationIndex >= m_formulaPath.size()) {
+        qDebug() << "Invalid object index or destination index";
+        return;
+    }
+
+    if (objectToMoveIndex == destinationIndex) {
+        // No need to move if the indices are the same
+        return;
+    }
+
+    if (objectToMoveIndex < destinationIndex) {
+        // Move forward: Move the element at objectToMoveIndex to destinationIndex,
+        // shifting the elements between them to the left
+        std::rotate(m_formulaPath.begin() + objectToMoveIndex,
+                    m_formulaPath.begin() + objectToMoveIndex + 1,
+                    m_formulaPath.begin() + destinationIndex + 1);
+    } else {
+        // Move backward: Move the element at objectToMoveIndex to destinationIndex,
+        // shifting the elements between them to the right
+        std::rotate(m_formulaPath.begin() + destinationIndex,
+                    m_formulaPath.begin() + objectToMoveIndex,
+                    m_formulaPath.begin() + objectToMoveIndex + 1);
     }
 }

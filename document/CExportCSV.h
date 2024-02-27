@@ -28,11 +28,11 @@ public:
     void reOrderFiles(int fileToMoveIndex, int targetPositionIndex);
 
     // Getters and setters
-    CEsquemaDoc* getAsocEsquemaDoc() const { return m_associatedEsquemaDoc; }
+    CEsquemaDoc* getAsocEsquemaDoc() const    { return m_associatedEsquemaDoc; }
     void setAsocEsquemaDoc(CEsquemaDoc* pDoc) { m_associatedEsquemaDoc = pDoc; }
 
     void setCSVFormat(const QString& string) { m_csvFormat = string; }
-    const QString& getCSVFormat() { return m_csvFormat; }
+    const QString& getCSVFormat()            { return m_csvFormat; }
 
     std::vector<QString> getPathFiles() const { return m_pdfFilePaths; }
     void setPathFiles(const std::vector<QString>& paths) {

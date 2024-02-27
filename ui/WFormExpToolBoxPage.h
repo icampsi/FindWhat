@@ -24,8 +24,6 @@ private slots:
 
     void on_checkBox_renameDocs_stateChanged(int arg1);
 
-    void on_lineEdit_renameDocs_textChanged(const QString &arg1);
-
 private:
     Ui::WExpFormToolBoxPage *ui;
     CExportCSV *m_exportCSV;

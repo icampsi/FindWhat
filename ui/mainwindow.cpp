@@ -1,26 +1,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QTabWidget>
-#include <QMessageBox>
 #include <QDebug>
-#include <qmap.h>
-#include "QToolButton"
+#include <QFileDialog>
 
 #include "document/CMDoc.h"
-#include "WDockPreview.h"
 
 // CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
 mainWindow::mainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::mainWindow) {
+    : QMainWindow(parent), newEsquemadlg{nullptr}, ui(new Ui::mainWindow) {
 
     ui->setupUi(this);
     // SetUp the Dock Prveiew Widget
     m_dockPreview = new WDockPreview(this);
     m_dockPreview->setAllowedAreas(Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, m_dockPreview);
+
     // Mediate between browserWidget and dockPreview
-    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview, &WDockPreview::handleFilePathChanged);
+    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &WDockPreview::handleFilePathChanged);
     connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &WMainEsquemaUI::handleFilePathChanged);
 
     // Menú actions connections
@@ -60,9 +57,11 @@ void mainWindow::action_newEsquema() {
 void mainWindow::action_loadEsquema() {
     QMessageBox::information(this, "Under Construction", "This action won't work until serialization is implemented");
 }
+
 void mainWindow::action_saveEsquema() {
     QMessageBox::information(this, "Under Construction", "This action won't work until serialization is implemented");
 }
+
 void mainWindow::on_btn_changeRoot_clicked() {
     QString newRootPath = QFileDialog::getExistingDirectory(this, tr("Select Root Directory"), QDir::homePath());
     if (!newRootPath.isEmpty()) {
@@ -76,9 +75,11 @@ void mainWindow::on_btn_changeRoot_clicked() {
 }
 
 void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
-    CEsquemaDoc* esquemaDoc = CMDoc::getMDoc().getActiveEsquemaDoc();
-    CEsquema* currentEsquema = nullptr;
-    if (esquemaDoc) currentEsquema = esquemaDoc->getEsquema();
+    Q_UNUSED(arg1);
+    CEsquemaDoc *esquemaDoc     = CMDoc::getMDoc().getActiveEsquemaDoc();
+    CEsquema    *currentEsquema = nullptr;
+
+    if (esquemaDoc)     currentEsquema = esquemaDoc->getEsquema();
     if (currentEsquema) currentEsquema->setCsvFormatFormula(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
 }
 

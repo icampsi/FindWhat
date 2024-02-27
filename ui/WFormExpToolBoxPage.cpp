@@ -68,7 +68,3 @@ void WFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
     else ui->lineEdit_renameDocs->setEnabled(false);
 }
 
-void WFormExpToolBoxPage::on_lineEdit_renameDocs_textChanged(const QString &arg1) {
-
-}
-

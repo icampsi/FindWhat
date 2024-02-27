@@ -8,7 +8,7 @@
 #include "poppler/cpp/poppler-document.h"
 #include "poppler/cpp/poppler-page.h"
 
-void CPdfDoc::PDFToTextPoppler(const QString& inName) {
+void CPdfDoc::PDFToTextPoppler() {
     // Check if the extension is .pdf. Else, return
     if (!m_filePath.endsWith(".pdf")) {
         return;

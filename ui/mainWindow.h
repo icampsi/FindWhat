@@ -3,21 +3,6 @@
 
 #include <QMainWindow>
 #include <QString>
-#include <QTabWidget>
-#include <QListWidgetItem>
-
-#include <QDir>
-
-#include <QFileDialog>
-#include <QFile>
-#include <QTextStream>
-#include <QFileSystemModel>
-#include <QPlainTextEdit>
-#include <QTabBar>
-
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QStandardItem>
 
 #include "WDockPreview.h"
 

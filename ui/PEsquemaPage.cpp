@@ -1,5 +1,6 @@
 #include "PEsquemaPage.h"
 #include "ui_PEsquemaPage.h"
+
 #include "QMenu"
 #include "mainWindow.h"
 
@@ -27,7 +28,7 @@ EsquemaPage::EsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     ui->treeView_Esquema->expandAll();
 
     connect(ui->treeView_Esquema, &WEsquemaTreeView::removeSecondLevel, this, &EsquemaPage::handleRemoveSecondLevel);
-    connect(this, &EsquemaPage::functionUpdated, dynamic_cast<mainWindow*>(getLastParent(this)), &mainWindow::functionUpdated);
+    connect(this, &EsquemaPage::functionUpdated, static_cast<mainWindow*>(getLastParent(this)), &mainWindow::functionUpdated);
     connect(ui->listWidget_formula->model(), &QAbstractItemModel::rowsMoved, this, &EsquemaPage::handleFunctionItemsMoved);
 }
 
@@ -44,23 +45,29 @@ EsquemaPage::~EsquemaPage() {
 
 // PUBLIC FUNCTIONS ----------------------------------------------------
 void EsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex) {
-    QStandardItem *item = dynamic_cast<QStandardItemModel*>(ui->treeView_Esquema->model())->itemFromIndex(ui->treeView_Esquema->model()->index(index, 0, parentIndex));
-    // HANDLE REMOVE STATICDATA
-    if(parentIndex.row() == 0) {
-        m_itemDataMap.remove(item);
-        m_esquemaDoc->getEsquema()->deleteStaticData(index);
-        ui->treeView_Esquema->model()->removeRow(index, parentIndex);
-    }
+    QStandardItemModel *itemModel = dynamic_cast<QStandardItemModel*>(ui->treeView_Esquema->model());
+    QStandardItem *item = nullptr;
 
-    // HANDLE REMOVE FORMULA
-    if(parentIndex.row() == 1) {
-        m_itemFormulaMap.remove(item);
-        m_esquemaDoc->getEsquema()->deleteFormula(index);
-        ui->treeView_Esquema->model()->removeRow(index, parentIndex);
-    }
+    if(itemModel) {
+        item = itemModel->itemFromIndex(ui->treeView_Esquema->model()->index(index, 0, parentIndex));
 
-    ui->treeView_Esquema->clearSelection();
-    ui->stackedWidget_general->setCurrentIndex(0);
+        // HANDLE REMOVE STATICDATA
+        if(parentIndex.row() == 0) {
+            m_itemDataMap.remove(item);
+            m_esquemaDoc->getEsquema()->deleteStaticData(index);
+            ui->treeView_Esquema->model()->removeRow(index, parentIndex);
+        }
+
+        // HANDLE REMOVE FORMULA
+        if(parentIndex.row() == 1) {
+            m_itemFormulaMap.remove(item);
+            m_esquemaDoc->getEsquema()->deleteFormula(index);
+            ui->treeView_Esquema->model()->removeRow(index, parentIndex);
+        }
+
+        ui->treeView_Esquema->clearSelection();
+        ui->stackedWidget_general->setCurrentIndex(0);
+    }
 }
 
 void EsquemaPage::loadFunction() {
@@ -82,9 +89,9 @@ void EsquemaPage::loadFunction() {
 
     updateFunctionProcess();
 
-    CIndexingFunction *indexingFunction = dynamic_cast<CIndexingFunction*>(function);
+    CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
-    CMathFunction *mathFunction = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
+    CMathFunction       *mathFunction       = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     QString parsedText;
     switch (function->getFunctionType()) {
     case CFunction::FunctionType::Find:
@@ -225,10 +232,15 @@ void EsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
     ui->stackedWidget_general->setCurrentIndex(1);
 
     // STATIC DATA
-    if(index.parent().row() == 0) {
+    if(index.parent().row() == 0) {       
         QStandardItem *retrievedDataItem = model_esquema->itemFromIndex(index);
+        // Load data member
         m_loadedStaticData = m_itemDataMap.value(retrievedDataItem);
+        // Update label and text editor
         ui->label_dataName->setText(m_loadedStaticData->getDataName());
+        // Update plainText editor
+        ui->plainTextEdit_staticDataString->setPlainText(m_loadedStaticData->getDataString());
+        // Set stacked widget page so it shows the data editor
         ui->stackedWidget_dataOrFormula->setCurrentIndex(0);
     }
 
@@ -247,10 +259,30 @@ void EsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
             ui->listWidget_formula->addItem(functionItem);
         }
         updateFunctionProcess();
+        // Set stacked widget page so it shows the formula editor
         ui->stackedWidget_dataOrFormula->setCurrentIndex(1);
     }
 }
 
+void EsquemaPage::handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
+    Q_UNUSED(parent);
+    Q_UNUSED(end);
+    Q_UNUSED(destination);
+
+    if(start < row) row--;
+    m_loadedFormula->reorderFunctionPath(start, row);
+}
+
+void EsquemaPage::handleItemEditFinish(const QModelIndex &index, const QString &text) {
+    if(index.parent().row() == 0) { // Handle Static Data Name edition
+        m_esquemaDoc->getEsquema()->setStaticDataName(m_loadedStaticData, text);
+        ui->label_dataName->setText(text);
+    }
+    else if(index.parent().row() == 1)  { // Handle formula name edition
+        m_esquemaDoc->getEsquema()->setFormulaName(m_loadedFormula, text);
+        ui->label_dataName->setText(m_loadedFormula->getDataName());
+    }
+}
 // MANAGE FUNCTIONS
 void EsquemaPage::on_btn_newFunction_clicked() {
     // Create a menu
@@ -273,27 +305,26 @@ void EsquemaPage::on_btn_newFunction_clicked() {
 
 void EsquemaPage::handle_newFunActions(CFunction::FunctionType functionType) {
     CFunction* newFunction = nullptr;
-
-    switch (functionType) {
-    case (CFunction::FunctionType::Find):
-    case CFunction::FunctionType::MoveIndex:
-    case CFunction::FunctionType::MoveLine:
-    case CFunction::FunctionType::AppendString:
-        newFunction = new CIndexingFunction(functionType);
-        break;
-    case CFunction::FunctionType::ExtractData:
-        newFunction = new CExtractingFunction(functionType);
-        break;
-    }
-
-    QListWidgetItem* item = new QListWidgetItem(newFunction->getFunctionTypeName());
-
+    QListWidgetItem* item  = nullptr;
     if(m_loadedFormula) {
+        switch (functionType) {
+        case (CFunction::FunctionType::Find):
+        case CFunction::FunctionType::MoveIndex:
+        case CFunction::FunctionType::MoveLine:
+        case CFunction::FunctionType::AppendString:
+            newFunction = new CIndexingFunction(functionType);
+            break;
+        case CFunction::FunctionType::ExtractData:
+            newFunction = new CExtractingFunction(functionType);
+            break;
+        }
+
+        item = new QListWidgetItem(newFunction->getFunctionTypeName());
         m_loadedFormula->addFunction(newFunction);
         m_itemFunctionMap[item] = newFunction;
         ui->listWidget_formula->addItem(item);
     }
-    else qDebug() << "No formula is been loaded yet";
+    else { qDebug() << "No formula is been loaded yet"; }
 
     if (ui->listWidget_formula != nullptr && ui->listWidget_formula->count() > 0) {
         int lastIndex = ui->listWidget_formula->count() - 1;
@@ -303,7 +334,7 @@ void EsquemaPage::handle_newFunActions(CFunction::FunctionType functionType) {
         QMessageBox* messageBox = new QMessageBox(QMessageBox::Warning, "Formula required", "You need to select a formula first", QMessageBox::Ok);
         messageBox->exec();
         delete messageBox; // Deleting the QMessageBox object
-    }
+    }  
 }
 
 void EsquemaPage::on_lineEdit_functionName_textChanged(const QString &arg1) {
@@ -389,7 +420,7 @@ void EsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
         return;
     }
 
-    dynamic_cast<CExtractingFunction*>(function)->setInvertedDirection(index);
+    static_cast<CExtractingFunction*>(function)->setInvertedDirection(index);
     // Applay formula up to this selected function
     updateFunctionProcess();
 }
@@ -451,25 +482,7 @@ void EsquemaPage::on_comboBox_typeOfData_currentIndexChanged(int index) {
     updateFunctionProcess();
 }
 
-void EsquemaPage::on_plainTextEdit_staticDataString_textChanged() { m_loadedStaticData->setDataString(ui->plainTextEdit_staticDataString->toPlainText()); }
-
-
-void EsquemaPage::handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
-    Q_UNUSED(parent);
-    Q_UNUSED(end);
-    Q_UNUSED(destination);
-
-    if(start < row) row--;
-    m_loadedFormula->reorderFunctionPath(start, row);
+void EsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
+    m_loadedStaticData->setDataString(ui->plainTextEdit_staticDataString->toPlainText());
 }
 
-void EsquemaPage::handleItemEditFinish(const QModelIndex &index, const QString &text) {
-    if(index.parent().row() == 0) { // Handle Static Data Name edition
-        m_esquemaDoc->getEsquema()->setStaticDataName(m_loadedStaticData, text);
-        ui->label_dataName->setText(text);
-    }
-    else if(index.parent().row() == 1)  { // Handle formula name edition
-        m_esquemaDoc->getEsquema()->setFormulaName(m_loadedFormula, text);
-        ui->label_dataName->setText(m_loadedFormula->getDataName());
-    }
-}
