@@ -1,4 +1,5 @@
 #include "generalfunctions.h"
+
 #include <cstdlib>   // For getenv on Unix-like systems
 #include <Windows.h> // For GetEnvironmentVariable on Windows
 
@@ -50,12 +51,7 @@ QString parseToText(const QString& text) {
 
 QWidget* getLastParent(QWidget* widget) {
     QWidget* parent = widget->parentWidget();
-    // base case
-    if (parent == nullptr) {
-        return widget;
-    } else {
-        // Recursively call the function with the parent widget
-        return getLastParent(parent);
-    }
+    if (parent == nullptr) return widget; // base case
+    else                   return getLastParent(parent); // Recursively call the function with the parent widget
 }
 

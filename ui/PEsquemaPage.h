@@ -13,15 +13,15 @@
 
 namespace Ui { class esquemaPage; }
 
-class EsquemaPage : public QWidget {
+class PEsquemaPage : public QWidget {
     Q_OBJECT
 
 public:
-    explicit EsquemaPage(CEsquemaDoc *esquema, QWidget *parent = nullptr);
-    explicit EsquemaPage(QWidget *parent = nullptr);
+    explicit PEsquemaPage(CEsquemaDoc *esquema, QWidget *parent = nullptr);
+    explicit PEsquemaPage(QWidget *parent = nullptr);
 
-    EsquemaPage() = default;
-    ~EsquemaPage();
+    PEsquemaPage() = default;
+    ~PEsquemaPage();
 
     void newFormula();
 

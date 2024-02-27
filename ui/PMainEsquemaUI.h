@@ -1,5 +1,5 @@
-#ifndef WMAINESQUEMAUI_H
-#define WMAINESQUEMAUI_H
+#ifndef PMAINESQUEMAUI_H
+#define PMAINESQUEMAUI_H
 
 #include <QWidget>
 #include <QStackedWidget>
@@ -7,17 +7,17 @@
 #include "WToolBarEsquema.h"
 #include "PEsquemaPage.h"
 
-namespace Ui { class WMainEsquemaUI; }
+namespace Ui { class PMainEsquemaUI; }
 
 // Edition interface for esquema. Each esquema would have it's own instance of this widget
-class WMainEsquemaUI : public QWidget {
+class PMainEsquemaUI : public QWidget {
     Q_OBJECT
 
 public:
-    explicit WMainEsquemaUI(QWidget *parent = nullptr);
-    ~WMainEsquemaUI();
+    explicit PMainEsquemaUI(QWidget *parent = nullptr);
+    ~PMainEsquemaUI();
     void newEsquema(CEsquemaDoc* esquemaDoc);
-    void changeCurrentPage(EsquemaPage* page);
+    void changeCurrentPage(PEsquemaPage* page);
 
 private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option);
@@ -31,6 +31,6 @@ private slots:
 public slots:
     void handleFilePathChanged(const QString &filePath);
 private:
-    Ui::WMainEsquemaUI *ui;
+    Ui::PMainEsquemaUI *ui;
 };
-#endif // WMAINESQUEMAUI_H
+#endif // PMAINESQUEMAUI_H

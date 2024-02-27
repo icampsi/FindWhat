@@ -20,17 +20,17 @@ SOURCES += \
     src/CFormula.cpp \
     src/CFunctionClasses.cpp \
     src/main.cpp \
+    ui/PDockPreview.cpp \
     ui/PEsquemaPage.cpp \
+    ui/PFormExpToolBoxPage.cpp \
+    ui/PMainEsquemaUI.cpp \
     ui/QCItemDelegateFormulaTreeView.cpp \
+    ui/QCSpreadSheetTableModel.cpp \
     ui/WBrowserTreeView.cpp \
-    ui/WDockPreview.cpp \
     ui/WEsquemaTreeView.cpp \
-    ui/WFormExpToolBoxPage.cpp \
     ui/WLoadedEsquemes.cpp \
     ui/WLoadedFilesTreeView.cpp \
-    ui/WMainEsquemaUI.cpp \
     ui/WSpreadSheetTable.cpp \
-    ui/WSpreadSheetTableModel.cpp \
     ui/WToolBarEsquema.cpp \
     ui/WToolbarPreview.cpp \
     ui/dialogs/NewEsquema_dlg.cpp \
@@ -49,17 +49,17 @@ HEADERS += \
     src/CEsquema.h \
     src/CFormula.h \
     src/CFunctionClasses.h \
+    ui/PDockPreview.h \
     ui/PEsquemaPage.h \
+    ui/PFormExpToolBoxPage.h \
+    ui/PMainEsquemaUI.h \
     ui/QCItemDelegateFormulaTreeView.h \
+    ui/QCSpreadSheetTableModel.h \
     ui/WBrowserTreeView.h \
-    ui/WDockPreview.h \
     ui/WEsquemaTreeView.h \
-    ui/WFormExpToolBoxPage.h \
     ui/WLoadedEsquemes.h \
     ui/WLoadedFilesTreeView.h \
-    ui/WMainEsquemaUI.h \
     ui/WSpreadSheetTable.h \
-    ui/WSpreadSheetTableModel.h \
     ui/WToolBarEsquema.h \
     ui/WToolbarPreview.h \
     ui/dialogs/ExportCSVProgressBar_dlg.h \
@@ -74,11 +74,11 @@ INCLUDEPATH += \
 
 # Form files
 FORMS += \
+    ui/PDockPreview.ui \
     ui/PEsquemaPage.ui \
-    ui/WDockPreview.ui \
-    ui/WFormExpToolBoxPage.ui \
+    ui/PFormExpToolBoxPage.ui \
+    ui/PMainEsquemaUI.ui \
     ui/WLoadedEsquemes.ui \
-    ui/WMainEsquemaUI.ui \
     ui/dialogs/ExportCSVProgressBar_dlg.ui \
     ui/dialogs/NewEsquema_dlg.ui \
     ui/mainwindow.ui
@@ -99,3 +99,7 @@ TARGET = FindWhat
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res/icons.qrc \
+    res/icons.qrc

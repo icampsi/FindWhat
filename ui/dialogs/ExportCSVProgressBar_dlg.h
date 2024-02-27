@@ -5,12 +5,12 @@
 
 namespace Ui { class exportCSVProgressBar_dlg; }
 
-class exportCSVProgressBar_dlg : public QDialog {
+class ExportCSVProgressBar_dlg : public QDialog {
     Q_OBJECT
 
 public:
-    explicit exportCSVProgressBar_dlg(int progressSize, QWidget *parent = nullptr);
-    ~exportCSVProgressBar_dlg();
+    explicit ExportCSVProgressBar_dlg(int progressSize, QWidget *parent = nullptr);
+    ~ExportCSVProgressBar_dlg();
 
     void updateProgress();
 

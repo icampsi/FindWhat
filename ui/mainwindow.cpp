@@ -11,14 +11,16 @@ mainWindow::mainWindow(QWidget *parent)
     : QMainWindow(parent), newEsquemadlg{nullptr}, ui(new Ui::mainWindow) {
 
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/logo/mainLogo.ico")); // Loads the .ico logo for the application
+
     // SetUp the Dock Prveiew Widget
-    m_dockPreview = new WDockPreview(this);
+    m_dockPreview = new PDockPreview(this);
     m_dockPreview->setAllowedAreas(Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, m_dockPreview);
 
     // Mediate between browserWidget and dockPreview
-    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &WDockPreview::handleFilePathChanged);
-    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &WMainEsquemaUI::handleFilePathChanged);
+    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &PDockPreview::handleFilePathChanged);
+    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &PMainEsquemaUI::handleFilePathChanged);
 
     // Menú actions connections
     connect(ui->action_NewEsquema , &QAction::triggered, this, &mainWindow::action_newEsquema);

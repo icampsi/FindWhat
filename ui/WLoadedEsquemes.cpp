@@ -1,7 +1,7 @@
 #include "WLoadedEsquemes.h"
 #include "ui_WLoadedEsquemes.h"
 #include "QListWidgetItem"
-#include "WMainEsquemaUI.h"
+#include "PMainEsquemaUI.h"
 
 WLoadedEsquemes::WLoadedEsquemes(QWidget *parent)
     : QWidget(parent), ui(new Ui::WListWidgetLoadedEsquemes)
@@ -11,7 +11,7 @@ WLoadedEsquemes::WLoadedEsquemes(QWidget *parent)
 
 WLoadedEsquemes::~WLoadedEsquemes() { delete ui; }
 
-void WLoadedEsquemes::newEsquema(EsquemaPage *page, CEsquema *esquema) {
+void WLoadedEsquemes::newEsquema(PEsquemaPage *page, CEsquema *esquema) {
     QListWidgetItem *esquemaItem = new QListWidgetItem(ui->list_esquemes);
     esquemaItem->setText(esquema->getName());
     m_itemPageMap.insert(esquemaItem, page);
@@ -25,7 +25,7 @@ void WLoadedEsquemes::newEsquema(EsquemaPage *page, CEsquema *esquema) {
 void WLoadedEsquemes::on_list_esquemes_itemSelectionChanged() {
     QListWidgetItem *item = ui->list_esquemes->selectedItems().front();
     if(item) {
-        WMainEsquemaUI *parent = dynamic_cast<WMainEsquemaUI*>(parentWidget());
+        PMainEsquemaUI *parent = dynamic_cast<PMainEsquemaUI*>(parentWidget());
         if(parent) {
             parent->changeCurrentPage(m_itemPageMap[item]);
         } else qDebug() << "No item selected in list_esquemes";

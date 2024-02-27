@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WDockPreview</class>
- <widget class="QDockWidget" name="WDockPreview">
+ <class>PDockPreview</class>
+ <widget class="QDockWidget" name="PDockPreview">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -5,7 +5,7 @@
 #include "CDocumentSubclasses.h"
 
 
-std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure(exportCSVProgressBar_dlg *progressDialog) {
+std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure(ExportCSVProgressBar_dlg *progressDialog) {
     std::vector<std::vector<CData*>> xsvStructure;
     QString text;
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();

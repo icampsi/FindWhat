@@ -1,7 +1,7 @@
 #include "ExportCSVProgressBar_dlg.h"
 #include "ui_ExportCSVProgressBar_dlg.h"
 
-exportCSVProgressBar_dlg::exportCSVProgressBar_dlg(int progressSize, QWidget *parent)
+ExportCSVProgressBar_dlg::ExportCSVProgressBar_dlg(int progressSize, QWidget *parent)
     : QDialog(parent), ui(new Ui::exportCSVProgressBar_dlg)
 {
     ui->setupUi(this);
@@ -10,11 +10,11 @@ exportCSVProgressBar_dlg::exportCSVProgressBar_dlg(int progressSize, QWidget *pa
     ui->progressBar->setValue(0);
 }
 
-exportCSVProgressBar_dlg::~exportCSVProgressBar_dlg() {
+ExportCSVProgressBar_dlg::~ExportCSVProgressBar_dlg() {
     delete ui;
 }
 
-void exportCSVProgressBar_dlg::updateProgress() {
+void ExportCSVProgressBar_dlg::updateProgress() {
     ui->progressBar->setValue(ui->progressBar->value() + 1);
 }
 

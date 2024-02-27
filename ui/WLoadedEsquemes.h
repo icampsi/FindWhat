@@ -13,14 +13,14 @@ class WLoadedEsquemes : public QWidget {
 public:
     explicit WLoadedEsquemes(QWidget *parent = nullptr);
     ~WLoadedEsquemes();
-    void newEsquema(EsquemaPage *page, CEsquema *esquema);
+    void newEsquema(PEsquemaPage *page, CEsquema *esquema);
 
 private slots:
     void on_list_esquemes_itemSelectionChanged();
 
 private:
     Ui::WListWidgetLoadedEsquemes *ui;
-    QMap<QListWidgetItem*, EsquemaPage*> m_itemPageMap;
+    QMap<QListWidgetItem*, PEsquemaPage*> m_itemPageMap;
 };
 
 #endif // WLOADEDESQUEMES_H

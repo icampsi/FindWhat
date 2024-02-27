@@ -1,17 +1,17 @@
-#ifndef WFORMEXPTOOLBOXPAGE_H
-#define WFORMEXPTOOLBOXPAGE_H
+#ifndef PFORMEXPTOOLBOXPAGE_H
+#define PFORMEXPTOOLBOXPAGE_H
 
 #include "document/CExportCSV.h"
 #include <QWidget>
 
 namespace Ui { class WExpFormToolBoxPage; }
 
-class WFormExpToolBoxPage : public QWidget { // Pages for Format Export ToolBox
+class PFormExpToolBoxPage : public QWidget { // Pages for Format Export ToolBox
     Q_OBJECT
 
 public:
-    explicit WFormExpToolBoxPage(QWidget *parent = nullptr);
-    ~WFormExpToolBoxPage();
+    explicit PFormExpToolBoxPage(QWidget *parent = nullptr);
+    ~PFormExpToolBoxPage();
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
 
 public slots:
@@ -29,4 +29,4 @@ private:
     CExportCSV *m_exportCSV;
 };
 
-#endif // WFORMEXPTOOLBOXPAGE_H
+#endif // PFORMEXPTOOLBOXPAGE_H

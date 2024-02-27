@@ -1,18 +1,18 @@
-#ifndef WDOCKPREVIEW_H
-#define WDOCKPREVIEW_H
+#ifndef PDOCKPREVIEW_H
+#define PDOCKPREVIEW_H
 
 #include <QDockWidget>
-#include "ui_WDockPreview.h"
+#include "ui_PDockPreview.h"
 #include "src/CFormula.h"
 
-namespace Ui { class WDockPreview; }
+namespace Ui { class PDockPreview; }
 
-class WDockPreview : public QDockWidget {
+class PDockPreview : public QDockWidget {
     Q_OBJECT
 
 public:
-    explicit WDockPreview(QWidget *parent = nullptr);
-    ~WDockPreview();
+    explicit PDockPreview(QWidget *parent = nullptr);
+    ~PDockPreview();
 
 public slots:
     void handleFilePathChanged(const QString &filePath);
@@ -22,7 +22,7 @@ private slots:
     void previewOptionChanged(WToolBarPreview::PreviewOption option);
 
 private:
-    Ui::WDockPreview *ui;
+    Ui::PDockPreview *ui;
 };
 
-#endif // WDOCKPREVIEW_H
+#endif // PDOCKPREVIEW_H

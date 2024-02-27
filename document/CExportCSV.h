@@ -41,7 +41,7 @@ public:
     }
 
     // Public function to build XSV structure
-    std::vector<std::vector<CData*>> buildXSVStructure(exportCSVProgressBar_dlg *progressDialog = nullptr);
+    std::vector<std::vector<CData*>> buildXSVStructure(ExportCSVProgressBar_dlg *progressDialog = nullptr);
 };
 
 #endif // CEXPORTCSV_H

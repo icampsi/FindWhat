@@ -19,7 +19,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
-     <widget class="WMainEsquemaUI" name="mainEsquemaUI" native="true"/>
+     <widget class="PMainEsquemaUI" name="mainEsquemaUI" native="true"/>
     </item>
     <item row="1" column="0">
      <widget class="QLineEdit" name="lineEdit_rowFormat"/>
@@ -110,9 +110,9 @@
    <header>WBrowserTreeView.h</header>
   </customwidget>
   <customwidget>
-   <class>WMainEsquemaUI</class>
+   <class>PMainEsquemaUI</class>
    <extends>QWidget</extends>
-   <header>WMainEsquemaUI.h</header>
+   <header>PMainEsquemaUI.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

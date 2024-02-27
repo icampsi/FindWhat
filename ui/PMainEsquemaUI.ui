@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WMainEsquemaUI</class>
- <widget class="QWidget" name="WMainEsquemaUI">
+ <class>PMainEsquemaUI</class>
+ <widget class="QWidget" name="PMainEsquemaUI">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -163,8 +163,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>1069</width>
-               <height>296</height>
+               <width>300</width>
+               <height>138</height>
               </rect>
              </property>
              <property name="minimumSize">
@@ -199,7 +199,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>1030</width>
+                   <width>98</width>
                    <height>500</height>
                   </rect>
                  </property>

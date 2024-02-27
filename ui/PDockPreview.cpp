@@ -1,32 +1,31 @@
-#include "WDockPreview.h"
-#include "ui_WDockPreview.h"
+#include "PDockPreview.h"
+#include "ui_PDockPreview.h"
 
 #include "PEsquemaPage.h"
 #include "document/CMDoc.h"
 
-WDockPreview::WDockPreview(QWidget *parent)
-    : QDockWidget(parent)
-    , ui(new Ui::WDockPreview)
+PDockPreview::PDockPreview(QWidget *parent)
+    : QDockWidget(parent), ui(new Ui::PDockPreview)
 {
     ui->setupUi(this);
-    connect(ui->WToolBar, &WToolBarPreview::previewOptionChanged, this, &WDockPreview::previewOptionChanged);
+    connect(ui->WToolBar, &WToolBarPreview::previewOptionChanged, this, &PDockPreview::previewOptionChanged);
     ui->stackedWidget_toolBoxOption->setCurrentIndex(0);
 }
 
-void WDockPreview::previewOptionChanged(WToolBarPreview::PreviewOption option) {
+void PDockPreview::previewOptionChanged(WToolBarPreview::PreviewOption option) {
     ui->stackedWidget_toolBoxOption->setCurrentIndex(static_cast<int>(option));
 }
 
-WDockPreview::~WDockPreview() { delete ui; }
+PDockPreview::~PDockPreview() { delete ui; }
 
-void WDockPreview::handleFilePathChanged(const QString &filePath) {
+void PDockPreview::handleFilePathChanged(const QString &filePath) {
     CPdfDoc *pPdfDoc = CMDoc::getMDoc().newDoc(filePath);
     CMDoc::getMDoc().setActivePdfDoc(pPdfDoc);
     QString docText = pPdfDoc->getText();
     ui->TextDisplayer->setPlainText(docText);
 
     if(ui->tabWidget_preview->count() > 0) {
-        EsquemaPage *currentPage = dynamic_cast<EsquemaPage*>(ui->tabWidget_preview->currentWidget());
+        PEsquemaPage *currentPage = dynamic_cast<PEsquemaPage*>(ui->tabWidget_preview->currentWidget());
         if(!currentPage) return;
         currentPage->loadFunction();
         CEsquema* currentEsquema = currentPage->getEsquemaDoc()->getEsquema();
@@ -37,7 +36,7 @@ void WDockPreview::handleFilePathChanged(const QString &filePath) {
     }
 }
 
-void WDockPreview::handleFunctionUpdated(CFormula::IndexPosition index, QString result) {
+void PDockPreview::handleFunctionUpdated(CFormula::IndexPosition index, QString result) {
     QBrush brush;
     if(result.isEmpty()) brush = Qt::green; // Green is indexing
     else                 brush = Qt::red;   // Red if exracting

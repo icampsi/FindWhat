@@ -4,10 +4,10 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
-class WSpreadSheetTableModel : public QAbstractTableModel {
+class QCSpreadSheetTableModel : public QAbstractTableModel {
     Q_OBJECT
 public:
-    WSpreadSheetTableModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {}
+    QCSpreadSheetTableModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {}
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override {
         Q_UNUSED(parent);

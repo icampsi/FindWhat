@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QString>
 
-#include "WDockPreview.h"
+#include "PDockPreview.h"
 
 #include "dialogs/NewEsquema_dlg.h"
 #include "document/CDocumentSubclasses.h"
@@ -23,7 +23,7 @@ public:
 
 protected:
     // Members
-    WDockPreview   *m_dockPreview = nullptr;
+    PDockPreview   *m_dockPreview = nullptr;
     newEsquema_dlg *newEsquemadlg = nullptr;
 
 private slots:

@@ -1,8 +1,8 @@
 #include "WSpreadSheetTable.h"
-#include "WSpreadSheetTableModel.h"
+#include "QCSpreadSheetTableModel.h"
 
 WSpreadSheetTable::WSpreadSheetTable(QWidget* parent) : QTableView(parent) {
-    WSpreadSheetTableModel model;
+    QCSpreadSheetTableModel model;
     setModel(&model);
 
     setDragEnabled(true);
