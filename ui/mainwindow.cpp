@@ -92,7 +92,14 @@ void mainWindow::on_pushButton1_clicked()
     QString fileName = "function.bin";
     std::ofstream file(fileName.toStdString(), std::ios::binary);
     CExtractingFunction *function = new CExtractingFunction(CFunction::FunctionType::Find);
-
+    function->setCharTypeToGet(CExtractingFunction::CharTypeToGet::digit);
+    function->setCharsToGet(333);
+    function->setCharsToRead(333);
+    function->setFunctionTypeName("333");
+    function->setEndingString("333");
+    function->setInvertedDirection(true);
+    function->setToAllow("333");
+    function->setToAvoid("333");
     if (file.is_open()) {
         // file.write(data.data(), data.size());
         function->setFunctionTypeName("hola");
@@ -107,21 +114,14 @@ void mainWindow::on_pushButton1_clicked()
     }
 
     std::ifstream openFile(fileName.toStdString(), std::ios::binary);
-    CExtractingFunction* desFuntion = new CExtractingFunction(CFunction::FunctionType::ExtractData);
-    desFuntion->setCharTypeToGet(CExtractingFunction::CharTypeToGet::digit);
-    desFuntion->setCharsToGet(333);
-    desFuntion->setCharsToRead(333);
-    desFuntion->setFunctionTypeName("333");
-    desFuntion->setEndingString("333");
-    desFuntion->setInvertedDirection(true);
-    desFuntion->setToAllow("333");
-    desFuntion->setToAvoid("333");
+    CExtractingFunction* desFunction = new CExtractingFunction(openFile);// = new CExtractingFunction(CFunction::FunctionType::ExtractData);
+
 
     if (openFile.is_open()) {
-        desFuntion->deserialize(openFile);
+        // desFunction->deserialize(openFile);
     }
     file.close();
-    if(function == desFuntion) {
+    if(function == desFunction) {
         qDebug() << "yeeaaahhhhh";
     }
 }

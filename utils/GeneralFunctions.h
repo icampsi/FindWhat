@@ -13,4 +13,11 @@ QString parseToText(const QString& text);
 // In theory it should allways be QMainWindow in this app, but i am returning QWidget for  flexibility
 QWidget* getLastParent(QWidget* widget);
 
+namespace SerializationUtils {
+    // Serialization helpers
+    void writeQString(std::ofstream& out, const QString& str);
+    void readQString(std::ifstream& in, QString& str);
+}
+
+
 #endif // GENERALFUNCTIONS_H

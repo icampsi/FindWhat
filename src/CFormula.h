@@ -1,11 +1,8 @@
 #ifndef CFORMULA_H
 #define CFORMULA_H
 
-#include "CData.h"
 #include "CFunctionClasses.h"
-#include "qdebug.h"
-
-
+#include "CData.h"
 
 // EXTREU UNA ÚNICA DADA A PARTIR DELS PARÀMETRES DONATS
 class CFormula {
@@ -74,8 +71,7 @@ public:
     void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);
     void clearPath() { m_formulaPath.clear();}
 
-    void serialize(std::vector<char>& out) const {
-    }
+    void serialize(std::ofstream& out) const;
 };
 
 #endif // CFORMULA_H

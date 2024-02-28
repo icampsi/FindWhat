@@ -31,6 +31,10 @@ public:
     CFormula *getParentFormula() const       { return m_parentFormula;   }
     void setParentFormula(CFormula* parent)  { m_parentFormula = parent; }
 
+
+    void serialize(std::ofstream& out) const;
+    void deserialize(std::ifstream& in);
+
     // enum class DataType { integer, floating, string, empty };
     // DataType m_dataType{ DataType::empty }; // Tipus de dada
 

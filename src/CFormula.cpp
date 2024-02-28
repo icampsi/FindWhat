@@ -1,5 +1,7 @@
 #include "CFormula.h"
+
 #include <QDebug>
+#include <fstream>
 
 // Copy constructor
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
@@ -476,3 +478,23 @@ void CFormula::reorderFunctionPath(int objectToMoveIndex, int destinationIndex) 
                     m_formulaPath.begin() + objectToMoveIndex + 1);
     }
 }
+
+void CFormula::serialize(std::ofstream& out) const {
+    /*  - SERIALIZATION ORDER -
+     *
+     *  int           size of result
+     *  QString       m_result
+     *  CData    	  m_data
+     *  IndexPosition m_indexPosition
+     *  std::vector<CFunction*> m_formulaPath
+     */
+
+    // m_result
+    int resultSize = m_result.size();
+    out.write(reinterpret_cast<const char*>(&resultSize), sizeof(int));
+    out.write(m_result.toUtf8().constData(), resultSize);
+
+
+    // m_data
+}
+

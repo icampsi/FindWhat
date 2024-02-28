@@ -16,6 +16,7 @@ protected:
 
 public:
     CFunction(FunctionType functionType, CFormula* parent = nullptr);
+    CFunction(std::ifstream& in) { CFunction::deserialize(in); } // Serialization constructor
     virtual ~CFunction() {} // Virtual destructor
 
     virtual FunctionType getFunctionType() const { return m_functionType; }
@@ -42,6 +43,9 @@ public:
     CIndexingFunction(FunctionType name);
     CIndexingFunction(FunctionType name, QString findText, int num = 0, bool option = false);
     CIndexingFunction(const CIndexingFunction &other);
+    CIndexingFunction(std::ifstream& in)
+        : CFunction(in) { CIndexingFunction::deserialize(in); } // Serialization constructor
+
     virtual ~CIndexingFunction() {}
 
     // Getters and setters
@@ -91,6 +95,8 @@ protected:
 public:
     CExtractingFunction(FunctionType name);
     CExtractingFunction(const CExtractingFunction &other);
+    CExtractingFunction(std::ifstream& in)
+        : CFunction(in) { CExtractingFunction::deserialize(in); } // Serialization constructor
     virtual ~CExtractingFunction() {}
 
     // Getters and setters
