@@ -38,7 +38,7 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 2 cells, stating "F12345" and "Whatever-Total-was-extracted-from-the-pdf".
 
 # Future updates
-- Serialization to store the created Esquemas and functionality to delete created ones or reorder them.
+- Serialization to store the created Esquemas and functionality to delete created ones or reorder them (I'm currently working on it in the serialization branch).
 - A feature to rename the parsed PDF files to a custom format that includes extracted values (e.g., "$date_$companyName_etc.pdf") for easier archiving and relocation to another folder.
 - Functionality to rename the extracted CSV files and specify a destination location.
 - Functionality to ensure that no two formulas or static data have the same name (right now it's a mess of you do that).
