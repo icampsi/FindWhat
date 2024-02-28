@@ -21,8 +21,15 @@
     <item row="0" column="0">
      <widget class="PMainEsquemaUI" name="mainEsquemaUI" native="true"/>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QLineEdit" name="lineEdit_rowFormat"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="pushButton1">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

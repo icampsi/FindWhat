@@ -53,8 +53,9 @@ public:
 
     inline void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends data to m_result
         if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
-        else                              m_result.prepend(pFunctionToApply->getText());
+        else                               m_result.prepend(pFunctionToApply->getText());
     }
+
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
 
     inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
@@ -72,6 +73,9 @@ public:
     // Moves object from one index to another
     void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);
     void clearPath() { m_formulaPath.clear();}
+
+    void serialize(std::vector<char>& out) const {
+    }
 };
 
 #endif // CFORMULA_H

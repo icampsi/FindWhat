@@ -18,10 +18,48 @@ public:
     CFunction(FunctionType functionType, CFormula* parent = nullptr);
     virtual ~CFunction() {} // Virtual destructor
 
-    virtual FunctionType getFunctionType();
-    QString getFunctionTypeName();
-    CFormula* getParent();
-    void setParent(CFormula* formulaPtr);
+    virtual FunctionType getFunctionType() const { return m_functionType; }
+
+    void setFunctionTypeName(const QString& name) { m_functionTypeName =  name; }
+    QString getFunctionTypeName() const           { return m_functionTypeName;  }
+
+    CFormula* getParent() const          {return m_parent;}
+    void setParent(CFormula* formulaPtr) {m_parent = formulaPtr;}
+
+    // Serialization
+    void virtual serialize(std::ofstream& out) const;
+    void virtual deserialize(std::ifstream& in);
+};
+
+class CIndexingFunction : public CFunction {
+protected:
+    QString m_text{ "" };
+    int     m_num{ 0 };
+    bool    m_option{ true };
+    bool    m_startFromBeggining{ false };
+
+public:
+    CIndexingFunction(FunctionType name);
+    CIndexingFunction(FunctionType name, QString findText, int num = 0, bool option = false);
+    CIndexingFunction(const CIndexingFunction &other);
+    virtual ~CIndexingFunction() {}
+
+    // Getters and setters
+    QString getText() const              { return m_text; }
+    void    setText(const QString& text) { m_text = text; }
+
+    int  getNum()        { return m_num; }
+    void setNum(int num) { m_num = num; }
+
+    bool getOption() const      { return m_option; }
+    void setOption(bool option) { m_option = option; }
+
+    bool getStartFromBeggining() const      { return m_startFromBeggining; }
+    void setStartFromBeggining(bool option) { m_startFromBeggining = option; }
+
+    // Serialization
+    void serialize(std::ofstream& out) const override;
+    void deserialize(std::ifstream& in) override;
 };
 
 class CMathFunction : public CFunction {
@@ -35,32 +73,6 @@ public:
     CMathFunction(FunctionType name);
     CMathFunction(const CMathFunction &other);
     virtual ~CMathFunction() {} // Virtual destructor
-};
-
-class CIndexingFunction : public CFunction {
-protected:
-    QString m_text{ "" };
-    int     m_num{ 0 };
-    bool    m_option{ true };
-    bool    m_startFromBeggining{ false };
-
-public:
-    QString getText() const              { return m_text; }
-    void    setText(const QString& text) { m_text = text; }
-
-    int  getNum()        { return m_num; }
-    void setNum(int num) { m_num = num; }
-
-    bool getOption()            { return m_option; }
-    void setOption(bool option) { m_option = option; }
-
-    bool getStartFromBeggining()            { return m_startFromBeggining; }
-    void setStartFromBeggining(bool option) { m_startFromBeggining = option; }
-
-    CIndexingFunction(FunctionType name);
-    CIndexingFunction(FunctionType name, QString findText, int num = 0, bool option = false);
-    CIndexingFunction(const CIndexingFunction &other);
-    virtual ~CIndexingFunction() {} // Virtual destructor
 };
 
 class CExtractingFunction : public CFunction {
@@ -77,30 +89,35 @@ protected:
     QString       m_toAvoid{ "" };
 
 public:
-    int  getCharsToGet() { return m_charsToGet; }
-    void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
-
-    int  getCharsToRead() { return m_charsToRead; }
-    void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
-
-    QString getEndingString() { return m_endingString; }
-    void setEndingString(QString endingString) { m_endingString = endingString; }
-
-    bool getInvertedDirection() { return m_invertDirection; }
-    void setInvertedDirection(bool invertedDirection) { m_invertDirection = invertedDirection; }
-
-    CharTypeToGet getCharTypeToGet() { return m_charTypeToGet; }
-    void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
-
-    QString getToAllow() { return m_toAllow; }
-    void setToAllow(QString toAllow) { m_toAllow = toAllow; }
-
-    QString getToAvoid() { return m_toAvoid; }
-    void setToAvoid(QString toAvoid) { m_toAvoid = toAvoid; }
-
     CExtractingFunction(FunctionType name);
     CExtractingFunction(const CExtractingFunction &other);
-    virtual ~CExtractingFunction() {} // Virtual destructor
+    virtual ~CExtractingFunction() {}
+
+    // Getters and setters
+    int  getCharsToGet() const         { return m_charsToGet; }
+    void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
+
+    int  getCharsToRead() const          { return m_charsToRead; }
+    void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
+
+    QString getEndingString() const            { return m_endingString; }
+    void setEndingString(QString endingString) { m_endingString = endingString; }
+
+    bool getInvertedDirection() const                 { return m_invertDirection; }
+    void setInvertedDirection(bool invertedDirection) { m_invertDirection = invertedDirection; }
+
+    CharTypeToGet getCharTypeToGet() const             { return m_charTypeToGet; }
+    void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
+
+    QString getToAllow() const       { return m_toAllow; }
+    void setToAllow(QString toAllow) { m_toAllow = toAllow; }
+
+    QString getToAvoid() const       { return m_toAvoid; }
+    void setToAvoid(QString toAvoid) { m_toAvoid = toAvoid; }
+
+    // Serialization
+    void serialize(std::ofstream& out) const override;
+    void deserialize(std::ifstream& in) override;
 };
 
 #endif // CFUNCTIONCLASSES_H

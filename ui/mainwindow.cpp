@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <fstream>
 
 #include "document/CMDoc.h"
 
@@ -83,5 +84,45 @@ void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
 
     if (esquemaDoc)     currentEsquema = esquemaDoc->getEsquema();
     if (currentEsquema) currentEsquema->setCsvFormatFormula(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
+}
+
+
+void mainWindow::on_pushButton1_clicked()
+{
+    QString fileName = "function.bin";
+    std::ofstream file(fileName.toStdString(), std::ios::binary);
+    CExtractingFunction *function = new CExtractingFunction(CFunction::FunctionType::Find);
+
+    if (file.is_open()) {
+        // file.write(data.data(), data.size());
+        function->setFunctionTypeName("hola");
+        function->serialize(file);
+        // CFunction *desFunction = new CFunction(CFunction::FunctionType::ExtractData);
+        // desFunction->deserialize();
+
+        file.close();
+        // std::cout << "Data saved to file: " << filename << std::endl;
+    } else {
+        qDebug() << "Error: Unable to open file for writing: " << "hola";
+    }
+
+    std::ifstream openFile(fileName.toStdString(), std::ios::binary);
+    CExtractingFunction* desFuntion = new CExtractingFunction(CFunction::FunctionType::ExtractData);
+    desFuntion->setCharTypeToGet(CExtractingFunction::CharTypeToGet::digit);
+    desFuntion->setCharsToGet(333);
+    desFuntion->setCharsToRead(333);
+    desFuntion->setFunctionTypeName("333");
+    desFuntion->setEndingString("333");
+    desFuntion->setInvertedDirection(true);
+    desFuntion->setToAllow("333");
+    desFuntion->setToAvoid("333");
+
+    if (openFile.is_open()) {
+        desFuntion->deserialize(openFile);
+    }
+    file.close();
+    if(function == desFuntion) {
+        qDebug() << "yeeaaahhhhh";
+    }
 }
 
