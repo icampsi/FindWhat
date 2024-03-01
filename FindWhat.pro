@@ -27,6 +27,7 @@ SOURCES += \
     ui/QCItemDelegateFormulaTreeView.cpp \
     ui/QCSpreadSheetTableModel.cpp \
     ui/WBrowserTreeView.cpp \
+    ui/WEsquemaListView.cpp \
     ui/WEsquemaTreeView.cpp \
     ui/WLoadedEsquemes.cpp \
     ui/WLoadedFilesTreeView.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     ui/QCItemDelegateFormulaTreeView.h \
     ui/QCSpreadSheetTableModel.h \
     ui/WBrowserTreeView.h \
+    ui/WEsquemaListView.h \
     ui/WEsquemaTreeView.h \
     ui/WLoadedEsquemes.h \
     ui/WLoadedFilesTreeView.h \

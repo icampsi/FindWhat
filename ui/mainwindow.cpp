@@ -19,15 +19,15 @@ mainWindow::mainWindow(QWidget *parent)
     m_dockPreview->setAllowedAreas(Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, m_dockPreview);
 
-    // Mediate between browserWidget and dockPreview
-    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &PDockPreview::handleFilePathChanged);
-    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &PMainEsquemaUI::handleFilePathChanged);
-
+    // CONNECTIONS
     // Menú actions connections
     connect(ui->action_NewEsquema , &QAction::triggered, this, &mainWindow::action_newEsquema);
     connect(ui->action_LoadEsquema, &QAction::triggered, this, &mainWindow::action_loadEsquema);
     connect(ui->action_SaveEsquema, &QAction::triggered, this, &mainWindow::action_saveEsquema);
 
+    // Mediate between browserWidget and dockPreview
+    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &PDockPreview::handleFilePathChanged);
+    connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &PMainEsquemaUI::handleFilePathChanged);
 
     // Enable sorting by column
     ui->browserWidget->setSortingEnabled(true);
@@ -58,11 +58,33 @@ void mainWindow::action_newEsquema() {
 }
 
 void mainWindow::action_loadEsquema() {
-    QMessageBox::information(this, "Under Construction", "This action won't work until serialization is implemented");
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "Binary Files (*.esq)");
+
+    std::ifstream file(fileName.toStdString(), std::ios::binary);
+    if (file.is_open()) {
+        std::vector<CEsquemaDoc*> loadedEsquemaDocs;
+        CMDoc::getMDoc().deserialize(file, loadedEsquemaDocs);
+        file.close();
+        for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
+            loadEsquema(esquemaDoc);
+        }
+
+    } else {
+        QString errorString = "Couldn't open file " + fileName;
+        QMessageBox::critical(this, "Error", errorString);
+    }
 }
 
 void mainWindow::action_saveEsquema() {
-    QMessageBox::information(this, "Under Construction", "This action won't work until serialization is implemented");
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save .bin File", QDir::homePath(), "Binary Files (*.esq)");
+    std::ofstream file(fileName.toStdString(), std::ios::binary);
+    if (file.is_open()) {
+        CMDoc::getMDoc().serialize(file);
+        file.close();
+    } else {
+        QString errorString = "Couldn't save file " + fileName;
+        QMessageBox::critical(this, "Error", errorString);
+    }
 }
 
 void mainWindow::on_btn_changeRoot_clicked() {
@@ -84,45 +106,5 @@ void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
 
     if (esquemaDoc)     currentEsquema = esquemaDoc->getEsquema();
     if (currentEsquema) currentEsquema->setCsvFormatFormula(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
-}
-
-
-void mainWindow::on_pushButton1_clicked()
-{
-    QString fileName = "function.bin";
-    std::ofstream file(fileName.toStdString(), std::ios::binary);
-    CExtractingFunction *function = new CExtractingFunction(CFunction::FunctionType::Find);
-    function->setCharTypeToGet(CExtractingFunction::CharTypeToGet::digit);
-    function->setCharsToGet(333);
-    function->setCharsToRead(333);
-    function->setFunctionTypeName("333");
-    function->setEndingString("333");
-    function->setInvertedDirection(true);
-    function->setToAllow("333");
-    function->setToAvoid("333");
-    if (file.is_open()) {
-        // file.write(data.data(), data.size());
-        function->setFunctionTypeName("hola");
-        function->serialize(file);
-        // CFunction *desFunction = new CFunction(CFunction::FunctionType::ExtractData);
-        // desFunction->deserialize();
-
-        file.close();
-        // std::cout << "Data saved to file: " << filename << std::endl;
-    } else {
-        qDebug() << "Error: Unable to open file for writing: " << "hola";
-    }
-
-    std::ifstream openFile(fileName.toStdString(), std::ios::binary);
-    CExtractingFunction* desFunction = new CExtractingFunction(openFile);// = new CExtractingFunction(CFunction::FunctionType::ExtractData);
-
-
-    if (openFile.is_open()) {
-        // desFunction->deserialize(openFile);
-    }
-    file.close();
-    if(function == desFunction) {
-        qDebug() << "yeeaaahhhhh";
-    }
 }
 

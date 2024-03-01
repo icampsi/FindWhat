@@ -94,23 +94,23 @@ void PEsquemaPage::loadFunction() {
     CMathFunction       *mathFunction       = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     QString parsedText;
     switch (function->getFunctionType()) {
-    case CFunction::FunctionType::Find:
+    case CFunction::Action::Find:
         parsedText = parseToText(indexingFunction->getText());
         if(ui->lineEdit_textToFind->text() != parsedText) ui->lineEdit_textToFind->setText(parsedText);
         if(ui->comboBox_setIndexAt->currentIndex() != !indexingFunction->getOption())ui->comboBox_setIndexAt->setCurrentIndex(!indexingFunction->getOption());
         ui->comboBox_startFrom->setCurrentIndex(indexingFunction->getStartFromBeggining());
         break;
-    case CFunction::FunctionType::MoveIndex:
+    case CFunction::Action::MoveIndex:
         break;
-    case CFunction::FunctionType::MoveLine:
+    case CFunction::Action::MoveLine:
         break;
-    case CFunction::FunctionType::AppendString:
+    case CFunction::Action::AppendString:
         parsedText = parseToText(indexingFunction->getText());
         ui->lineEdit_stringToAppend->setText(parsedText);
         if(!indexingFunction->getOption()) ui->radioButton_append->setChecked(true);
         if(indexingFunction->getOption()) ui->radioButton_preppend->setChecked(true);
         break;
-    case CFunction::FunctionType::ExtractData:
+    case CFunction::Action::ExtractData:
         parsedText = parseToText(extractingFunction->getEndingString());
         ui->lineEdit_endingString->setText(parsedText);
         ui->textEdit_extractedData->setText(function->getParent()->getResult());
@@ -157,7 +157,7 @@ void PEsquemaPage::updateFunctionProcess() {
         }
 
         CFunction* function = m_itemFunctionMap[item];
-        if(function && function->getFunctionType() == CFunction::FunctionType::ExtractData) {
+        if(function && function->getFunctionType() == CFunction::Action::ExtractData) {
             ui->textEdit_extractedData->setText(result);
         }
 
@@ -178,6 +178,15 @@ void PEsquemaPage::loadEsquema() {
     QStandardItem *rootItem = model_esquema->invisibleRootItem();
     rootItem->appendRow(staticData);
     rootItem->appendRow(formulas);
+    // Create third level items from esquema.m_staticData[] attached to "Static Data"
+    for(int i{0}; i < esquema->getStaticData().size(); i++) {
+        QStandardItem *staticDataItem = new QStandardItem(esquema->getStaticData()[i]->getDataName()); // Create new item for each member of the vector
+        CData *data = esquema->getStaticData()[i];
+        staticDataItem->setData(QVariant::fromValue(data), Qt::UserRole);
+        m_itemDataMap[staticDataItem] = data;
+        staticData->appendRow(staticDataItem);
+    }
+
     // Create third level items from esquema.t_extractDataFormula[] attached to "Formulas"
     for(int i{0}; i < esquema->getExtractDataFormula().size(); i++) {
         QStandardItem *formulaItem = new QStandardItem(esquema->getExtractDataFormula()[i]->getDataName()); // Create new item for each member of the vector
@@ -294,27 +303,27 @@ void PEsquemaPage::on_btn_newFunction_clicked() {
     QAction *action_extractData  = menu->addAction("Extract Data");
 
     // Connect actions' triggered signal to slots
-    connect(action_Find        , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::FunctionType::Find); });
-    connect(action_MoveIndex   , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::FunctionType::MoveIndex); });
-    connect(action_MoveLine    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::FunctionType::MoveLine); });
-    connect(action_appendString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::FunctionType::AppendString); });
-    connect(action_extractData , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::FunctionType::ExtractData); });
+    connect(action_Find        , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::Find); });
+    connect(action_MoveIndex   , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveIndex); });
+    connect(action_MoveLine    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveLine); });
+    connect(action_appendString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::AppendString); });
+    connect(action_extractData , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ExtractData); });
 
     menu->exec(ui->btn_newFunction->mapToGlobal(QPoint(0, ui->btn_newFunction->height())));
 }
 
-void PEsquemaPage::handle_newFunActions(CFunction::FunctionType functionType) {
+void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
     CFunction* newFunction = nullptr;
     QListWidgetItem* item  = nullptr;
     if(m_loadedFormula) {
         switch (functionType) {
-        case (CFunction::FunctionType::Find):
-        case CFunction::FunctionType::MoveIndex:
-        case CFunction::FunctionType::MoveLine:
-        case CFunction::FunctionType::AppendString:
+        case (CFunction::Action::Find):
+        case CFunction::Action::MoveIndex:
+        case CFunction::Action::MoveLine:
+        case CFunction::Action::AppendString:
             newFunction = new CIndexingFunction(functionType);
             break;
-        case CFunction::FunctionType::ExtractData:
+        case CFunction::Action::ExtractData:
             newFunction = new CExtractingFunction(functionType);
             break;
         }

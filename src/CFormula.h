@@ -11,6 +11,7 @@ public:
         int initial = 0;
         int final   = 0;
     };
+    enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization
 protected:
 
     QString       m_result = "";
@@ -22,6 +23,7 @@ public:
     // CONSTRUCTORS AND DESTRUCTORS
     CFormula(QString dataName) : m_data(dataName, this) {}
     CFormula() = default;
+    CFormula(std::ifstream& in) : m_data(in, this) { CFormula::deserialize(in); }
     CFormula(const CFormula& other);
     ~CFormula();
 
@@ -65,6 +67,7 @@ public:
         function->setParent(this);
         m_formulaPath.push_back(function);
     }
+
     void deleteFunction(int index);
 
     // Moves object from one index to another
@@ -72,6 +75,7 @@ public:
     void clearPath() { m_formulaPath.clear();}
 
     void serialize(std::ofstream& out) const;
+    void deserialize(std::ifstream& in);
 };
 
 #endif // CFORMULA_H

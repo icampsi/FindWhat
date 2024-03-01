@@ -3,21 +3,21 @@
 #include <fstream>
 #include "utils/GeneralFunctions.h"
 
-CFunction::CFunction(FunctionType functionType, CFormula *parent) : m_functionType{ functionType }, m_parent{parent} {
-    switch(m_functionType) {
-    case FunctionType::Find:
+CFunction::CFunction(Action functionType, CFormula *parent) : m_action{ functionType }, m_parent{parent} {
+    switch(m_action) {
+    case Action::Find:
         m_functionTypeName = "Find";
         break;
-    case FunctionType::MoveIndex:
+    case Action::MoveIndex:
         m_functionTypeName = "Move Index";
         break;
-    case FunctionType::MoveLine:
+    case Action::MoveLine:
         m_functionTypeName = "Move Line";
         break;
-    case FunctionType::AppendString:
+    case Action::AppendString:
         m_functionTypeName = "Append String";
         break;
-    case FunctionType::ExtractData:
+    case Action::ExtractData:
         m_functionTypeName = "Extract Data";
         break;
     default:
@@ -28,39 +28,37 @@ CFunction::CFunction(FunctionType functionType, CFormula *parent) : m_functionTy
 void CFunction::serialize(std::ofstream& out) const {
     /* - SERIALIZATION ORDER -
      *
-     * FunctionType m_functionType
+     * Action       m_action
      * size of      m_functionTypeName
      * QString      m_functionTypeName
     */
-    out.write(reinterpret_cast<const char*>(&m_functionType), sizeof(FunctionType)); // m_functionType
-    SerializationUtils::writeQString(out, m_functionTypeName);                       // m_functionTypeName
-
-    // still need to serialize parent pointer
+    out.write(reinterpret_cast<const char*>(&m_action), sizeof(Action)); // m_action
+    SerializationUtils::writeQString(out, m_functionTypeName);           // m_functionTypeName
 }
 
 
 void CFunction::deserialize(std::ifstream& in) {
     /* - DESERIALIZATION ORDER -
      *
-     * FunctionType m_functionType
+     * Action       m_action
      * size of      m_functionTypeName
      * QString      m_functionTypeName
     */
 
-    in.read(reinterpret_cast<char*>(&m_functionType), sizeof(m_functionType)); // m_functionType
-    SerializationUtils::readQString(in, m_functionTypeName);                   // m_functionTypeName
+    in.read(reinterpret_cast<char*>(&m_action), sizeof(Action)); // m_action
+    SerializationUtils::readQString(in, m_functionTypeName);     // m_functionTypeName
 }
 
-CMathFunction::CMathFunction(FunctionType name) : CFunction(name) {}
+CMathFunction::CMathFunction(Action name) : CFunction(name) {}
 CMathFunction::CMathFunction(const CMathFunction &other)
-    : CFunction(other.m_functionType), m_val1{other.m_val1}, m_val2{other.m_val2} {}
+    : CFunction(other.m_action), m_val1{other.m_val1}, m_val2{other.m_val2} {}
 
 
 
-CIndexingFunction::CIndexingFunction(FunctionType name) : CFunction(name) {}
-CIndexingFunction::CIndexingFunction(FunctionType name, QString findText, int num, bool option) : CFunction(name), m_text{ findText }, m_num{ num }, m_option{ option } {};
+CIndexingFunction::CIndexingFunction(Action name) : CFunction(name) {}
+CIndexingFunction::CIndexingFunction(Action name, QString findText, int num, bool option) : CFunction(name), m_text{ findText }, m_num{ num }, m_option{ option } {};
 CIndexingFunction::CIndexingFunction(const CIndexingFunction &other)
-    : CFunction(other.m_functionType), m_text{other.m_text}, m_num{other.m_num}, m_option{other.m_option} {}
+    : CFunction(other.m_action), m_text{other.m_text}, m_num{other.m_num}, m_option{other.m_option} {}
 
 
 
@@ -82,7 +80,6 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
 }
 
 void CIndexingFunction::deserialize(std::ifstream& in) {
-    CFunction::deserialize(in);
     /* - DESERIALIZATION ORDER -
      *
      * size of  m_text
@@ -98,9 +95,9 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
 }
 
-CExtractingFunction::CExtractingFunction(FunctionType name) : CFunction(name) {}
+CExtractingFunction::CExtractingFunction(Action name) : CFunction(name) {}
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
-    : CFunction(other.m_functionType), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_endingString{other.m_endingString},
+    : CFunction(other.m_action), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_endingString{other.m_endingString},
     m_invertDirection{other.m_invertDirection}, m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid} {}
 
 void CExtractingFunction::serialize(std::ofstream& out) const {
@@ -129,7 +126,6 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
 }
 
 void CExtractingFunction::deserialize(std::ifstream& in) {
-    CFunction::deserialize(in);
     /* - DESERIALIZATION ORDER -
      *
      * int           m_charsToGet

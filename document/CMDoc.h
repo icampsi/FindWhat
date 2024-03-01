@@ -18,9 +18,7 @@ public:
     }
 
     ~CMDoc() {
-        for (auto* esquemaDoc : m_loadedEsquemaDocs) {
-            delete esquemaDoc;
-        }
+        for (auto* esquemaDoc : m_loadedEsquemaDocs) delete esquemaDoc;
         m_loadedEsquemaDocs.clear();
     }
 
@@ -32,24 +30,28 @@ public:
     CEsquemaDoc *newDoc(CEsquema* esquema);
     CPdfDoc     *newDoc(const QString& filePath);
 
-    // Getters and setters
-    CEsquemaDoc *getActiveEsquemaDoc() { return m_activeEsquema; }
-    CPdfDoc     *getActivePdfDoc()     { return m_activePdfDoc; }
-    const std::vector<CEsquemaDoc*> *getLoadedEsquemaDocs() {
-        return &m_loadedEsquemaDocs;
+    // GETTERS AND SETTERS
+    CEsquemaDoc *getActiveEsquemaDoc() const { return m_activeEsquema; }
+    CPdfDoc     *getActivePdfDoc()     const { return m_activePdfDoc; }
+    const std::vector<CEsquemaDoc*> *getLoadedEsquemaDocs() const { return &m_loadedEsquemaDocs; }
+
+    void setActiveEsquemaDoc(CEsquemaDoc* esquema) { m_activeEsquema = esquema; }
+    void setActivePdfDoc(CPdfDoc* pdfDoc) { m_activePdfDoc = pdfDoc; }
+
+    CExportPathDoc& getExportPathDoc()  { return m_exportPathDoc; }
+
+    void deleteEsquema(int index) {
+        if (index < 0 || index >= m_loadedEsquemaDocs.size()) {
+            qDebug() << "Esquema out of range for deletition";
+            return;
+        }
+        delete m_loadedEsquemaDocs[index];
+        m_loadedEsquemaDocs.erase(m_loadedEsquemaDocs.begin() + index);
     }
 
-    void setActiveEsquemaDoc(CEsquemaDoc* esquema) {
-        m_activeEsquema = esquema;
-    }
-
-    void setActivePdfDoc(CPdfDoc* pdfDoc) {
-        m_activePdfDoc = pdfDoc;
-    }
-
-    CExportPathDoc& getExportPathDoc() {
-        return m_exportPathDoc;
-    }
+    // SERIALIZATION
+    void serialize(std::ofstream& out);
+    void deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs);
 
     // No need for that until serialization is fully applied
     // void loadExportPathDoc(CExportPathDoc exportDoc) {
@@ -72,30 +74,14 @@ private:
     // OBSERVERS ARCHITECTURE
 private:
     // Notify all registered Esquema document observers
-    void esquemaListUpdated() {
-        std::vector<QString> updatedEsquemaDocList;
-        for (auto& esquemaDoc : m_loadedEsquemaDocs) {
-            updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
-        }
-
-        // Proceed with observer notification
-        for (const auto &observer : m_esquemaDocObservers) {
-            observer(updatedEsquemaDocList);
-        }
-    }
+    void esquemaListUpdated();
 
 public:
     void onDocumentDestroyed(CDocument *pDoc);
 
     // Register and unregister observers for Esquema document changes
-    void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); }
-
-    void removeObserver(std::function<void(const std::vector<QString>&)> observer) {
-        auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
-                                 [&](const std::function<void(const std::vector<QString>&)>& storedObserver) { return &observer == &storedObserver; }
-                                 );
-        m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
-    }
+    void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); } 
+    void removeObserver(std::function<void(const std::vector<QString>&)> observer);
 };
 
 #endif // CMDOC_H

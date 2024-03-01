@@ -7,19 +7,19 @@ class CFormula;
 
 class CFunction {
 public:
-    enum class FunctionType { Find, MoveIndex, MoveLine, AppendString, ExtractData };
+    enum class Action { Find, MoveIndex, MoveLine, AppendString, ExtractData };
 
 protected:
-    FunctionType m_functionType;
+    Action       m_action;
     QString      m_functionTypeName;
     CFormula*    m_parent = nullptr;
 
 public:
-    CFunction(FunctionType functionType, CFormula* parent = nullptr);
-    CFunction(std::ifstream& in) { CFunction::deserialize(in); } // Serialization constructor
+    CFunction(Action functionType, CFormula* parent = nullptr);
+    CFunction(std::ifstream& in, CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
     virtual ~CFunction() {} // Virtual destructor
 
-    virtual FunctionType getFunctionType() const { return m_functionType; }
+    virtual Action getFunctionType() const { return m_action; }
 
     void setFunctionTypeName(const QString& name) { m_functionTypeName =  name; }
     QString getFunctionTypeName() const           { return m_functionTypeName;  }
@@ -40,11 +40,11 @@ protected:
     bool    m_startFromBeggining{ false };
 
 public:
-    CIndexingFunction(FunctionType name);
-    CIndexingFunction(FunctionType name, QString findText, int num = 0, bool option = false);
+    CIndexingFunction(Action name);
+    CIndexingFunction(Action name, QString findText, int num = 0, bool option = false);
     CIndexingFunction(const CIndexingFunction &other);
-    CIndexingFunction(std::ifstream& in)
-        : CFunction(in) { CIndexingFunction::deserialize(in); } // Serialization constructor
+    CIndexingFunction(std::ifstream& in, CFormula* parent = nullptr)
+        : CFunction(in, parent) { CIndexingFunction::deserialize(in); } // Serialization constructor
 
     virtual ~CIndexingFunction() {}
 
@@ -74,7 +74,7 @@ public:
     QString   m_val2{ "" };
     Operation m_operation{ Operation::add };
 
-    CMathFunction(FunctionType name);
+    CMathFunction(Action name);
     CMathFunction(const CMathFunction &other);
     virtual ~CMathFunction() {} // Virtual destructor
 };
@@ -84,19 +84,19 @@ public:
     enum class CharTypeToGet { all, digit, letter };
 
 protected:
-    int          m_charsToGet{ -1 };       // If negative, ignored. Stop when this amount of chars have been extracted.
-    int          m_charsToRead{ -1 };      // If negative, ignored. Stop when this amount of chars have been read.
-    QString      m_endingString = "\n";     // When this string is found, stop reading. Can be a single character, e.g., \n, space, ., etc.
+    int          m_charsToGet{ -1 };         // If negative, ignored. Stop when this amount of chars have been extracted.
+    int          m_charsToRead{ -1 };        // If negative, ignored. Stop when this amount of chars have been read.
+    QString      m_endingString = "\n";      // When this string is found, stop reading. Can be a single character, e.g., \n, space, ., etc.
     bool         m_invertDirection{ false }; // Invert the direction in which the data is read.
     CharTypeToGet m_charTypeToGet = CharTypeToGet::all; // Specifies if only numbers, characters, or all should be obtained
     QString       m_toAllow{ "" };
     QString       m_toAvoid{ "" };
 
 public:
-    CExtractingFunction(FunctionType name);
+    CExtractingFunction(Action name);
     CExtractingFunction(const CExtractingFunction &other);
-    CExtractingFunction(std::ifstream& in)
-        : CFunction(in) { CExtractingFunction::deserialize(in); } // Serialization constructor
+    CExtractingFunction(std::ifstream& in, CFormula* parent = nullptr)
+        : CFunction(in, parent) { CExtractingFunction::deserialize(in); } // Serialization constructor
     virtual ~CExtractingFunction() {}
 
     // Getters and setters
@@ -122,7 +122,7 @@ public:
     void setToAvoid(QString toAvoid) { m_toAvoid = toAvoid; }
 
     // Serialization
-    void serialize(std::ofstream& out) const override;
+    void serialize(std::ofstream& out)  const override;
     void deserialize(std::ifstream& in) override;
 };
 

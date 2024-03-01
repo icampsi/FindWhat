@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <fstream>
 
+#include "utils/GeneralFunctions.h"
+
 // Copy constructor
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     // Copy simple members
@@ -93,15 +95,15 @@ QString CFormula::applyFormula(QString& text,  unsigned int from, int to) {
         CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
 
         switch (m_formulaPath[i]->getFunctionType()) {
-        case CFunction::FunctionType::Find:
+        case CFunction::Action::Find:
             if (pIndexingFunction) {
                 if (findText(text, pIndexingFunction) == -1) return m_result;
             }
             break;
-        case CFunction::FunctionType::MoveIndex:
+        case CFunction::Action::MoveIndex:
             if (pIndexingFunction) { moveIndex(text, pIndexingFunction); }
             break;
-        case CFunction::FunctionType::MoveLine:
+        case CFunction::Action::MoveLine:
             if (pIndexingFunction) { moveLine(text, pIndexingFunction); }
             break;
         // case FunctionType::BeginLine:
@@ -110,7 +112,7 @@ QString CFormula::applyFormula(QString& text,  unsigned int from, int to) {
         // case FunctionType::EndLine:
         //     EndLine(text);
         //     break;
-        case CFunction::FunctionType::AppendString:
+        case CFunction::Action::AppendString:
             appendString(pIndexingFunction); // I DONT LIKE IT BEING INDEXING FUNCTION. CREATE A SUBCLASS FOR APPENDING/SUBSTRACTING STRINGS?
             break;
         // case FunctionType::AppendData:
@@ -121,7 +123,7 @@ QString CFormula::applyFormula(QString& text,  unsigned int from, int to) {
         //     //MathData(pMathFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
         //     break;
 
-        case CFunction::FunctionType::ExtractData:
+        case CFunction::Action::ExtractData:
             CExtractingFunction* pExctractingFunction = static_cast<CExtractingFunction*>(m_formulaPath[i]);
             if (!pExctractingFunction->getInvertedDirection()) { extractData(text, pExctractingFunction); }
             else { extractDataInverted(text, pExctractingFunction); }
@@ -481,20 +483,80 @@ void CFormula::reorderFunctionPath(int objectToMoveIndex, int destinationIndex) 
 
 void CFormula::serialize(std::ofstream& out) const {
     /*  - SERIALIZATION ORDER -
+     *  CData                   m_data
+     *  IndexPosition           m_indexPosition
+     *  int                     vector m_formulaPath size
+     *  FunctionType            type
+     *  std::vector<CFunction*> m_formulaPath
+     *  NO NEED - m_result
+     */
+
+    m_data.serialize(out);                                                             // m_data
+    out.write(reinterpret_cast<const char*>(&m_indexPosition), sizeof(IndexPosition)); // m_indexPosition
+    int formulaPathSize = m_formulaPath.size();
+    out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(int));           // size of formulaPath
+
+    for (CFunction* function : m_formulaPath) {                                        // FunctionTye & m_formulaPath
+        FunctionType type;
+        if (CIndexingFunction* indexingFunction = dynamic_cast<CIndexingFunction*>(function)) {
+            type = FunctionType::Indexing;
+            out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
+            indexingFunction->serialize(out);
+        } else if (CExtractingFunction* extractingFunction = dynamic_cast<CExtractingFunction*>(function)) {
+            type = FunctionType::Extracting;
+            out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
+            extractingFunction->serialize(out);
+        } else if (CMathFunction* mathFunction = dynamic_cast<CMathFunction*>(function)) {
+            type = FunctionType::Math;
+            out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
+            mathFunction->serialize(out);
+        } else {
+            qDebug() << "Function pointer not valid";
+            continue;
+        }
+    }
+}
+
+void CFormula::deserialize(std::ifstream& in) {
+    /*  - DESERIALIZATION ORDER -
      *
-     *  int           size of result
-     *  QString       m_result
      *  CData    	  m_data
      *  IndexPosition m_indexPosition
      *  std::vector<CFunction*> m_formulaPath
+     *
+     *  NO NEED - m_result
      */
 
-    // m_result
-    int resultSize = m_result.size();
-    out.write(reinterpret_cast<const char*>(&resultSize), sizeof(int));
-    out.write(m_result.toUtf8().constData(), resultSize);
+    m_formulaPath.clear();
 
+    in.read(reinterpret_cast<char*>(&m_indexPosition), sizeof(IndexPosition));  // m_indexPosition
+    int formulaPathSize;                                                        // Size of m_formulaPath
+    in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(int));
+    for (int i{0}; i < formulaPathSize; i++) {                                  // m_formulaPath
+        FunctionType type;
+        in.read(reinterpret_cast<char*>(&type), sizeof(FunctionType));
 
-    // m_data
+        switch (type) {
+            case FunctionType::Indexing: {
+                CIndexingFunction *indexingFunction = new CIndexingFunction(in, this);
+                addFunction(indexingFunction);
+                break;
+            }
+            case FunctionType::Extracting: {
+                CExtractingFunction *extractingFunction = new CExtractingFunction(in, this);
+                addFunction(extractingFunction);
+                break;
+            }
+            case FunctionType::Math: {
+                // CMathFunction *mathFunction = new CMathFunction(in, this); // Not used yet
+                // addFunction(mathFunction);
+                break;
+            }
+            default: {
+                qDebug() << "Unknown function type during deserialization";
+                break;
+            }
+        }
+    }
 }
 

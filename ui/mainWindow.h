@@ -36,8 +36,6 @@ private slots:
     void on_btn_changeRoot_clicked();
     void on_lineEdit_rowFormat_textChanged(const QString &arg1);
 
-    void on_pushButton1_clicked();
-
 public slots:
     void functionUpdated(CFormula::IndexPosition index, QString result);
 

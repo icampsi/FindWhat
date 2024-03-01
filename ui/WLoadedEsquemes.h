@@ -17,6 +17,7 @@ public:
 
 private slots:
     void on_list_esquemes_itemSelectionChanged();
+    void handleDeleteEsquema(const int index);
 
 private:
     Ui::WListWidgetLoadedEsquemes *ui;

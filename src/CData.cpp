@@ -4,12 +4,8 @@
 
 #include <fstream>
 
-CData::CData(const CData& other) :
+CData::CData(const CData& other, CFormula *parent) :
     m_dataName(other.m_dataName), m_dataString(other.m_dataString) {
-    // Perform a deep copy of the parent formula if it exists
-    if (other.m_parentFormula) {
-        m_parentFormula = new CFormula(*(other.m_parentFormula));
-    }
 }
 
 CData& CData::operator=(const CData& other) {

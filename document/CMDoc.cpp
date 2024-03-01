@@ -29,3 +29,41 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
     }
 }
 
+// SERIALIZATOIN
+void CMDoc::serialize(std::ofstream& out) {
+    int loadedEsquemaDocsSize = m_loadedEsquemaDocs.size();
+    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(int));
+
+    for(CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
+        esquemaDoc->getEsquema()->serialize(out);
+    }
+}
+
+void CMDoc::deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
+    int loadedEsquemaDocsSize;
+    in.read(reinterpret_cast<char*>(&loadedEsquemaDocsSize), sizeof(int));
+    for (int i{0}; i < loadedEsquemaDocsSize; i++) {
+        CEsquema *esquema = new CEsquema(in);
+        loadedEsquemaDocs.push_back(newDoc(esquema));
+    }
+}
+
+void CMDoc::esquemaListUpdated() {
+    std::vector<QString> updatedEsquemaDocList;
+    for (auto& esquemaDoc : m_loadedEsquemaDocs) {
+        updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
+    }
+
+    // Proceed with observer notification
+    for (const auto &observer : m_esquemaDocObservers) {
+        observer(updatedEsquemaDocList);
+    }
+}
+
+void CMDoc::removeObserver(std::function<void(const std::vector<QString>&)> observer) {
+    auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
+                             [&](const std::function<void(const std::vector<QString>&)>& storedObserver) { return &observer == &storedObserver; }
+                             );
+    m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
+}
+

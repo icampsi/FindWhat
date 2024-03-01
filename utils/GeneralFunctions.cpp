@@ -2,7 +2,6 @@
 
 #include <cstdlib>   // For getenv on Unix-like systems
 #include <Windows.h> // For GetEnvironmentVariable on Windows
-#include <fstream>
 
 QString getUserHomeDirectory() {
     QString homePath;
@@ -56,17 +55,33 @@ QWidget* getLastParent(QWidget* widget) {
     else                   return getLastParent(parent); // Recursively call the function with the parent widget
 }
 
-void SerializationUtils::writeQString(std::ofstream& out, const QString& str) {
-    int size = str.size();
-    out.write(reinterpret_cast<const char*>(&size), sizeof(int));
-    out.write(str.toUtf8().constData(), size);
+namespace SerializationUtils {
+    void writeQString(std::ofstream& out, const QString& str) {
+        int size = str.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        out.write(str.toUtf8().constData(), size);
+    }
+
+    void readQString(std::ifstream& in, QString& str) {
+        int size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(int));
+        char *buffer = new char[size];
+        in.read(buffer, size);
+        str = QString::fromUtf8(buffer, size);
+        delete[] buffer;
+    }
 }
 
-void SerializationUtils::readQString(std::ifstream& in, QString& str) {
-    int size;
-    in.read(reinterpret_cast<char*>(&size), sizeof(int));
-    char *buffer = new char[size];
-    in.read(buffer, size);
-    str = QString::fromUtf8(buffer, size);
-    delete[] buffer;
+namespace SystemUtils {
+    // Definition of global variable
+    bool G_isLittleEndian;
+
+    // Implementation of function to set endianness
+    void setEndianness() {
+        int num = 1;
+        if (*(reinterpret_cast<char*>(&num)) == 1)  G_isLittleEndian = true;
+        else                                        G_isLittleEndian = false;
+    }
 }
+
+

@@ -22,10 +22,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="list_esquemes"/>
+    <widget class="WEsquemaListView" name="list_esquemes"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WEsquemaListView</class>
+   <extends>QListWidget</extends>
+   <header>WEsquemaListView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

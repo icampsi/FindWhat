@@ -1,20 +1,23 @@
 #include "PMainEsquemaUI.h"
 #include "qtpreprocessorsupport.h"
 #include "ui_PMainEsquemaUI.h"
+
+#include <QToolBox>
+
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
 #include "document/CMDoc.h"
-#include <QToolBox>
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
-    : QWidget(parent), ui(new Ui::PMainEsquemaUI)
+    : QWidget(parent), ui(new Ui::PMainEsquemaUI), m_emptyPage(this)
 {
     ui->setupUi(this);
+
+    // CONNECTION
     connect(ui->toolBar, &WToolBarEsquema::previewOptionChanged, this, &PMainEsquemaUI::esquemaOptionChanged);
-    PEsquemaPage *newPage = new PEsquemaPage(this);
-    ui->stackedWidget_esquemaPage->addWidget(newPage);
-    ui->stackedWidget_esquemaPage->setCurrentWidget(newPage);
-    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+
+    // Set esquemaPage to empty and remove .ui generated toolBox_formatEsquema page
+    setCurrentPageToEmptyPage();
     ui->toolBox_formatEsquema->removeItem(0); // Needed since the .ui file interface doesent allow for empty pages in the toolbox widget
 }
 
@@ -23,7 +26,7 @@ PMainEsquemaUI::~PMainEsquemaUI() { delete ui; }
 void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
     CEsquema* esquema = esquemaDoc->getEsquema();
     PEsquemaPage *newPage = new PEsquemaPage(esquemaDoc, this);
-    ui->stackedWidget_esquemaPage->addWidget(newPage);// tabWidget_esquemaTab->addTab(newPage, esquema->m_nameEsquema);
+    ui->stackedWidget_esquemaPage->addWidget(newPage);
     ui->stackedWidget_esquemaPage->setCurrentWidget(newPage);
     ui->loadedEsquemes->newEsquema(newPage, esquema);
 }
@@ -101,4 +104,16 @@ void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
     } else {
         qDebug() << "Current widget is not an instance of EsquemaPage";
     }
+}
+
+void PMainEsquemaUI::handleDeleteEsquema(const int index) {
+    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+    CMDoc::getMDoc().deleteEsquema(index);
+    qDebug() << ui->stackedWidget_esquemaPage->count();
+}
+
+void PMainEsquemaUI::setCurrentPageToEmptyPage() {
+    ui->stackedWidget_esquemaPage->addWidget(&m_emptyPage);
+    ui->stackedWidget_esquemaPage->setCurrentWidget(&m_emptyPage);
+    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
 }

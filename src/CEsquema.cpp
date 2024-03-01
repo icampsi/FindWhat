@@ -1,7 +1,8 @@
 #include "CEsquema.h"
+#include "utils/GeneralFunctions.h"
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
-    : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_valorsEstatics(valorsEstatics),
+    : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
     m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNameFormula(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
@@ -10,7 +11,7 @@ CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDat
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
-    for (auto data : m_valorsEstatics) {
+    for (auto data : m_staticData) {
         delete data;
     }
     // Delete dynamically allocated CFormula objects in t_extractDataFormula vector
@@ -92,15 +93,15 @@ void CEsquema::deleteFormula(int index) {
 
 void CEsquema::addStaticData(CData* data ) {
     m_dataMap.insert(data->getDataName(), data); // Update m_dataMap
-    m_valorsEstatics.push_back(data);
+    m_staticData.push_back(data);
 }
 
 void CEsquema::deleteStaticData(int index) {
-    if (index >= 0 && index < m_valorsEstatics.size()) {
-        CData* data = m_valorsEstatics[index];
+    if (index >= 0 && index < m_staticData.size()) {
+        CData* data = m_staticData[index];
         m_dataMap.remove(data->getDataName()); // Update m_dataMap
         delete data;
-        m_valorsEstatics.erase(m_valorsEstatics.begin() + index);
+        m_staticData.erase(m_staticData.begin() + index);
     }
     else qDebug() << "Index out of bounds for m_valorsEstatics vector";
 }
@@ -179,4 +180,88 @@ void CEsquema::xsvm_structureToString(QString* pFullFileString, char enclosureCh
     }
 }
 
+void CEsquema::serialize(std::ofstream& out) const {
+    /* - SERIALIZATION ORDER -
+     * int                              size of m_nameEsquema
+     * QString                          m_nameEsquema
+     * int                              size of m_IDText
+     * QString                          m_IDText
+     * int                              size of t_extractDataFormula
+     * std::vector<CFormula*>           t_extractDataFormula
+     * int                              size of m_valorsEstatics
+     * std::vector<CData*>              m_valorsEstatics
+     * int                              size of m_dataForCheck1
+     * std::vector<unsigned int>        m_dataForCheck1
+     * int                              size of m_dataForCheck2
+     * std::vector<unsigned int>        m_dataForCheck2
+     * int                              size of m_fileNameFormula
+     * QString                          m_fileNameFormula
+     * int                              size of m_outputDirectori
+     * QString                          m_outputDirectori
+     *
+     * - NO NEED -
+     * m_XSVStructureResult
+     * m_csvFormatFormula       - TO BE RECONSTRUCTED ON DESERIALIZATION from m_fileNameFormula
+     * m_dataMap                - TO BE RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
+     *
+     */
 
+    SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
+    SerializationUtils::writeQString(out, m_IDText);                     // m_IDText
+    SerializationUtils::writeCustomContainer(out, t_extractDataFormula); // t_extractDataFormula
+    SerializationUtils::writeCustomContainer(out, m_staticData);     // m_valorsEstatics
+
+    SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1
+    SerializationUtils::writePrimitiveContainer(out, m_dataForCheck2);   // m_dataForCheck2
+    SerializationUtils::writeQString(out, m_fileNameFormula);            // m_fileNameFormula
+    SerializationUtils::writeQString(out, m_outputDirectori);            // m_outputDirectori
+}
+
+void CEsquema::deserliazile(std::ifstream& in) {
+    /* - DESERIALIZATION ORDER -
+     * int                              size of m_nameEsquema
+     * QString                          m_nameEsquema
+     * int                              size of m_IDText
+     * QString                          m_IDText
+     * int                              size of t_extractDataFormula
+     * std::vector<CFormula*>           t_extractDataFormula
+     * int                              size of m_valorsEstatics
+     * std::vector<CData*>              m_valorsEstatics
+     * int                              size of m_dataForCheck1
+     * std::vector<unsigned int>        m_dataForCheck1
+     * int                              size of m_dataForCheck2
+     * std::vector<unsigned int>        m_dataForCheck2
+     * int                              size of m_fileNameFormula
+     * QString                          m_fileNameFormula
+     * int                              size of m_outputDirectori
+     * QString                          m_outputDirectori
+     *
+     * - RECONSTRUCTION -
+     * m_csvFormatFormula       - RECONSTRUCTED ON DESERIALIZATION from m_fileNameFormula
+     * m_dataMap                - RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
+     *
+     * - NO NEED -
+     * m_XSVStructureResult
+     */
+
+    SerializationUtils::readQString(in, m_nameEsquema);                // m_nameEsquema
+    SerializationUtils::readQString(in, m_IDText);                     // m_nameEsquema
+    int extractDataFormulaSize;
+    in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(int));
+    for(int i{0}; i < extractDataFormulaSize; i++ ) {
+        CFormula* formula = new CFormula(in);
+        t_extractDataFormula.push_back(formula);
+    }
+    // SerializationUtils::readCustomContainer(in, t_extractDataFormula, this); // t_extractDataFormula
+    int valorsEstaticsSize;
+    in.read(reinterpret_cast<char*>(&valorsEstaticsSize), sizeof(int));
+    for(int i{0}; i < valorsEstaticsSize; i++ ) {
+        CData* data = new CData(in);
+        m_staticData.push_back(data);
+    }
+    // SerializationUtils::readCustomContainer(in, m_valorsEstatics, this);     // m_valorsEstatics
+    SerializationUtils::readPrimitiveContainer(in, m_dataForCheck1);   // m_dataForCheck1
+    SerializationUtils::readPrimitiveContainer(in, m_dataForCheck2);   // m_dataForCheck2
+    SerializationUtils::readQString(in, m_fileNameFormula);            // m_fileNameFormula
+    SerializationUtils::readQString(in, m_outputDirectori);            // m_outputDirectori
+}
