@@ -40,6 +40,7 @@ The program is not yet intuitive and does not provide much guidance on how to us
 # Latest updates
 01/03/2024
 - Added serialization features to save and load esquemes merging serialization branch. Still needs a bit of pulishing.
+- Added option to delete loaded esquemas (press "del" on selected esquema)
 - Fixed some minor bugs
 - Cleaned code
 
