@@ -3,6 +3,7 @@
 #include <QString>
 
 #include <QMessageBox>
+#include <fstream>
 #include "CData.h"
 #include "CFormula.h"
 
@@ -12,6 +13,7 @@ public:
     // Constructors and destructors
     CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText);
     CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, QString IDText = "");
+    CEsquema(std::ifstream& in) { deserliazile(in); }
     CEsquema() = default;
     ~CEsquema();
 
@@ -21,7 +23,7 @@ protected:
     QString m_IDText;      // Text que identifica el document
 
     std::vector<CFormula*> t_extractDataFormula;
-    std::vector<CData*>    m_valorsEstatics;    // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
+    std::vector<CData*>    m_staticData;        // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
     std::vector<QString>   m_csvFormatFormula;  // { "", "data", "data", "num", "\n", "BI" } Especifica l'ordre en que es rpèsentaràn les dades al XSV. "\n" per salt de columna.
 
     std::vector<std::vector<CData*>> m_XSVStructureResult; // Stores the result as an xsv structure
@@ -55,6 +57,7 @@ public:
 
     // SETTERS AND GETTERS
     void addStaticData(CData* data );
+    const std::vector<CData*>& getStaticData() const { return m_staticData; }
     void deleteStaticData(int index);
     void setStaticDataName(CData* data, QString name) {
         // Update m_dataMap
@@ -93,6 +96,9 @@ public:
     void setName(const QString& name)   { m_nameEsquema = name; }
 
     const std::vector<std::vector<CData*>>& getXSVStructureResult() const { return m_XSVStructureResult; };
+
+    void serialize(std::ofstream& out) const;
+    void deserliazile(std::ifstream& in);
 };
 
 #endif // CESQUEMA_H

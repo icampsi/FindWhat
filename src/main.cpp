@@ -30,9 +30,12 @@
 
 #include "ui/mainwindow.h"
 #include <QApplication>
+#include "utils/GeneralFunctions.h"
 
 int main(int argc, char *argv[])
 {
+    SystemUtils::setEndianness(); // Checks the endianess architecture and stores it in the global variable extern bool G_isLittleEndian
+
     QApplication a(argc, argv);
     mainWindow w;
     w.showMaximized();

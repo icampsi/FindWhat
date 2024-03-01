@@ -2,6 +2,8 @@
 #define GENERALFUNCTIONS_H
 #include <QString>
 #include <QWidget>
+#include "fstream"
+
 
 QString getUserHomeDirectory();
 
@@ -12,5 +14,78 @@ QString parseToText(const QString& text);
 // Helps retrieving the last parent of a widget
 // In theory it should allways be QMainWindow in this app, but i am returning QWidget for  flexibility
 QWidget* getLastParent(QWidget* widget);
+
+namespace SerializationUtils {
+    // Serialization helpers
+    void writeQString(std::ofstream& out, const QString& str);
+    void readQString(std::ifstream& in, QString& str);
+
+#include <fstream>
+
+    template<typename Container>
+    void writeCustomContainer(std::ofstream& out, const Container& container) {
+        int size = container.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        for (auto&& item : container) {
+            item->serialize(out);
+        }
+    }
+
+    template<typename Container, typename item>
+    void readCustomContainer(std::ifstream& in, Container& container, item* parent) {
+        int size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(int));
+        for (int i = 0; i < size; ++i) {
+            typename item::value_type newItem(in, parent); // Create an instance of the item type by calling its constructor
+            container.push_back(newItem);
+        }
+    }
+
+
+    template<typename primContainer>
+    void writePrimitiveContainer(std::ofstream& out, const primContainer& container) {
+        int size = container.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        for (const auto& item : container) {
+            out.write(reinterpret_cast<const char*>(&item), sizeof(typename primContainer::value_type));
+        }
+    }
+
+    template<typename primContainer>
+    void readPrimitiveContainer(std::ifstream& in, primContainer& container) {
+        int size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(int));
+        for (int i = 0; i < size; ++i) {
+            typename primContainer::value_type item; // Create an instance of the item type
+            in.read(reinterpret_cast<char*>(&item), sizeof(typename primContainer::value_type));
+            container.push_back(item);
+        }
+    }
+
+
+    /*
+        template<typename InputIt>
+        void serializeContainer(std::ofstream& out, InputIt first, InputIt last) {
+            int size = std::distance(first, last);
+            out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+            for (auto it = first; it != last; ++it) {
+                (*it)->serialize(out);
+            }
+        }
+
+     * serializeContainer(out, t_extractDataFormula.begin(), t_extractDataFormula.end());
+     * serializeContainer(out, m_valorsEstatics.begin(), m_valorsEstatics.end());
+    */
+
+}
+
+
+namespace SystemUtils {
+// Declaration of global variable
+extern bool G_isLittleEndian;
+
+// Function to set endianness
+void setEndianness();
+}
 
 #endif // GENERALFUNCTIONS_H

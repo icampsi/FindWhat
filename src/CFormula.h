@@ -1,11 +1,8 @@
 #ifndef CFORMULA_H
 #define CFORMULA_H
 
-#include "CData.h"
 #include "CFunctionClasses.h"
-#include "qdebug.h"
-
-
+#include "CData.h"
 
 // EXTREU UNA ÚNICA DADA A PARTIR DELS PARÀMETRES DONATS
 class CFormula {
@@ -14,6 +11,7 @@ public:
         int initial = 0;
         int final   = 0;
     };
+    enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization
 protected:
 
     QString       m_result = "";
@@ -25,6 +23,7 @@ public:
     // CONSTRUCTORS AND DESTRUCTORS
     CFormula(QString dataName) : m_data(dataName, this) {}
     CFormula() = default;
+    CFormula(std::ifstream& in) : m_data(in, this) { CFormula::deserialize(in); }
     CFormula(const CFormula& other);
     ~CFormula();
 
@@ -53,8 +52,9 @@ public:
 
     inline void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends data to m_result
         if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
-        else                              m_result.prepend(pFunctionToApply->getText());
+        else                               m_result.prepend(pFunctionToApply->getText());
     }
+
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
 
     inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
@@ -67,11 +67,15 @@ public:
         function->setParent(this);
         m_formulaPath.push_back(function);
     }
+
     void deleteFunction(int index);
 
     // Moves object from one index to another
     void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);
     void clearPath() { m_formulaPath.clear();}
+
+    void serialize(std::ofstream& out) const;
+    void deserialize(std::ifstream& in);
 };
 
 #endif // CFORMULA_H

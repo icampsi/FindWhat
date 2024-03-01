@@ -15,8 +15,8 @@ public:
     // CONSTURCTORS AND DESTRUCTORS
     CData(const QString& dataName, const QString& dataString = "", CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{dataString}, m_parentFormula{parent} {}
     CData(const QString& dataName, CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{""}, m_parentFormula{parent} {}
-
-    CData(const CData& other);
+    CData(std::ifstream& in, CFormula* parent = nullptr) : m_parentFormula{parent} { CData::deserialize(in); } // Serialization constructor
+    CData(const CData& other, CFormula *parent = nullptr);
     ~CData() = default;
 
     CData& operator=(const CData& other);
@@ -30,6 +30,9 @@ public:
 
     CFormula *getParentFormula() const       { return m_parentFormula;   }
     void setParentFormula(CFormula* parent)  { m_parentFormula = parent; }
+
+    void serialize(std::ofstream& out) const;
+    void deserialize(std::ifstream& in);
 
     // enum class DataType { integer, floating, string, empty };
     // DataType m_dataType{ DataType::empty }; // Tipus de dada

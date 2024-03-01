@@ -1,12 +1,11 @@
 #include "CData.h"
 #include "CFormula.h"
+#include "utils/GeneralFunctions.h"
 
-CData::CData(const CData& other) :
+#include <fstream>
+
+CData::CData(const CData& other, CFormula *parent) :
     m_dataName(other.m_dataName), m_dataString(other.m_dataString) {
-    // Perform a deep copy of the parent formula if it exists
-    if (other.m_parentFormula) {
-        m_parentFormula = new CFormula(*(other.m_parentFormula));
-    }
 }
 
 CData& CData::operator=(const CData& other) {
@@ -24,6 +23,32 @@ CData& CData::operator=(const CData& other) {
         }
     }
     return *this;
+}
+
+void CData::serialize(std::ofstream& out) const {
+    /* - SERIALIZATION ORDER -
+     * int       size of m_dataName
+     * QString   m_dataName
+     * int       size of m_dataString
+     * QString   m_dataString
+     * CFormula *m_parentFormula - NEED TO CHECK HOW TO DO THAT
+    */
+
+    SerializationUtils::writeQString(out, m_dataName);   // m_dataName
+    SerializationUtils::writeQString(out, m_dataString); // m_dataString
+}
+
+void CData::deserialize(std::ifstream& in) {
+    /* - DESERIALIZATION ORDER -
+     * int       size of m_dataName
+     * QString   m_dataName
+     * int       size of m_dataString
+     * QString   m_dataString
+     * CFormula *m_parentFormula - NEED TO CHECK HOW TO DO THAT
+    */
+
+    SerializationUtils::readQString(in, m_dataName);   // m_dataName
+    SerializationUtils::readQString(in, m_dataString); // m_dataString
 }
 
 // CData::CData(QString dataName, QString dataString, DataType dataType, QString assocBegin, QString assocEnd) {

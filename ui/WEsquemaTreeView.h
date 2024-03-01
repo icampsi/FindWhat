@@ -23,7 +23,7 @@ signals:
 
 private slots:
     void handleDoubleClick(const QModelIndex &index);
-    void handleEditingFinished(const QModelIndex &index, const QString &text);
+    void handleEditingFinished(const QModelIndex &index, const QString &text);    
 };
 
 #endif // WESQUEMATREEVIEW_H

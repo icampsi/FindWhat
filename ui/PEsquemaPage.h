@@ -89,7 +89,7 @@ private slots:
     void on_comboBox_typeOfData_currentIndexChanged(int index);
 
     // Menú actions for the "new function" push button
-    void handle_newFunActions(CFunction::FunctionType functionType);
+    void handle_newFunActions(CFunction::Action functionType);
 
 signals:
     void functionUpdated(CFormula::IndexPosition index, QString result);
