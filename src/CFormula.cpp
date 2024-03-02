@@ -3,8 +3,6 @@
 #include <QDebug>
 #include <fstream>
 
-#include "utils/GeneralFunctions.h"
-
 // Copy constructor
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     // Copy simple members

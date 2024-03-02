@@ -1,0 +1,21 @@
+Package: poppler
+Version: 23.11.0
+Depends: boost-container, boost-move, freetype, libiconv, libjpeg-turbo, libpng, openjpeg, tiff, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 750f58fd8d6296b723dd7432d465d7453d5c5fabf78e807951bf32268e72a667
+Description: A PDF rendering library
+Default-Features: font-configuration, zlib
+
+Package: poppler
+Feature: font-configuration
+Architecture: x64-windows
+Multi-Arch: same
+Description: Defaut font configuration backend
+
+Package: poppler
+Feature: zlib
+Depends: zlib
+Architecture: x64-windows
+Multi-Arch: same
+Description: zlib for poppler

@@ -1,13 +1,16 @@
 #include "CEsquema.h"
 #include "utils/GeneralFunctions.h"
 
+#include <QRegularExpression>
+#include <QRegularExpressionMatchIterator>
+
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
-    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNameFormula(), m_outputDirectori() {}
+    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
-    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNameFormula(), m_outputDirectori() {}
+    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
@@ -54,34 +57,25 @@ void inline CEsquema::formatDate(QString& data) {
     data = any + '-' + mes + '-' + dia;
 }
 
-void CEsquema::renameFile(const char* oldName, const char* newName) {
-    std::rename(oldName, newName);
+void CEsquema::createFileName(QString& newFileName) {
+    QRegularExpression regex("<(.*?)>");
+    QRegularExpressionMatchIterator matches = regex.globalMatch(m_fileNamePlaceholder);
+
+    newFileName = m_fileNamePlaceholder;
+
+    while (matches.hasNext()) {
+        // Extract the captured string
+        QRegularExpressionMatch match = matches.next();
+        QString capturedString = match.captured(1);
+
+        if (m_dataMap.contains(capturedString)) {
+            // Replace the captured string with the corresponding value from the map
+            newFileName.replace(match.capturedStart(0), match.capturedLength(0), m_dataMap.value(capturedString)->getDataString());
+        } else {
+            newFileName.replace(match.capturedStart(1), match.capturedLength(1), "ERROR_REPLACING_PLACEHOLDER");
+        }
+    }
 }
-
-// void CEsquema::createFileName(CFileData& file) {
-//     QString tempStr{ "" };
-//     int dataIndex;
-
-//     file.m_newFileName.append(m_outputDirectori);
-//     if (file.m_error) { file.m_newFileName += "ERROR - "; }
-
-//     for (unsigned int i{ 0 }; i < m_fileNameFormula.length(); i++) {
-//         tempStr = "";
-//         if (m_fileNameFormula[i] == '$') {
-//             i++;
-//             while (m_fileNameFormula[i] != '$') {
-//                 tempStr.append(m_fileNameFormula.at(i));
-//                 i++;
-//             }
-//             dataIndex = tempStr.toInt();
-//             if (file.m_extractedFileData.size() > dataIndex) {
-//                 file.m_newFileName += file.m_extractedFileData[dataIndex].getDataString();
-//             }
-//             else {QMessageBox::critical(nullptr, "ERROR", "Error en escriure el nom del document. Revisa els paràmetres.", QMessageBox::Ok);}
-//         }
-//         if (m_fileNameFormula[i] != '$') { file.m_newFileName.append(m_fileNameFormula.at(i)); }
-//     }
-// }
 
 void CEsquema::deleteFormula(int index) {
     if (index >= 0 && index < t_extractDataFormula.size()) {
@@ -142,14 +136,17 @@ void CEsquema::generateXSVStructure(QString &text) {
     std::vector<CData*> row;
 
     for(int i{0}; i < m_csvFormatFormula.size(); i++) {
+        // Store the name of the data inside the formula we are checking
         QString dataName = m_csvFormatFormula.at(i);
 
+        // Finds the data either from static data or t_extractDataFormula
         auto it = m_dataMap.find(dataName);
         if (it != m_dataMap.end()) {
             CData    *data    = it.value();
             CFormula *formula = data->getParentFormula();
 
-            if(formula) { formula->applyFormula(text); }             // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
+            // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
+            if(formula) { formula->applyFormula(text); }
             row.push_back(data);
         }
         else qDebug() << "data named " + dataName + " was not found. Be sure to have written it correctly and cas sensitive";
@@ -213,7 +210,7 @@ void CEsquema::serialize(std::ofstream& out) const {
 
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::writeQString(out, m_fileNameFormula);            // m_fileNameFormula
+    SerializationUtils::writeQString(out, m_fileNamePlaceholder);            // m_fileNameFormula
     SerializationUtils::writeQString(out, m_outputDirectori);            // m_outputDirectori
 }
 
@@ -262,6 +259,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
     // SerializationUtils::readCustomContainer(in, m_valorsEstatics, this);     // m_valorsEstatics
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::readQString(in, m_fileNameFormula);            // m_fileNameFormula
+    SerializationUtils::readQString(in, m_fileNamePlaceholder);            // m_fileNameFormula
     SerializationUtils::readQString(in, m_outputDirectori);            // m_outputDirectori
 }

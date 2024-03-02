@@ -11,9 +11,9 @@ public:
         int initial = 0;
         int final   = 0;
     };
-    enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization
-protected:
+    enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization purposes
 
+protected:
     QString       m_result = "";
     CData    	  m_data;
     IndexPosition m_indexPosition;
@@ -22,7 +22,7 @@ protected:
 public:
     // CONSTRUCTORS AND DESTRUCTORS
     CFormula(QString dataName) : m_data(dataName, this) {}
-    CFormula() = default;
+    CFormula() : m_data("", this) {}
     CFormula(std::ifstream& in) : m_data(in, this) { CFormula::deserialize(in); }
     CFormula(const CFormula& other);
     ~CFormula();
@@ -56,7 +56,6 @@ public:
     }
 
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
-
     inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
 
     void extractData(QString& text, CExtractingFunction* pFunctionToApply);

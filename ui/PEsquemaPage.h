@@ -11,7 +11,7 @@
 #include "src/CFormula.h"
 #include "document/CDocumentSubclasses.h"
 
-namespace Ui { class esquemaPage; }
+namespace Ui { class PEsquemaPage; }
 
 class PEsquemaPage : public QWidget {
     Q_OBJECT
@@ -28,7 +28,7 @@ public:
     CEsquemaDoc* getEsquemaDoc() { return m_esquemaDoc; }
 
 protected:
-    Ui::esquemaPage *ui;
+    Ui::PEsquemaPage *ui;
     // Maps for conecting the items in the views with their object
     QMap<QStandardItem*  , CEsquema* >  m_itemEsquemaMap;
     QMap<QStandardItem*  , CFormula* >  m_itemFormulaMap;

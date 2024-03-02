@@ -10,7 +10,7 @@
 // Guarda tota la informació necessària per a extreure cada un dels valors especificats d'un PDF i guardar-los com a CData
 class CEsquema {
 public:
-    // Constructors and destructors
+    // CONSTRUCTORS & DESTRUCTORS
     CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText);
     CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, QString IDText = "");
     CEsquema(std::ifstream& in) { deserliazile(in); }
@@ -18,7 +18,7 @@ public:
     ~CEsquema();
 
 protected:
-    //Members
+    // MEMBERS
     QString m_nameEsquema; // Name for the esquema
     QString m_IDText;      // Text que identifica el document
 
@@ -31,9 +31,9 @@ protected:
     std::vector<unsigned int> m_dataForCheck1; // { 8, 9, 5} For the future. Índex dels valors que volem fer check. val1 + val2 == val 3? (molaria donar més opcions d'operacions complexes)
     std::vector<unsigned int> m_dataForCheck2; // For the future. Índex dels valors que volem fer check. L'últim és el valor a comparar.
 
-    QMap<QString, CData*> m_dataMap; // This maps every CData structure with it's name for efficient lookup
-    QString               m_fileNameFormula; // { "$6$_$2$_$4$_$1$.pdf" } Use $1$ for insert value 1. etc.
-    QString               m_outputDirectori; // { "LLUM\\" }  // On es vol guardar l'arxiu
+    QMap<QString, CData*>  m_dataMap;         // This maps every CData structure with it's name for efficient lookup. This includes also data from inside every CFormula in the t_extractDataFormula
+    QString                m_fileNamePlaceholder; // { "%6%_%2%_%4%_%1%.pdf" } Use $1$ for insert value 1. etc.
+    QString                m_outputDirectori; // { "LLUM\\" }  // On es vol guardar l'arxiu
 
 public:
     void inline formatDate(QString& data);  // Still unused
@@ -42,7 +42,7 @@ public:
     // Future updates:
     // void createFileData(QString& text, CFileData& file); // This is not used, it is part of an old idea and will probably be deleted
     // bool checkData(CFileData& file); // Still unused
-    // void createFileName(CFileData& file);
+    void createFileName(QString& newFileName);
 
     // Breaks a csv line into a vector to set up m_csvFormatFormula.
     void setCsvFormatFormula(const QString& rLine, char enclosureChar, char separator);
@@ -89,6 +89,9 @@ public:
         formula->setDataName(name);
     }
 
+    void setFileNamePlaceholder(const QString& placeholder) { m_fileNamePlaceholder = placeholder; }
+    const QString& getFileNamePlaceholder() const { return m_fileNamePlaceholder; }
+
     void setIDText(const QString& idText)   { m_IDText = idText; }
     const QString& getIDText() const        { return m_IDText; }
 
@@ -97,6 +100,7 @@ public:
 
     const std::vector<std::vector<CData*>>& getXSVStructureResult() const { return m_XSVStructureResult; };
 
+    // SERIALIZATION
     void serialize(std::ofstream& out) const;
     void deserliazile(std::ifstream& in);
 };

@@ -1,10 +1,10 @@
 #include "PFormExpToolBoxPage.h"
-#include "ui_WFormExpToolBoxPage.h"
+#include "ui_PFormExpToolBoxPage.h"
 #include "document/CMDoc.h"
 #include "QComboBox"
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::WExpFormToolBoxPage)
+    : QWidget(parent), ui(new Ui::PExpFormToolBoxPage)
 {
     ui->setupUi(this);
 
@@ -66,5 +66,12 @@ void PFormExpToolBoxPage::on_comboBox_esquemaName_currentIndexChanged(int index)
 void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
     if (arg1) ui->lineEdit_renameDocs->setEnabled(true);
     else ui->lineEdit_renameDocs->setEnabled(false);
+}
+
+
+void PFormExpToolBoxPage::on_lineEdit_renameDocs_textChanged(const QString &arg1) {
+    // Pass value to associated Esquema
+    CEsquema* esquema = m_exportCSV->getAsocEsquemaDoc()->getEsquema();
+    esquema ->setFileNamePlaceholder(arg1);
 }
 

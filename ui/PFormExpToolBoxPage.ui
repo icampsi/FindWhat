@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WExpFormToolBoxPage</class>
- <widget class="QWidget" name="WExpFormToolBoxPage">
+ <class>PExpFormToolBoxPage</class>
+ <widget class="QWidget" name="PExpFormToolBoxPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,7 +30,11 @@
     <widget class="QComboBox" name="comboBox_esquemaName"/>
    </item>
    <item row="3" column="0">
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defines formating of the csv exported doc. use ',' for each cell. Example: &lt;span style=&quot; font-style:italic;&quot;&gt;data1,data2,data3...&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_formatString">
@@ -47,6 +51,9 @@
    </item>
    <item row="4" column="0">
     <widget class="QCheckBox" name="checkBox_renameDocs">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable renaming of each parsed pdf document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Rename Documents</string>
      </property>
@@ -145,7 +152,14 @@
     </widget>
    </item>
    <item row="5" column="0">
-    <widget class="QLineEdit" name="lineEdit_renameDocs"/>
+    <widget class="QLineEdit" name="lineEdit_renameDocs">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;use &lt;span style=&quot; font-style:italic;&quot;&gt;&amp;lt;dataName&amp;gt;&lt;/span&gt; as placeholders. example: &lt;span style=&quot; font-style:italic;&quot;&gt;&amp;lt;data1&amp;gt; fixed text &amp;lt;data2&amp;gt; more fixed text&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="placeholderText">
+      <string extracomment="use '&lt;dataName&gt;' as placeholders "/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

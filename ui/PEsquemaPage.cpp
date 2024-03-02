@@ -14,7 +14,7 @@ QString parseToText(const QString& text);
 
 // CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
 PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
-    : QWidget(parent), ui(new Ui::esquemaPage), m_esquemaDoc {esquemaDoc} {
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc} {
     ui->setupUi(this);
 
     model_esquema = new QStandardItemModel();
@@ -33,7 +33,7 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::esquemaPage), m_esquemaDoc {nullptr} {
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {nullptr} {
     ui->setupUi(this);
     ui->frame_esquema->setEnabled(false);
     ui->stackedWidget_general->setCurrentIndex(0);
