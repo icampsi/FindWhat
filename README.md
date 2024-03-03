@@ -33,9 +33,9 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 - Finally, click "Export CSV" and wait until every PDF is parsed correctly.
 
-- Go to "Parse Document", add a page, and link it to the Esquema with the combo box. Then, underneath in the text edit, write "NIF,Total" and drag and drop every bill that matches these specifications (for example, drop 20 PDF files you received from the same company, which are all the same except for the Total amount of the bill and some other numbers).
+- Go to "Parse Document", add a page, and link it to the Esquema with the combo box. Then, underneath in the text edit, write "<NIF>,<Total>,Some Fixed Text etc." and drag and drop every bill that matches these specifications (for example, drop 20 PDF files you received from the same company, which are all the same except for the Total amount of the bill and some other numbers).
 
-- You'll get a .csv file with 20 rows, each with 2 cells, stating "F12345" and "Whatever-Total-was-extracted-from-the-pdf".
+- You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
 03/03/2024
@@ -53,7 +53,7 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 
 # Future updates
-- A feature to rename the parsed PDF files to a custom format that includes extracted values (e.g., "$date_$companyName_etc.pdf") for easier archiving and relocation to another folder.
+- A feature to Relocate or copy parsed PDF files to another folder.
 - Functionality to rename the extracted CSV files and specify a destination location.
 - Functionality to ensure that no two formulas or static data have the same name (right now it's a mess of you do that).
 - Additional functions to enhance capabilities related to extracting variables from the pdf.
