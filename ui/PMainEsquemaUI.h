@@ -7,6 +7,7 @@
 #include "document/CDocumentSubclasses.h"
 #include "WToolBarEsquema.h"
 #include "PEsquemaPage.h"
+#include "ui_PMainEsquemaUI.h"
 
 namespace Ui { class PMainEsquemaUI; }
 
@@ -21,10 +22,10 @@ public:
 
     // PUBLIC FUNCTIONS
     void newEsquema(CEsquemaDoc* esquemaDoc);
-    void changeCurrentPage(PEsquemaPage* page);
+    void changeCurrentPage(PEsquemaPage* page) { ui->stackedWidget_esquemaPage->setCurrentWidget(page); }
 
 private slots:
-    void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option);
+    void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
     void on_pushButton_addEsquema_clicked();
     void on_DeleteEsquema_clicked();
     void on_pushButton_clicked();

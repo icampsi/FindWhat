@@ -6,11 +6,11 @@
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
-    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
-    m_csvFormatFormula(), m_XSVStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
@@ -21,40 +21,6 @@ CEsquema::~CEsquema() {
     for (auto formula : t_extractDataFormula) {
         delete formula;
     }
-
-    // Delete dynamically allocated CData objects in m_XSVStructureResult vector of vectors
-    for (auto& row : m_XSVStructureResult) {
-        for (auto data : row) {
-            delete data;
-        }
-    }
-}
-
-void inline CEsquema::formatDate(QString& data) {
-    for (unsigned int i{ 0 }; i < data.size(); i++)
-        if (data.at(i) == '-') data[i] = '/';
-
-    int trackFormat{ 0 };
-    QString dia;
-    QString mes;
-    QString any;
-    for (unsigned int i{ 0 }; i < data.size(); i++) {
-        if (data.at(i) == '/')	trackFormat++;
-        else {
-            switch (trackFormat) {
-            case 0:
-                dia.append(data.at(i));
-                break;
-            case 1:
-                mes.append(data.at(i));
-                break;
-            case 2:
-                any.append(data[i]);
-                break;
-            }
-        }
-    }
-    data = any + '-' + mes + '-' + dia;
 }
 
 void CEsquema::createFileName(QString& newFileName) {
@@ -100,8 +66,19 @@ void CEsquema::deleteStaticData(int index) {
     else qDebug() << "Index out of bounds for m_valorsEstatics vector";
 }
 
-void CEsquema::setCsvFormatFormula(const QString& rLine, char enclosureChar, char separator) {
-    m_csvFormatFormula.clear();
+void CEsquema::setStaticDataName(CData* data, QString name) {
+    // Update m_dataMap
+    QString oldName = data->getDataName();
+    m_dataMap.insert(name, data);
+    if (m_dataMap.contains(oldName)) {
+        m_dataMap.take(oldName);        // Remove the old key-value pair and get the value
+        m_dataMap.insert(name, data);   // Insert the value with the new key
+    }
+    data->setDataName(name);
+}
+
+void CEsquema::constructCsvFormatFormulaStructure(const QString& rLine, char enclosureChar, char separator) {
+    m_csvFormatFormulaStructure.clear();
     QString cell{ "" };
     for (unsigned int i{ 0 }; i < rLine.length(); i++) {
         if (rLine[i] != separator && i != rLine.length() - 1) {
@@ -125,19 +102,43 @@ void CEsquema::setCsvFormatFormula(const QString& rLine, char enclosureChar, cha
             if (i == rLine.length() - 1 && rLine[i] != separator) {
                 cell.append(rLine[i]);
             }
-            m_csvFormatFormula.push_back(cell);
+            m_csvFormatFormulaStructure.push_back(cell);
             cell.clear();
         }
     }
 }
 
-void CEsquema::generateXSVStructure(QString &text) {
-    m_XSVStructureResult.clear();
-    std::vector<CData*> row;
+void CEsquema::xsv_stringStructureToString(QString* pFullFileString, char enclosureChar, char separator) {
+    for (int i{ 0 }; i < m_XSVStringStructureResult.size(); i++) {
+        for (int k{ 0 }; k < m_XSVStringStructureResult[i].size(); k++) {
+            // Add enclosure char on both ends and start second loop for accessing individual chars from the string
+            // of this cell. We copy each char and check if " is found, so we can add another one to keep it as a scape.
+            const QString &cell = m_XSVStringStructureResult[i][k];
+            if (!cell.isEmpty()) { // Si la cela ha de ser buida, no facis tot el procés de sota: Evita que es posen "" a les celes buides.
+                pFullFileString->append("\"");
+                for (unsigned int index{ 0 }; index < cell.length(); index++) {
+                    if (cell[index] == '\"') {
+                        pFullFileString->append("\"\"");
+                    }
+                    else {
+                        pFullFileString->append(cell[index]);
+                    }
+                }
+                pFullFileString->append(enclosureChar);
+            }
+            pFullFileString->append(separator);
+        }
+        pFullFileString->append('\n');
+    }
+}
 
-    for(int i{0}; i < m_csvFormatFormula.size(); i++) {
+void CEsquema::generateXSVStringStructure(const QString &text) {
+    m_XSVStringStructureResult.clear();
+    std::vector<QString> row;
+
+    for(int i{0}; i < m_csvFormatFormulaStructure.size(); i++) {
         // Store the name of the data inside the formula we are checking
-        QString dataName = m_csvFormatFormula.at(i);
+        QString dataName = m_csvFormatFormulaStructure.at(i);
 
         // Finds the data either from static data or t_extractDataFormula
         auto it = m_dataMap.find(dataName);
@@ -147,34 +148,13 @@ void CEsquema::generateXSVStructure(QString &text) {
 
             // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
             if(formula) { formula->applyFormula(text); }
-            row.push_back(data);
+            row.push_back(data->getDataString());
         }
-        else qDebug() << "data named " + dataName + " was not found. Be sure to have written it correctly and cas sensitive";
-    }
-    m_XSVStructureResult.push_back(row);
-}
-
-void CEsquema::xsvm_structureToString(QString* pFullFileString, char enclosureChar, char separator) {
-    for (int i{ 0 }; i < m_XSVStructureResult.size(); i++) {
-        for (int k{ 0 }; k < m_XSVStructureResult[i].size(); k++) {
-            // Posem cometes al principi i al final de la cela, i fem un segon loop per accedir als caracters individuals de
-            // l'string d'aquesta cela. Copiem els caracters un per un perquè així, si trobem ", hi insertem una altra ".
-            if (!m_XSVStructureResult[i][k]->getDataString().isEmpty()) { // Si la cela ha de ser buida, no facis tot el procés de sota: Evita que es posen "" a les celes buides.
-                pFullFileString->append("\"");
-                for (unsigned int index{ 0 }; index < m_XSVStructureResult[i][k]->getDataString().length(); index++) {
-                    if (m_XSVStructureResult[i][k]->getDataString()[index] == '\"') {
-                        pFullFileString->append("\"\"");
-                    }
-                    else {
-                        pFullFileString->append(m_XSVStructureResult[i][k]->getDataString()[index]);
-                    }
-                }
-                pFullFileString->append(enclosureChar);
-            }
-            pFullFileString->append(separator);
+        else {
+            row.push_back(dataName); // If data was not found, whatever the user inputed as a text will become the text of the cell
         }
-        pFullFileString->append('\n');
     }
+    m_XSVStringStructureResult.push_back(std::move(row));
 }
 
 void CEsquema::serialize(std::ofstream& out) const {
@@ -197,7 +177,7 @@ void CEsquema::serialize(std::ofstream& out) const {
      * QString                          m_outputDirectori
      *
      * - NO NEED -
-     * m_XSVStructureResult
+     * m_XSVStringStructureResult
      * m_csvFormatFormula       - TO BE RECONSTRUCTED ON DESERIALIZATION from m_fileNameFormula
      * m_dataMap                - TO BE RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
      *
@@ -206,7 +186,7 @@ void CEsquema::serialize(std::ofstream& out) const {
     SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
     SerializationUtils::writeQString(out, m_IDText);                     // m_IDText
     SerializationUtils::writeCustomContainer(out, t_extractDataFormula); // t_extractDataFormula
-    SerializationUtils::writeCustomContainer(out, m_staticData);     // m_valorsEstatics
+    SerializationUtils::writeCustomContainer(out, m_staticData);         // m_valorsEstatics
 
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck2);   // m_dataForCheck2
@@ -238,7 +218,7 @@ void CEsquema::deserliazile(std::ifstream& in) {
      * m_dataMap                - RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
      *
      * - NO NEED -
-     * m_XSVStructureResult
+     * m_XSVStringStructureResult
      */
 
     SerializationUtils::readQString(in, m_nameEsquema);                // m_nameEsquema
@@ -247,14 +227,14 @@ void CEsquema::deserliazile(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(int));
     for(int i{0}; i < extractDataFormulaSize; i++ ) {
         CFormula* formula = new CFormula(in);
-        t_extractDataFormula.push_back(formula);
+        addExtractDataFormula(formula);
     }
     // SerializationUtils::readCustomContainer(in, t_extractDataFormula, this); // t_extractDataFormula
     int valorsEstaticsSize;
     in.read(reinterpret_cast<char*>(&valorsEstaticsSize), sizeof(int));
     for(int i{0}; i < valorsEstaticsSize; i++ ) {
         CData* data = new CData(in);
-        m_staticData.push_back(data);
+        addStaticData(data);
     }
     // SerializationUtils::readCustomContainer(in, m_valorsEstatics, this);     // m_valorsEstatics
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck1);   // m_dataForCheck1
@@ -262,3 +242,33 @@ void CEsquema::deserliazile(std::ifstream& in) {
     SerializationUtils::readQString(in, m_fileNamePlaceholder);            // m_fileNameFormula
     SerializationUtils::readQString(in, m_outputDirectori);            // m_outputDirectori
 }
+
+
+// FUTURE UPDATES
+
+// void inline CEsquema::formatDate(QString& data) {
+//     for (unsigned int i{ 0 }; i < data.size(); i++)
+//         if (data.at(i) == '-') data[i] = '/';
+
+//     int trackFormat{ 0 };
+//     QString dia;
+//     QString mes;
+//     QString any;
+//     for (unsigned int i{ 0 }; i < data.size(); i++) {
+//         if (data.at(i) == '/')	trackFormat++;
+//         else {
+//             switch (trackFormat) {
+//             case 0:
+//                 dia.append(data.at(i));
+//                 break;
+//             case 1:
+//                 mes.append(data.at(i));
+//                 break;
+//             case 2:
+//                 any.append(data[i]);
+//                 break;
+//             }
+//         }
+//     }
+//     data = any + '-' + mes + '-' + dia;
+// }

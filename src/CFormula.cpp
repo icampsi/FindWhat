@@ -79,7 +79,7 @@ CFormula::~CFormula() {
     }
 }
 
-QString CFormula::applyFormula(QString& text,  unsigned int from, int to) {
+QString CFormula::applyFormula(const QString& text,  unsigned int from, int to) {
     m_result = ""; // Reset result
     if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
     if(to < 0) to = m_formulaPath.size() - 1; // so you can specify -1 as a "go throwgh the full path"
@@ -133,7 +133,7 @@ QString CFormula::applyFormula(QString& text,  unsigned int from, int to) {
     return m_result;
 }
 
-inline int CFormula::findText(QString& text, CIndexingFunction* pFunctionToApply) {
+inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionToApply) {
     if (pFunctionToApply->getStartFromBeggining()) m_indexPosition = {0, 0};
     // TRUE = end text. FALSE = begin text
     if (text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial) != -1) {
@@ -152,7 +152,7 @@ inline int CFormula::findText(QString& text, CIndexingFunction* pFunctionToApply
     return 0;
 }
 
-inline void CFormula::moveIndex(QString& text, CIndexingFunction* pFunctionToApply) {
+inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToApply) {
     int newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
     if (newIndex >= 0 && newIndex < text.size()) {
@@ -164,7 +164,7 @@ inline void CFormula::moveIndex(QString& text, CIndexingFunction* pFunctionToApp
     }
 }
 
-void CFormula::moveLine(QString& text, CIndexingFunction* pFunctionToApply) {
+void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply) {
     int linesToMove = pFunctionToApply->getNum(); // utilitzem un número intern per evitar que canviï el valor dins CFormula, ja que formula ha de ser reutilitzable
     // Case when we go back X linesToMove
     if (linesToMove < 0) {
@@ -200,7 +200,7 @@ void CFormula::moveLine(QString& text, CIndexingFunction* pFunctionToApply) {
     if(pFunctionToApply->getOption()) EndLine(text);
 }
 
-inline void CFormula::BeginLine(QString& text) { // Moves index to the beggining of current line
+inline void CFormula::BeginLine(const QString &text) { // Moves index to the beggining of current line
     while (m_indexPosition.initial != 0) {
         m_indexPosition.initial--;
         if (text[m_indexPosition.initial] == '\n') {
@@ -212,7 +212,7 @@ inline void CFormula::BeginLine(QString& text) { // Moves index to the beggining
     m_indexPosition.final = m_indexPosition.initial;
 }
 
-inline void CFormula::EndLine(QString& text) { // Moves index to the ending of current line
+inline void CFormula::EndLine(const QString& text) { // Moves index to the ending of current line
     while (m_indexPosition.initial < text.size()) {
         m_indexPosition.initial++;
         if (text[m_indexPosition.initial] == '\n') {
@@ -305,7 +305,7 @@ inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply, std::vector<
     return true;
 }
 
-void CFormula::extractData(QString& text, CExtractingFunction* pFunctionToApply) {
+void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionToApply) {
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
     int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
@@ -372,7 +372,7 @@ void CFormula::extractData(QString& text, CExtractingFunction* pFunctionToApply)
     }
 }
 
-void CFormula::extractDataInverted(QString& text, CExtractingFunction* pFunctionToApply) {
+void CFormula::extractDataInverted(const QString& text, CExtractingFunction* pFunctionToApply) {
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
     int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
@@ -436,7 +436,7 @@ void CFormula::extractDataInverted(QString& text, CExtractingFunction* pFunction
     }
 }
 
-void CFormula::deleteFunction(int index) {
+void CFormula::deleteFunction(const int index) {
     // Check if the index is within bounds
     if (index >= 0 && index < m_formulaPath.size()) {
         // Check if the pointer at the specified index is valid

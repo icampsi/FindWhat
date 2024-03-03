@@ -29,9 +29,9 @@ void PDockPreview::handleFilePathChanged(const QString &filePath) {
         if(!currentPage) return;
         currentPage->loadFunction();
         CEsquema* currentEsquema = currentPage->getEsquemaDoc()->getEsquema();
-        currentEsquema->generateXSVStructure(docText);
+        // currentEsquema->generateXSVStructure(docText);
         QString text;
-        currentEsquema->xsvm_structureToString(&text, '\"', ',');
+        // currentEsquema->xsvm_structureToString(&text, '\"', ',');
         ui->plainTextEdit_resultPreview->setPlainText(text);
     }
 }

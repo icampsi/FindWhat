@@ -31,24 +31,26 @@ public:
     CFormula& operator=(const CFormula& other); // Assignment operator to support assignment between CFormula instances
 
     // GETTERS AND SETTERS
-    QString         getResult()   { return m_result; }
-    QString         getDataName() { return m_data.getDataName();}
-    CData          *getData()     { return &m_data; }
+    QString         getResult() const   { return m_result; }
+    QString         getDataName() const { return m_data.getDataName();}
+    CData          *getData()           { return &m_data; }
 
     void            setDataName(const QString& dataName) { m_data.setDataName(dataName); }
-    IndexPosition   getIndexPosition() { return m_indexPosition; }
-    CFunction*      getFunction(int index){ return m_formulaPath[index]; }
-    size_t          getPathSize() { return m_formulaPath.size(); }
+
+    IndexPosition   getIndexPosition() const                 { return m_indexPosition; }
     void            setIndexPosition(int initial, int final) { m_indexPosition = {initial, final}; }
 
-    // FORMULA FUNCTIONS
-    QString applyFormula(QString& text, unsigned int from = 0, int to = -1);
+    CFunction*      getFunction(int index) const { return m_formulaPath[index]; }
+    size_t          getPathSize() const          { return m_formulaPath.size(); }
 
-    inline int  findText(QString&  text, CIndexingFunction* pFunctionToApply);
-    inline void moveIndex(QString& text, CIndexingFunction* pFunctionToApply);
-    inline void moveLine(QString&  text, CIndexingFunction* pFunctionToApply);
-    inline void BeginLine(QString& text); // Sets index at the begining of current line
-    inline void EndLine(QString&   text); // Sets index at the begining of current line
+    // FORMULA FUNCTIONS
+    QString applyFormula(const QString &text, unsigned int from = 0, int to = -1);
+
+    inline int  findText(const QString &text, CIndexingFunction* pFunctionToApply);
+    inline void moveIndex(const QString& text, CIndexingFunction* pFunctionToApply);
+    inline void moveLine(const QString &text, CIndexingFunction* pFunctionToApply);
+    inline void BeginLine(const QString& text); // Sets index at the begining of current line
+    inline void EndLine(const QString&   text); // Sets index at the begining of current line
 
     inline void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends data to m_result
         if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
@@ -58,8 +60,8 @@ public:
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
 
-    void extractData(QString& text, CExtractingFunction* pFunctionToApply);
-    void extractDataInverted(QString& text, CExtractingFunction* pFunctionToApply);
+    void extractData(const QString &text, CExtractingFunction* pFunctionToApply);
+    void extractDataInverted(const QString &text, CExtractingFunction* pFunctionToApply);
 
     // PATH INTERFACE
     void addFunction(CFunction* function) {
@@ -67,7 +69,7 @@ public:
         m_formulaPath.push_back(function);
     }
 
-    void deleteFunction(int index);
+    void deleteFunction(const int index);
 
     // Moves object from one index to another
     void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);

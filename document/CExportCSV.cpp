@@ -9,23 +9,22 @@
 #include "CDocumentSubclasses.h"
 
 
-std::vector<std::vector<CData*>> CExportCSV::buildXSVStructure(ExportCSVProgressBar_dlg *progressDialog) {
-    std::vector<std::vector<CData*>> xsvStructure;
+void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructure, ExportCSVProgressBar_dlg *progressDialog) {
     QString text;
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 
     for(auto& it : m_pdfFilePaths) {
         CTextExtractor::PDFToTextPoppler(it, text);
-        esquema->generateXSVStructure(text);
-        for(auto& j : esquema->getXSVStructureResult()) {
+        esquema->generateXSVStringStructure(text);
+        for(auto& j : esquema->getXSVStringStructureResult()) {
             xsvStructure.push_back(j);
         }
+        if(m_renameParsedPDFFlag) renameFile(it); // Rename document if flag enabled
+
+        // Update progress bar
         QCoreApplication::processEvents();
-        renameFile(it);
-        // NEED TO RENAME THE FILES HERE MAYBE??
         progressDialog->updateProgress();
     }
-    return xsvStructure;
 }
 
 void CExportCSV::reOrderFiles(int fileToMoveIndex, int targetPositionIndex) {

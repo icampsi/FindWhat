@@ -82,8 +82,8 @@ public:
         m_exportCSVs.erase(m_exportCSVs.begin() + index);
     }
 
-    // Creates a .csv File from a xsvStructure
-    void xsvm_structureToFile(const QString& fileName, std::vector<std::vector<CData*>>& rXSVStructure, QChar separator) {
+    // Creates a .csv File from a xsvStringStructure
+    void xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator) {
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QMessageBox::critical(nullptr, QStringLiteral("ERROR"), QStringLiteral("Couldn't create file"));
@@ -94,7 +94,7 @@ public:
         for (const auto& row : rXSVStructure) {
             for (const auto &cell : row) {
                 out << '"';
-                for (const QChar& c : cell->getDataString()) {
+                for (const QChar& c : cell) {
                     if (c == '"')
                         out << "\"\"";
                     else

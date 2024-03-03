@@ -224,15 +224,7 @@ void PEsquemaPage::newStaticData() {
 }
 
 // SLOTS ---------------------------------------------------------------
-void PEsquemaPage::on_pushButton_addFormula_clicked() { newFormula(); }
-
-void PEsquemaPage::on_pushButton_addStaticData_clicked() { newStaticData(); }
-
 // VIEWS
-void PEsquemaPage::on_listWidget_formula_itemSelectionChanged() {
-    loadFunction();
-}
-
 void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
     if (!index.isValid() || !index.parent().isValid()) return;
 
@@ -256,16 +248,26 @@ void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
     // FORMULA
     if(index.parent().row() == 1) {
         QStandardItem *retrievedFormulaItem = model_esquema->itemFromIndex(index);
+        // Load formula member
         m_loadedFormula = m_itemFormulaMap.value(retrievedFormulaItem);
+        // Update label
         ui->label_dataName->setText(m_loadedFormula->getDataName());
 
         QString functionName;
+        // Add function items to listWidget_formula
         for(int i{0}; i < m_loadedFormula->getPathSize(); i++) {
             CFunction* function = m_loadedFormula->getFunction(i);
             functionName = function->getFunctionTypeName() + ": ";
             QListWidgetItem * functionItem = new QListWidgetItem(functionName);
             m_itemFunctionMap[functionItem] = function;
             ui->listWidget_formula->addItem(functionItem);
+        }
+        // If any function is loaded, show the first one, else, empty stacked edit function page by showing the empty page on index 0
+        if(ui->listWidget_formula->count() > 0) {
+            ui->listWidget_formula->setCurrentRow(0);
+        }
+        else {
+            ui->stacked_editFunction->setCurrentIndex(0);
         }
         updateFunctionProcess();
         // Set stacked widget page so it shows the formula editor
@@ -492,6 +494,6 @@ void PEsquemaPage::on_comboBox_typeOfData_currentIndexChanged(int index) {
 }
 
 void PEsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
-    m_loadedStaticData->setDataString(ui->plainTextEdit_staticDataString->toPlainText());
+    QString text = ui->plainTextEdit_staticDataString->toPlainText();
+    m_loadedStaticData->setDataString(text);
 }
-

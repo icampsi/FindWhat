@@ -105,6 +105,6 @@ void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
     CEsquema    *currentEsquema = nullptr;
 
     if (esquemaDoc)     currentEsquema = esquemaDoc->getEsquema();
-    if (currentEsquema) currentEsquema->setCsvFormatFormula(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
+    // if (currentEsquema) currentEsquema->constructCsvFormatFormulaStruct(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
 }
 

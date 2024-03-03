@@ -31,14 +31,6 @@ void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
     ui->loadedEsquemes->newEsquema(newPage, esquema);
 }
 
-void PMainEsquemaUI::esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) {
-    ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option));
-}
-
-void PMainEsquemaUI::changeCurrentPage(PEsquemaPage* page) {
-    ui->stackedWidget_esquemaPage->setCurrentWidget(page);
-}
-
 void PMainEsquemaUI::on_pushButton_addEsquema_clicked() {
     // Disable the button until actions are finished so there are no conflicts witht he document types we acces on the toolboxpage constructor
     ui->pushButton_addEsquema->setEnabled(false);
@@ -59,7 +51,7 @@ void PMainEsquemaUI::on_DeleteEsquema_clicked() {
 
 void PMainEsquemaUI::on_pushButton_clicked() {
     ui->pushButton->setEnabled(false);
-    std::vector<std::vector<CData*>> xsvStructure;
+    std::vector<std::vector<QString>> xsvStructure;
     // Get all the loaded exportCSV as a vector
     std::vector<CExportCSV*> exportCSVs = CMDoc::getMDoc().getExportPathDoc().getExportCSVs();
 
@@ -75,17 +67,17 @@ void PMainEsquemaUI::on_pushButton_clicked() {
         // Process pending events to update the UI
         QCoreApplication::processEvents();
 
-        std::vector<std::vector<CData*>> newData;
+        std::vector<std::vector<QString>> newData;
         for (CExportCSV* it : exportCSVs) {
             // Pass the string taken from the textedit in the WFormExpToolBoxPage to the selected esquema
-            it->getAsocEsquemaDoc()->getEsquema()->setCsvFormatFormula(it->getCSVFormat(), '\"',',');
+            it->getAsocEsquemaDoc()->getEsquema()->constructCsvFormatFormulaStructure(it->getCSVFormat(), '\"',',');
             // Build the structure
-            newData = it->buildXSVStructure(progressDlg);
+            it->buildXSVStructure(newData, progressDlg);
             // Append it to the global xsvm structure
             xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
         }
         // Create .csv File from the structure
-        CMDoc::getMDoc().getExportPathDoc().xsvm_structureToFile("extractedText.csv", xsvStructure, ',');
+        CMDoc::getMDoc().getExportPathDoc().xsvm_stringStructureToFile("extractedText.csv", xsvStructure, ',');
         // Delete progress dialog for closing
         delete progressDlg;
         progressDlg = nullptr;

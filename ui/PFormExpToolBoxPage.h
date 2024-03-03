@@ -15,15 +15,12 @@ public:
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
 
 public slots:
-    void handlePathContentChanged(const std::vector<QString>& paths);
+    void handlePathContentChanged(const std::vector<QString>& paths) { m_exportCSV->setPathFiles(paths); }
 
 private slots:
-    void on_lineEdit_textChanged(const QString &arg1);
-
+    void on_lineEdit_textChanged(const QString &arg1) { m_exportCSV->setCSVFormat(arg1); }
     void on_comboBox_esquemaName_currentIndexChanged(int index);
-
     void on_checkBox_renameDocs_stateChanged(int arg1);
-
     void on_lineEdit_renameDocs_textChanged(const QString &arg1);
 
 private:
