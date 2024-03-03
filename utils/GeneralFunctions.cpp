@@ -1,7 +1,10 @@
 #include "generalfunctions.h"
 
+#include <QRegularExpression>
+
 #include <cstdlib>   // For getenv on Unix-like systems
 #include <Windows.h> // For GetEnvironmentVariable on Windows
+
 
 QString getUserHomeDirectory() {
     QString homePath;
@@ -82,6 +85,11 @@ namespace SystemUtils {
         int num = 1;
         if (*(reinterpret_cast<char*>(&num)) == 1)  G_isLittleEndian = true;
         else                                        G_isLittleEndian = false;
+    }
+
+    bool containsInvalidFileNameChars(const QString& fileName) {
+        QRegularExpression regex("[<>:\"\\/\\\\|?*]");
+        return regex.match(fileName).hasMatch();
     }
 }
 

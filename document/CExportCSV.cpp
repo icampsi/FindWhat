@@ -41,7 +41,13 @@ void CExportCSV::reOrderFiles(int fileToMoveIndex, int targetPositionIndex) {
 void CExportCSV::renameFile(const QString &oldFilePath) {
     QFileInfo fileInfo(oldFilePath);
     QString newFileName;
-    m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName);
+    if (!m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName)) {
+        m_invalidFileNameDlg = new InvalidFileName_dlg(nullptr, &newFileName, oldFilePath);
+        if (m_invalidFileNameDlg->exec() == QDialog::Rejected) {
+            return;
+        }
+    }
+
     QString newFilePath = QDir::toNativeSeparators(fileInfo.path() + QDir::separator() + newFileName + '.' + fileInfo.suffix());
 
     QFile file(oldFilePath);

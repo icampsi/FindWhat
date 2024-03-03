@@ -36,8 +36,8 @@ protected:
     QString                m_outputDirectori;     // { "LLUM\\" }  // where to save the pdf file
 
 public:
-    void renameFile(const char* oldName, const char* newName);  
-    void createFileName(QString& newFileName);
+    void renameFile(const char* oldName, const char* newName);
+    bool createFileName(QString& newFileName); // Return false if name contains any invalid naming character: < > " \ / | ? *
 
     // Generates a string xsv Structure from the format specified in m_csvFormatFormula
     void generateXSVStringStructure(const QString &text);

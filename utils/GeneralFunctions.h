@@ -86,6 +86,10 @@ extern bool G_isLittleEndian;
 
 // Function to set endianness
 void setEndianness();
+
+// Check if a stirng contains invalid characters for file name: < > : " / \ | ? *
+bool containsInvalidFileNameChars(const QString& fileName);
+
 }
 
 #endif // GENERALFUNCTIONS_H

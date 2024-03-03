@@ -23,7 +23,7 @@ CEsquema::~CEsquema() {
     }
 }
 
-void CEsquema::createFileName(QString& newFileName) {
+bool CEsquema::createFileName(QString& newFileName) {
     QRegularExpression regex("<(.*?)>");
     QRegularExpressionMatchIterator matches = regex.globalMatch(m_fileNamePlaceholder);
 
@@ -38,9 +38,14 @@ void CEsquema::createFileName(QString& newFileName) {
             // Replace the captured string with the corresponding value from the map
             newFileName.replace(match.capturedStart(0), match.capturedLength(0), m_dataMap.value(capturedString)->getDataString());
         } else {
-            newFileName.replace(match.capturedStart(1), match.capturedLength(1), "ERROR_REPLACING_PLACEHOLDER");
+            newFileName.replace(match.capturedStart(0), match.capturedLength(0), "ERROR_REPLACING_PLACEHOLDER");
         }
+        matches = regex.globalMatch(newFileName); // Repeat the search so indexes get updated
     }
+    if(SystemUtils::containsInvalidFileNameChars(newFileName)) {
+        return false;
+    }
+    else return true;
 }
 
 void CEsquema::deleteFormula(int index) {

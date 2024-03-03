@@ -34,6 +34,7 @@ SOURCES += \
     ui/WSpreadSheetTable.cpp \
     ui/WToolBarEsquema.cpp \
     ui/WToolbarPreview.cpp \
+    ui/dialogs/InvalidFileName_dlg.cpp \
     ui/dialogs/NewEsquema_dlg.cpp \
     ui/dialogs/ExportCSVProgressBar_dlg.cpp \
     ui/dialogs/exportEsquema_dlg.cpp \
@@ -66,6 +67,7 @@ HEADERS += \
     ui/WToolBarEsquema.h \
     ui/WToolbarPreview.h \
     ui/dialogs/ExportCSVProgressBar_dlg.h \
+    ui/dialogs/InvalidFileName_dlg.h \
     ui/dialogs/NewEsquema_dlg.h \
     ui/dialogs/exportEsquema_dlg.h \
     ui/mainWindow.h \
@@ -84,6 +86,7 @@ FORMS += \
     ui/PMainEsquemaUI.ui \
     ui/WLoadedEsquemes.ui \
     ui/dialogs/ExportCSVProgressBar_dlg.ui \
+    ui/dialogs/InvalidFileName_dlg.ui \
     ui/dialogs/NewEsquema_dlg.ui \
     ui/dialogs/exportEsquema_dlg.ui \
     ui/mainwindow.ui

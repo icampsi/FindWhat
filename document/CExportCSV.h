@@ -5,6 +5,7 @@
 
 #include "ui/dialogs/ExportCSVProgressBar_dlg.h"
 #include "src/CData.h"
+#include "ui/dialogs/InvalidFileName_dlg.h"
 
 class CEsquemaDoc;
 
@@ -21,6 +22,9 @@ protected:
     QString              m_csvFormat;            // A string made of csv each having the name of a formula or static data. this data will be replaced with the extracted data
     QString              m_exportFileRename;     // A string with placeholders for renaming files
     bool                 m_renameParsedPDFFlag;  // A flag to state whether a pdf document should be renamed
+
+    InvalidFileName_dlg *m_invalidFileNameDlg;
+
 
 public:
     // GETTERS AND SETTERS
