@@ -53,9 +53,9 @@ public slots:
 
 private slots:
     // VIEWS
-    void on_listWidget_formula_itemSelectionChanged()               { loadFunction();  }
-    void on_pushButton_addFormula_clicked()                         { newFormula();    }
-    void on_pushButton_addStaticData_clicked()                      { newStaticData(); }
+    void on_listWidget_formula_itemSelectionChanged() { loadFunction();  }
+    void on_pushButton_addFormula_clicked()           { newFormula();    }
+    void on_pushButton_addStaticData_clicked()        { newStaticData(); }
 
     void on_treeView_Esquema_clicked(const QModelIndex &index);
     void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);

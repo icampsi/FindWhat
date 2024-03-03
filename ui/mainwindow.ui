@@ -24,6 +24,13 @@
     <item row="1" column="0">
      <widget class="QLineEdit" name="lineEdit_rowFormat"/>
     </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">

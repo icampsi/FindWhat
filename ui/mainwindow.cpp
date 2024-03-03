@@ -108,3 +108,8 @@ void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
     // if (currentEsquema) currentEsquema->constructCsvFormatFormulaStruct(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
 }
 
+
+void mainWindow::on_pushButton_clicked() {
+
+}
+
