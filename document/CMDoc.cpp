@@ -30,7 +30,7 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
 }
 
 // SERIALIZATOIN
-void CMDoc::serialize(std::ofstream& out) {
+void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
     int loadedEsquemaDocsSize = m_loadedEsquemaDocs.size();
     out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(int));
 
@@ -38,6 +38,14 @@ void CMDoc::serialize(std::ofstream& out) {
         esquemaDoc->getEsquema()->serialize(out);
     }
 }
+
+void CMDoc::serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc) {
+    int loadedEsquemaDocsSize = 1;
+    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(int));
+
+    esquemaDoc->getEsquema()->serialize(out);
+}
+
 
 void CMDoc::deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
     int loadedEsquemaDocsSize;

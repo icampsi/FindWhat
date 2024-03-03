@@ -3,9 +3,10 @@
 
 #include <QWidget>
 #include "PEsquemaPage.h"
+#include "ui_WLoadedEsquemes.h"
 #include <QMap>
 
-namespace Ui { class WListWidgetLoadedEsquemes; }
+namespace Ui { class WLoadedEsquemes; }
 
 class WLoadedEsquemes : public QWidget {
     Q_OBJECT
@@ -14,13 +15,13 @@ public:
     explicit WLoadedEsquemes(QWidget *parent = nullptr);
     ~WLoadedEsquemes();
     void newEsquema(PEsquemaPage *page, CEsquema *esquema);
+    void deleteEsquema(const int index) { ui->list_esquemes->handleDeleteEsquema(index); }
 
 private slots:
     void on_list_esquemes_itemSelectionChanged();
-    void handleDeleteEsquema(const int index);
 
 private:
-    Ui::WListWidgetLoadedEsquemes *ui;
+    Ui::WLoadedEsquemes *ui;
     QMap<QListWidgetItem*, PEsquemaPage*> m_itemPageMap;
 };
 

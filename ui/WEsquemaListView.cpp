@@ -22,9 +22,6 @@ void WEsquemaListView::keyPressEvent(QKeyEvent *event) {
 
             // Ensures a valid row is selected
             if (index != -1) {
-                // Remove the item from the list widget
-                QListWidgetItem *item = takeItem(index);
-                delete item;
                 emit deleteEsquema(index);
             }
             else QMessageBox::warning(this, "No Esquema Selected", "Please select a row to delete.");

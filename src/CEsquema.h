@@ -22,8 +22,8 @@ protected:
     QString m_nameEsquema; // Name for the esquema
     QString m_IDText;      // Text que identifica el document
 
-    std::vector<CFormula*> t_extractDataFormula;
-    std::vector<CData*>    m_staticData;        // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
+    std::vector<CFormula*> t_extractDataFormula;         // Formula vector for each data to be extracted
+    std::vector<CData*>    m_staticData;                 // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
     std::vector<QString>   m_csvFormatFormulaStructure;  // { dataName1,dataName2,some_fixed_text,,,dataName3 etc. } Specifies order of cells in the xsv exported file. Still want to add an option for "\n" for new row
 
     std::vector<std::vector<QString>> m_XSVStringStructureResult; // Stores the result as an xsv string structure

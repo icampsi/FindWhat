@@ -56,21 +56,21 @@ QWidget* getLastParent(QWidget* widget) {
 }
 
 namespace SerializationUtils {
-void writeQString(std::ofstream& out, const QString& str) {
-    // conversion so i can get size in bytes, not characters
-    QByteArray utf8Data = str.toUtf8();
-    int size = utf8Data.size();
-    out.write(reinterpret_cast<const char*>(&size), sizeof(int));
-    out.write(utf8Data.constData(), size);
-}
+    void writeQString(std::ofstream& out, const QString& str) {
+        // conversion so i can get size in bytes, not characters
+        QByteArray utf8Data = str.toUtf8();
+        int size = utf8Data.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        out.write(utf8Data.constData(), size);
+    }
 
-void readQString(std::ifstream& in, QString& str) {
-    int size;
-    in.read(reinterpret_cast<char*>(&size), sizeof(int));
-    QByteArray utf8Data(size, Qt::Uninitialized);  // Reserve space for UTF-8 data
-    in.read(utf8Data.data(), size);
-    str = QString::fromUtf8(utf8Data);
-}
+    void readQString(std::ifstream& in, QString& str) {
+        int size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(int));
+        QByteArray utf8Data(size, Qt::Uninitialized);  // Reserve space for UTF-8 data
+        in.read(utf8Data.data(), size);
+        str = QString::fromUtf8(utf8Data);
+    }
 }
 
 namespace SystemUtils {

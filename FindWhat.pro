@@ -36,6 +36,7 @@ SOURCES += \
     ui/WToolbarPreview.cpp \
     ui/dialogs/NewEsquema_dlg.cpp \
     ui/dialogs/ExportCSVProgressBar_dlg.cpp \
+    ui/dialogs/exportEsquema_dlg.cpp \
     ui/mainwindow.cpp \
     utils/CTextExtractor.cpp \
     utils/GeneralFunctions.cpp
@@ -66,6 +67,7 @@ HEADERS += \
     ui/WToolbarPreview.h \
     ui/dialogs/ExportCSVProgressBar_dlg.h \
     ui/dialogs/NewEsquema_dlg.h \
+    ui/dialogs/exportEsquema_dlg.h \
     ui/mainWindow.h \
     utils/CTextExtractor.h \
     utils/GeneralFunctions.h
@@ -83,6 +85,7 @@ FORMS += \
     ui/WLoadedEsquemes.ui \
     ui/dialogs/ExportCSVProgressBar_dlg.ui \
     ui/dialogs/NewEsquema_dlg.ui \
+    ui/dialogs/exportEsquema_dlg.ui \
     ui/mainwindow.ui
 
 # Debug and Release library linking

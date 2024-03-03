@@ -1,5 +1,6 @@
 #include "PMainEsquemaUI.h"
 #include "qtpreprocessorsupport.h"
+#include "ui/mainWindow.h"
 #include "ui_PMainEsquemaUI.h"
 
 #include <QToolBox>
@@ -7,6 +8,7 @@
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
 #include "document/CMDoc.h"
+#include "utils/generalfunctions.h"
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     : QWidget(parent), ui(new Ui::PMainEsquemaUI), m_emptyPage(this)
@@ -100,7 +102,10 @@ void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
 
 void PMainEsquemaUI::handleDeleteEsquema(const int index) {
     ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+    ui->loadedEsquemes->deleteEsquema(index);
     CMDoc::getMDoc().deleteEsquema(index);
+    // Perform a check in main window for disableing Export Esquema menu action if needed
+    qobject_cast<mainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
     qDebug() << ui->stackedWidget_esquemaPage->count();
 }
 

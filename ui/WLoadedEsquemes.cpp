@@ -6,12 +6,10 @@
 #include "WEsquemaListView.h"
 
 WLoadedEsquemes::WLoadedEsquemes(QWidget *parent)
-    : QWidget(parent), ui(new Ui::WListWidgetLoadedEsquemes) {
+    : QWidget(parent), ui(new Ui::WLoadedEsquemes) {
     ui->setupUi(this);
 
     connect(ui->list_esquemes, &WEsquemaListView::deleteEsquema, static_cast<PMainEsquemaUI*>(parent), &PMainEsquemaUI::handleDeleteEsquema);
-    connect(ui->list_esquemes, &WEsquemaListView::deleteEsquema, this, &WLoadedEsquemes::handleDeleteEsquema);
-
 }
 
 
@@ -44,15 +42,4 @@ void WLoadedEsquemes::on_list_esquemes_itemSelectionChanged() {
             parent->setCurrentPageToEmptyPage();
         }
     }
-}
-
-
-void WLoadedEsquemes::handleDeleteEsquema(const int index) {
-    // QListWidgetItem *item = ui->list_esquemes->selectedItems().front();
-    // if(item) {
-    //     PMainEsquemaUI *parent = dynamic_cast<PMainEsquemaUI*>(parentWidget());
-    //     if(parent) {
-    //         parent->changeCurrentPage(m_itemPageMap[item]);
-    //     } else qDebug() << "No item selected in list_esquemes";
-    // } else qDebug() << "Selected item not found in m_itemPageMap";
 }

@@ -50,7 +50,8 @@ public:
     }
 
     // SERIALIZATION
-    void serialize(std::ofstream& out);
+    void serializeFullEsquemaArray(std::ofstream& out);
+    void serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc);
     void deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs);
 
     // No need for that until serialization is fully applied

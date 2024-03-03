@@ -14,6 +14,12 @@ public:
 signals:
     void deleteEsquema(const int index);
 
+public slots:
+    void handleDeleteEsquema(const int index) {
+        // Remove the item from the list widget
+        QListWidgetItem *item = takeItem(index);
+        delete item;
+    }
 };
 
 #endif // WESQUEMALISTVIEW_H

@@ -24,13 +24,6 @@
     <item row="1" column="0">
      <widget class="QLineEdit" name="lineEdit_rowFormat"/>
     </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>PushButton</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -47,8 +40,12 @@
      <string>File</string>
     </property>
     <addaction name="action_NewEsquema"/>
-    <addaction name="action_LoadEsquema"/>
-    <addaction name="action_SaveEsquema"/>
+    <addaction name="action_LoadSession"/>
+    <addaction name="action_SaveSession"/>
+    <addaction name="action_SaveSessionAs"/>
+    <addaction name="separator"/>
+    <addaction name="action_ExportEsquema"/>
+    <addaction name="action_ImportEsquema"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -99,14 +96,29 @@
     <string>New Esquema</string>
    </property>
   </action>
-  <action name="action_LoadEsquema">
+  <action name="action_LoadSession">
    <property name="text">
-    <string>Load Esquema</string>
+    <string>Load Session</string>
    </property>
   </action>
-  <action name="action_SaveEsquema">
+  <action name="action_SaveSession">
    <property name="text">
-    <string>Save Esquema</string>
+    <string>Save Session</string>
+   </property>
+  </action>
+  <action name="action_ExportEsquema">
+   <property name="text">
+    <string>Export Esquema</string>
+   </property>
+  </action>
+  <action name="action_ImportEsquema">
+   <property name="text">
+    <string>Import Esquema</string>
+   </property>
+  </action>
+  <action name="action_SaveSessionAs">
+   <property name="text">
+    <string>Save Session As...</string>
    </property>
   </action>
  </widget>

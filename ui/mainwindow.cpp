@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "document/CMDoc.h"
+#include "ui/dialogs/exportEsquema_dlg.h"
 
 // CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
 mainWindow::mainWindow(QWidget *parent)
@@ -19,11 +20,28 @@ mainWindow::mainWindow(QWidget *parent)
     m_dockPreview->setAllowedAreas(Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, m_dockPreview);
 
+
+    // Check if there is any loaded esquema to export
+    if (CMDoc::getMDoc().getLoadedEsquemaDocs()->size() == 0) {
+        QMenu *fileMenu = ui->menuFile;
+
+        // Find the "Export Esquema" action
+        foreach(QAction *action, fileMenu->actions()) {
+            if(action->text() == "Export Esquema") {
+                m_exportEsquemaAction = action;
+                m_exportEsquemaAction->setEnabled(false); // Disable the action
+                break;
+            }
+        }
+    }
+
     // CONNECTIONS
     // Menú actions connections
-    connect(ui->action_NewEsquema , &QAction::triggered, this, &mainWindow::action_newEsquema);
-    connect(ui->action_LoadEsquema, &QAction::triggered, this, &mainWindow::action_loadEsquema);
-    connect(ui->action_SaveEsquema, &QAction::triggered, this, &mainWindow::action_saveEsquema);
+    connect(ui->action_NewEsquema   , &QAction::triggered, this, &mainWindow::action_newEsquema);
+    connect(ui->action_LoadSession  , &QAction::triggered, this, &mainWindow::action_loadSession);
+    connect(ui->action_SaveSession  , &QAction::triggered, this, &mainWindow::action_saveSession);
+    connect(ui->action_ImportEsquema, &QAction::triggered, this, &mainWindow::action_importEsquema);
+    connect(ui->action_ExportEsquema, &QAction::triggered, this, &mainWindow::action_exportEsquema);
 
     // Mediate between browserWidget and dockPreview
     connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &PDockPreview::handleFilePathChanged);
@@ -54,11 +72,24 @@ void mainWindow::action_newEsquema() {
         esquemaNames.push_back(it->getEsquema()->getName());
     }
     newEsquemadlg = new newEsquema_dlg(this, esquemaNames);
-    newEsquemadlg->show();
+    newEsquemadlg->exec();
+
+    checkExortEsquemaActionEnable();
 }
 
-void mainWindow::action_loadEsquema() {
-    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "Binary Files (*.esq)");
+void mainWindow::action_loadSession() {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "FindWhat Session Files (*.fw)");
+    if (fileName.isEmpty()) return;
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Unsaved Changes",
+                                  "Loading a new session will replace current one and discard unsaved changes. Continue?",
+                                  QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::No) return;
+
+    for (int i{0}; i < CMDoc::getMDoc().getLoadedEsquemaDocs()->size(); i++) {
+        ui->mainEsquemaUI->handleDeleteEsquema(i);
+    }
 
     std::ifstream file(fileName.toStdString(), std::ios::binary);
     if (file.is_open()) {
@@ -75,11 +106,57 @@ void mainWindow::action_loadEsquema() {
     }
 }
 
-void mainWindow::action_saveEsquema() {
-    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save .bin File", QDir::homePath(), "Binary Files (*.esq)");
+void mainWindow::action_saveSession() {
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save .bin File", QDir::homePath(), "FindWhat Session Files (*.fw)");
     std::ofstream file(fileName.toStdString(), std::ios::binary);
     if (file.is_open()) {
-        CMDoc::getMDoc().serialize(file);
+        CMDoc::getMDoc().serializeFullEsquemaArray(file);
+        file.close();
+    } else {
+        QString errorString = "Couldn't save file " + fileName;
+        QMessageBox::critical(this, "Error", errorString);
+    }
+}
+
+void mainWindow::action_importEsquema() {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "FindWhat Esquema Files (*.esq)");
+    if (fileName.isEmpty()) return;
+
+    std::ifstream file(fileName.toStdString(), std::ios::binary);
+    if (file.is_open()) {
+        std::vector<CEsquemaDoc*> loadedEsquemaDocs;
+        CMDoc::getMDoc().deserialize(file, loadedEsquemaDocs);
+        file.close();
+        for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
+            loadEsquema(esquemaDoc);
+        }
+
+    } else {
+        QString errorString = "Couldn't open file " + fileName;
+        QMessageBox::critical(this, "Error", errorString);
+    }
+}
+
+void mainWindow::action_exportEsquema() {
+    // Check if there is any loaded esquema to export
+    if (CMDoc::getMDoc().getLoadedEsquemaDocs()->size() == 0) {
+        QMessageBox::information(this, "Empty", "There are no esquemes to export");
+        return;
+    }
+
+    int esquemaIndex; // For storing index selected on the dialog combo box
+    // Creates a dialog for selecting esquema to export
+    exportEsquemaDlg = new exportEsquema_dlg(this, &esquemaIndex);
+    int result = exportEsquemaDlg->exec();
+    if (result == QDialog::Rejected) return;
+
+    // Creates a dialog for choosing file name and path
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save .esq File", QDir::homePath(), "FindWhat Esquema Files (*.esq)");
+
+    // Serialize ou the selected esquema
+    std::ofstream file(fileName.toStdString(), std::ios::binary);
+    if (file.is_open()) {
+        CMDoc::getMDoc().serializeEsquema(file, CMDoc::getMDoc().getLoadedEsquemaDocs()->at(esquemaIndex));
         file.close();
     } else {
         QString errorString = "Couldn't save file " + fileName;
@@ -108,8 +185,11 @@ void mainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
     // if (currentEsquema) currentEsquema->constructCsvFormatFormulaStruct(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
 }
 
-
-void mainWindow::on_pushButton_clicked() {
-
+void mainWindow::checkExortEsquemaActionEnable() {
+    if (CMDoc::getMDoc().getLoadedEsquemaDocs()->size() == 0)  {
+        m_exportEsquemaAction->setEnabled(false);
+    }
+    else {
+        m_exportEsquemaAction->setEnabled(true);
+    }
 }
-

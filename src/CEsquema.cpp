@@ -132,27 +132,39 @@ void CEsquema::xsv_stringStructureToString(QString* pFullFileString, char enclos
     }
 }
 
+
 void CEsquema::generateXSVStringStructure(const QString &text) {
     m_XSVStringStructureResult.clear();
     std::vector<QString> row;
 
     for(int i{0}; i < m_csvFormatFormulaStructure.size(); i++) {
-        // Store the name of the data inside the formula we are checking
-        QString dataName = m_csvFormatFormulaStructure.at(i);
+        QString cell = m_csvFormatFormulaStructure.at(i);
+        QRegularExpression regex("<(.*?)>");
+        QRegularExpressionMatchIterator matches = regex.globalMatch(cell);
 
-        // Finds the data either from static data or t_extractDataFormula
-        auto it = m_dataMap.find(dataName);
-        if (it != m_dataMap.end()) {
-            CData    *data    = it.value();
-            CFormula *formula = data->getParentFormula();
+        while (matches.hasNext()) {
+            // Extract the captured string
+            QRegularExpressionMatch match = matches.next();
+            QString capturedString = match.captured(1);
 
-            // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
-            if(formula) { formula->applyFormula(text); }
-            row.push_back(data->getDataString());
+            // Finds the data either from static data or t_extractDataFormula
+            auto it = m_dataMap.find(capturedString);
+            if (it != m_dataMap.end()) {
+                CData    *data    = it.value();
+                CFormula *formula = data->getParentFormula();
+
+                // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
+                if(formula) { formula->applyFormula(text); }
+                // Replace the captured string with the corresponding value from the map
+                cell.replace(match.capturedStart(0), match.capturedLength(0), data->getDataString());
+            }
+            else {
+                cell.replace(match.capturedStart(1), match.capturedLength(1), "ERROR_REPLACING_PLACEHOLDER");
+            }
+            // Repeat the loock up for matches so indexes of found match get updated and the substitutions are performed where they should
+            matches = regex.globalMatch(cell);
         }
-        else {
-            row.push_back(dataName); // If data was not found, whatever the user inputed as a text will become the text of the cell
-        }
+        row.push_back(std::move(cell));
     }
     m_XSVStringStructureResult.push_back(std::move(row));
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WListWidgetLoadedEsquemes</class>
- <widget class="QWidget" name="WListWidgetLoadedEsquemes">
+ <class>WLoadedEsquemes</class>
+ <widget class="QWidget" name="WLoadedEsquemes">
   <property name="geometry">
    <rect>
     <x>0</x>
