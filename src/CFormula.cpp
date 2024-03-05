@@ -134,8 +134,8 @@ QString CFormula::applyFormula(const QString& text,  unsigned int from, int to) 
 }
 
 inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionToApply) {
-    // // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    // if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
     if (pFunctionToApply->getStartFromBeggining()) m_indexPosition = {0, 0};
     // TRUE = end text. FALSE = begin text
@@ -156,6 +156,9 @@ inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionT
 }
 
 inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToApply) {
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     // Perform an initial check for index position. If final > initial means last function was extracting function and indexes need to be brought together now.
     int newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
@@ -169,6 +172,9 @@ inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctio
 }
 
 void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply) {
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     int linesToMove = pFunctionToApply->getNum(); // utilitzem un número intern per evitar que canviï el valor dins CFormula, ja que formula ha de ser reutilitzable
     // Case when we go back X linesToMove
     if (linesToMove < 0) {
@@ -205,6 +211,9 @@ void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply
 }
 
 inline void CFormula::BeginLine(const QString &text) { // Moves index to the beggining of current line
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     while (m_indexPosition.initial != 0) {
         m_indexPosition.initial--;
         if (text[m_indexPosition.initial] == '\n') {
@@ -217,6 +226,9 @@ inline void CFormula::BeginLine(const QString &text) { // Moves index to the beg
 }
 
 inline void CFormula::EndLine(const QString& text) { // Moves index to the ending of current line
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     while (m_indexPosition.initial < text.size()) {
         m_indexPosition.initial++;
         if (text[m_indexPosition.initial] == '\n') {
@@ -228,12 +240,17 @@ inline void CFormula::EndLine(const QString& text) { // Moves index to the endin
     m_indexPosition.final = m_indexPosition.initial;
 }
 
-inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) { // Col·loca l'index al final de la línia actual
+inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {
     for (auto i = 0; i < thisContainer->size(); ++i) {
         if (thisContainer->at(i).getDataName() == pFunctionToApply->getText()) {
             m_result += thisContainer->at(i).getDataString();
         }
     }
+}
+
+inline void CFormula::appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends string to m_result
+    if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
+    else                               m_result.prepend(pFunctionToApply->getText());
 }
 
 // Functions related to CMathFunction are still unused and not working
@@ -310,6 +327,9 @@ inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply, std::vector<
 }
 
 void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionToApply) {
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
     int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
@@ -377,6 +397,9 @@ void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionTo
 }
 
 void CFormula::extractDataInverted(const QString& text, CExtractingFunction* pFunctionToApply) {
+    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
     int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
@@ -438,6 +461,9 @@ void CFormula::extractDataInverted(const QString& text, CExtractingFunction* pFu
         allowed = false;
         avoided = false;
     }
+    int indexInitialTemp = m_indexPosition.initial;
+    m_indexPosition.initial = m_indexPosition.final;
+    m_indexPosition.final = indexInitialTemp;
 }
 
 void CFormula::deleteFunction(const int index) {

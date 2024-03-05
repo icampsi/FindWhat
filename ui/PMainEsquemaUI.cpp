@@ -68,8 +68,12 @@ void PMainEsquemaUI::on_DeleteEsquema_clicked() {
     // Remove the page from the toolBox
     ui->toolBox_formatEsquema->removeItem(index);
 
+    // Select last page
+    int count = ui->toolBox_formatEsquema->count();
+    if (count > 1) ui->toolBox_formatEsquema->setCurrentIndex(count - 1);
+
     // Disable export esquema button if no pages are loaded
-    switch (ui->toolBox_formatEsquema->count()) {
+    switch (count) {
     case 0:
         ui->pushButton_ExportCSV->setEnabled(false);
         ui->DeleteEsquema->setEnabled(false);

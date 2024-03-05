@@ -51,11 +51,7 @@ public:
     inline void moveLine(const QString &text, CIndexingFunction* pFunctionToApply);
     inline void BeginLine(const QString& text); // Sets index at the begining of current line
     inline void EndLine(const QString&   text); // Sets index at the begining of current line
-
-    inline void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends data to m_result
-        if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
-        else                               m_result.prepend(pFunctionToApply->getText());
-    }
+    inline void appendString(CIndexingFunction* pFunctionToApply);
 
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
@@ -63,18 +59,16 @@ public:
     void extractData(const QString &text, CExtractingFunction* pFunctionToApply);
     void extractDataInverted(const QString &text, CExtractingFunction* pFunctionToApply);
 
-    // PATH INTERFACE
+    // m_formulaPath INTERFACE
     void addFunction(CFunction* function) {
         function->setParent(this);
         m_formulaPath.push_back(function);
     }
-
     void deleteFunction(const int index);
-
-    // Moves object from one index to another
-    void reorderFunctionPath(int objectToMoveIndex, int destinationIndex);
+    void reorderFunctionPath(int objectToMoveIndex, int destinationIndex); // Moves object from one index to another
     void clearPath() { m_formulaPath.clear();}
 
+    // SERIALIZATION
     void serialize(std::ofstream& out) const;
     void deserialize(std::ifstream& in);
 };

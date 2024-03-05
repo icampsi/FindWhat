@@ -15,6 +15,7 @@ void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructu
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 
     for(auto& it : m_pdfFilePaths) {
+        text.clear();
         CTextExtractor::PDFToTextPoppler(it, text);
         esquema->generateXSVStringStructure(text);
         for(auto& j : esquema->getXSVStringStructureResult()) {
