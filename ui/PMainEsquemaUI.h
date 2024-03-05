@@ -28,7 +28,7 @@ private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
     void on_pushButton_addEsquema_clicked();
     void on_DeleteEsquema_clicked();
-    void on_pushButton_clicked();
+    void on_pushButton_ExportCSV_clicked();
 
 public slots:
     void handleDeleteEsquema(const int index);

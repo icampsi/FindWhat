@@ -4,7 +4,6 @@
 #include <QString>
 
 #include "ui/dialogs/ExportCSVProgressBar_dlg.h"
-#include "src/CData.h"
 #include "ui/dialogs/InvalidFileName_dlg.h"
 
 class CEsquemaDoc;
@@ -12,7 +11,7 @@ class CEsquemaDoc;
 class CExportCSV {
 public:
     // CONSTRUCTORS AND DESTRUCTORS
-    CExportCSV() : m_pdfFilePaths(), m_associatedEsquemaDoc(nullptr), m_csvFormat(), m_exportFileRename(), m_renameParsedPDFFlag(false) {}
+    CExportCSV() : m_pdfFilePaths(), m_associatedEsquemaDoc(nullptr), m_csvFormat(), m_exportFileRename(), m_renameParsedPDFFlag(false), m_fileNamePlaceholder() {}
     ~CExportCSV() = default;
 
 protected:
@@ -22,9 +21,9 @@ protected:
     QString              m_csvFormat;            // A string made of csv each having the name of a formula or static data. this data will be replaced with the extracted data
     QString              m_exportFileRename;     // A string with placeholders for renaming files
     bool                 m_renameParsedPDFFlag;  // A flag to state whether a pdf document should be renamed
+    QString              m_fileNamePlaceholder; // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
 
     InvalidFileName_dlg *m_invalidFileNameDlg;
-
 
 public:
     // GETTERS AND SETTERS
@@ -45,6 +44,9 @@ public:
 
     void setRenameParsedPDFFlag(bool isToBeRenamed) { m_renameParsedPDFFlag =  isToBeRenamed; }
     const bool getRenameParsedPDFFlag() const { return m_renameParsedPDFFlag; }
+
+    void setFileNamePlaceholder(const QString& fileNamePlaceholder) { m_fileNamePlaceholder = fileNamePlaceholder; }
+    const QString& getFileNamePlaceholder() const { return m_fileNamePlaceholder; }
 
     // PUBLIC FUNCTIONS
     // Functions to add and delete PDF file paths

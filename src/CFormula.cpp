@@ -134,6 +134,9 @@ QString CFormula::applyFormula(const QString& text,  unsigned int from, int to) 
 }
 
 inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionToApply) {
+    // // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
+    // if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+
     if (pFunctionToApply->getStartFromBeggining()) m_indexPosition = {0, 0};
     // TRUE = end text. FALSE = begin text
     if (text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial) != -1) {
@@ -153,6 +156,7 @@ inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionT
 }
 
 inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToApply) {
+    // Perform an initial check for index position. If final > initial means last function was extracting function and indexes need to be brought together now.
     int newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
     if (newIndex >= 0 && newIndex < text.size()) {

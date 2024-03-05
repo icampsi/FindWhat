@@ -6,11 +6,11 @@
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
-    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
     : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
-    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_fileNamePlaceholder(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
@@ -23,11 +23,11 @@ CEsquema::~CEsquema() {
     }
 }
 
-bool CEsquema::createFileName(QString& newFileName) {
+bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlaceholder) {
     QRegularExpression regex("<(.*?)>");
-    QRegularExpressionMatchIterator matches = regex.globalMatch(m_fileNamePlaceholder);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(fileNamePlaceholder);
 
-    newFileName = m_fileNamePlaceholder;
+    newFileName = fileNamePlaceholder;
 
     while (matches.hasNext()) {
         // Extract the captured string
@@ -188,8 +188,6 @@ void CEsquema::serialize(std::ofstream& out) const {
      * std::vector<unsigned int>        m_dataForCheck1
      * int                              size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * int                              size of m_fileNameFormula
-     * QString                          m_fileNameFormula
      * int                              size of m_outputDirectori
      * QString                          m_outputDirectori
      *
@@ -207,7 +205,6 @@ void CEsquema::serialize(std::ofstream& out) const {
 
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::writeQString(out, m_fileNamePlaceholder);            // m_fileNameFormula
     SerializationUtils::writeQString(out, m_outputDirectori);            // m_outputDirectori
 }
 
@@ -225,8 +222,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
      * std::vector<unsigned int>        m_dataForCheck1
      * int                              size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * int                              size of m_fileNameFormula
-     * QString                          m_fileNameFormula
      * int                              size of m_outputDirectori
      * QString                          m_outputDirectori
      *
@@ -256,7 +251,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
     // SerializationUtils::readCustomContainer(in, m_valorsEstatics, this);     // m_valorsEstatics
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::readQString(in, m_fileNamePlaceholder);            // m_fileNameFormula
     SerializationUtils::readQString(in, m_outputDirectori);            // m_outputDirectori
 }
 

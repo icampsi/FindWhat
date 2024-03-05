@@ -4,6 +4,7 @@
 #include "qdir.h"
 #include "qfileinfo.h"
 
+#include "qregularexpression.h"
 #include "src/CEsquema.h"
 #include "utils/CTextExtractor.h"
 #include "CDocumentSubclasses.h"
@@ -41,7 +42,7 @@ void CExportCSV::reOrderFiles(int fileToMoveIndex, int targetPositionIndex) {
 void CExportCSV::renameFile(const QString &oldFilePath) {
     QFileInfo fileInfo(oldFilePath);
     QString newFileName;
-    if (!m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName)) {
+    if (!m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName, m_fileNamePlaceholder)) {
         m_invalidFileNameDlg = new InvalidFileName_dlg(nullptr, &newFileName, oldFilePath);
         if (m_invalidFileNameDlg->exec() == QDialog::Rejected) {
             return;

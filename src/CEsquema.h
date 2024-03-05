@@ -24,7 +24,7 @@ protected:
 
     std::vector<CFormula*> t_extractDataFormula;         // Formula vector for each data to be extracted
     std::vector<CData*>    m_staticData;                 // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
-    std::vector<QString>   m_csvFormatFormulaStructure;  // { dataName1,dataName2,some_fixed_text,,,dataName3 etc. } Specifies order of cells in the xsv exported file. Still want to add an option for "\n" for new row
+    std::vector<QString>   m_csvFormatFormulaStructure;  // { <dataName1>,<dataName2>,some_fixed_text,,,<dataName3> etc. } Specifies order of cells in the xsv exported file. Still want to add an option for "\n" for new row
 
     std::vector<std::vector<QString>> m_XSVStringStructureResult; // Stores the result as an xsv string structure
 
@@ -32,12 +32,11 @@ protected:
     std::vector<unsigned int> m_dataForCheck2; // For the future. Índex dels valors que volem fer check. L'últim és el valor a comparar.
 
     QMap<QString, CData*>  m_dataMap;             // This maps every CData structure with it's name for efficient lookup. This includes also data from inside every CFormula in the t_extractDataFormula
-    QString                m_fileNamePlaceholder; // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
     QString                m_outputDirectori;     // { "LLUM\\" }  // where to save the pdf file
 
 public:
     void renameFile(const char* oldName, const char* newName);
-    bool createFileName(QString& newFileName); // Return false if name contains any invalid naming character: < > " \ / | ? *
+    bool createFileName(QString& newFileName, const QString& fileNamePlaceholder); // Return false if name contains any invalid naming character: < > " \ / | ? *
 
     // Generates a string xsv Structure from the format specified in m_csvFormatFormula
     void generateXSVStringStructure(const QString &text);
@@ -69,9 +68,6 @@ public:
         formula->setDataName(name);
     }
 
-    void setFileNamePlaceholder(const QString& placeholder) { m_fileNamePlaceholder = placeholder; }
-    const QString& getFileNamePlaceholder() const { return m_fileNamePlaceholder; }
-
     void setIDText(const QString& idText)   { m_IDText = idText; }
     const QString& getIDText() const        { return m_IDText; }
 
@@ -87,7 +83,6 @@ public:
     // SERIALIZATION
     void serialize(std::ofstream& out) const;
     void deserliazile(std::ifstream& in);
-
 
     // FUTURE UPDATES:
     // bool checkData(CFileData& file); // Still unused

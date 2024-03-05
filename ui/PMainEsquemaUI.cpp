@@ -21,6 +21,12 @@ PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     // Set esquemaPage to empty and remove .ui generated toolBox_formatEsquema page
     setCurrentPageToEmptyPage();
     ui->toolBox_formatEsquema->removeItem(0); // Needed since the .ui file interface doesent allow for empty pages in the toolbox widget
+
+    // Disable "export CSV" and "delete esquema" buttons if no toolbox pages are loaded
+    if(ui->toolBox_formatEsquema->count() == 0) {
+        ui->pushButton_ExportCSV->setEnabled(false);
+        ui->DeleteEsquema->setEnabled(false);
+    }
 }
 
 PMainEsquemaUI::~PMainEsquemaUI() { delete ui; }
@@ -40,6 +46,18 @@ void PMainEsquemaUI::on_pushButton_addEsquema_clicked() {
     PFormExpToolBoxPage *newToolBoxPage = new PFormExpToolBoxPage(ui->toolBox_formatEsquema);
     ui->toolBox_formatEsquema->addItem(newToolBoxPage, "New Page"); // Still need a way to rename pages so it has more sense. Maybe with the name of the used Esquema on this page
     ui->toolBox_formatEsquema->setCurrentWidget(newToolBoxPage);
+
+    // Enable export esquema button if any page is loaded
+    switch (ui->toolBox_formatEsquema->count()) {
+    case 0:
+        ui->pushButton_ExportCSV->setEnabled(false);
+        break;
+    case 1:
+        ui->pushButton_ExportCSV->setEnabled(true);
+        ui->DeleteEsquema->setEnabled(true);
+        break;
+    }
+
     ui->pushButton_addEsquema->setEnabled(true);
 }
 
@@ -49,10 +67,25 @@ void PMainEsquemaUI::on_DeleteEsquema_clicked() {
     CMDoc::getMDoc().getExportPathDoc().deleteExportCSV(index);
     // Remove the page from the toolBox
     ui->toolBox_formatEsquema->removeItem(index);
+
+    // Disable export esquema button if no pages are loaded
+    switch (ui->toolBox_formatEsquema->count()) {
+    case 0:
+        ui->pushButton_ExportCSV->setEnabled(false);
+        ui->DeleteEsquema->setEnabled(false);
+        break;
+    case 1:
+        ui->pushButton_ExportCSV->setEnabled(true);
+        break;
+    }
 }
 
-void PMainEsquemaUI::on_pushButton_clicked() {
-    ui->pushButton->setEnabled(false);
+void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
+    if (CMDoc::getMDoc().getLoadedEsquemaDocs()->size() == 0) {
+        QMessageBox::information(this, "Empty esquema", "You need to define at least one esquema to extract data from PDF files");
+        return;
+    }
+    ui->pushButton_ExportCSV->setEnabled(false);
     std::vector<std::vector<QString>> xsvStructure;
     // Get all the loaded exportCSV as a vector
     std::vector<CExportCSV*> exportCSVs = CMDoc::getMDoc().getExportPathDoc().getExportCSVs();
@@ -85,7 +118,7 @@ void PMainEsquemaUI::on_pushButton_clicked() {
         progressDlg = nullptr;
     }
 
-    ui->pushButton->setEnabled(true);
+    ui->pushButton_ExportCSV->setEnabled(true);
 }
 void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
     Q_UNUSED(filePath);

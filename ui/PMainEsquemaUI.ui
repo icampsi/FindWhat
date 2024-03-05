@@ -38,7 +38,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_editEsquema">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -129,7 +129,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="pushButton_ExportCSV">
                <property name="text">
                 <string>Export CSV</string>
                </property>
@@ -163,8 +163,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>300</width>
-               <height>138</height>
+               <width>1069</width>
+               <height>296</height>
               </rect>
              </property>
              <property name="minimumSize">
@@ -199,7 +199,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>261</width>
+                   <width>1030</width>
                    <height>500</height>
                   </rect>
                  </property>

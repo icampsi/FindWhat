@@ -68,8 +68,6 @@ void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
 
 
 void PFormExpToolBoxPage::on_lineEdit_renameDocs_textChanged(const QString &arg1) {
-    // Pass value to associated Esquema
-    CEsquema* esquema = m_exportCSV->getAsocEsquemaDoc()->getEsquema();
-    esquema ->setFileNamePlaceholder(arg1);
+    m_exportCSV->setFileNamePlaceholder(arg1);
 }
 
