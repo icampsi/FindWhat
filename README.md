@@ -40,27 +40,26 @@ The program is not yet intuitive and does not provide much guidance on how to us
 # Latest updates
 15/03/2024
 - Swutched from qmake to CMake build system.
-- Cleaned code and made some re-estructuring
-- Fixed minor bugs
+- Cleaned code and made some re-estructuring.
+- Fixed minor bugs.
   
 03/03/2024
-- Improved Serialization and serialization UI
-- Added a way to rename files
-- Fixed minor bugs
-- Cleaned code
+- Improved Serialization and serialization UI.
+- Added a way to rename files.
+- Fixed minor bugs.
+- Cleaned code.
 
 01/03/2024
 - Added serialization features to save and load esquemes merging serialization branch. Still needs a bit of pulishing.
-- Added option to delete loaded esquemas (press "del" on selected esquema)
-- Fixed some minor bugs
-- Cleaned code
-
-
+- Added option to delete loaded esquemas (press "del" on selected esquema).
+- Fixed some minor bugs.
+- Cleaned code.
 
 # Future updates
 - A feature to Relocate or copy parsed PDF files to another folder.
-- Functionality to rename the extracted CSV files and specify a destination location.
-- Functionality to ensure that no two formulas or static data have the same name (right now it's a mess of you do that).
+- Functionality to specify a destination location for extracted CSV files.
+- Add a check to see if a file you want to load is corrupted so the program doesen't crash if you do so.
+- Functionality to ensure that no two formulas or static data have the same name (right now it's a mess if you do that).
 - Additional functions to enhance capabilities related to extracting variables from the pdf.
 - Implementation of a verification mechanism to ensure the accuracy of extracted variables, with user notification for possible discrepancies.
 - Improvement of the CSV structure definition method to mitigate user errors.
