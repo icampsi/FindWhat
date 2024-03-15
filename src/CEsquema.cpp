@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CEsquema.h"
 #include "utils/GeneralFunctions.h"
 
@@ -5,11 +10,11 @@
 #include <QRegularExpressionMatchIterator>
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
-    : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
+    : m_nameEsquema(nameEsquema), m_IDText(IDText), m_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
 CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
-    : m_nameEsquema(nameEsquema), m_IDText(IDText), t_extractDataFormula(tExtractDataFormula),
+    : m_nameEsquema(nameEsquema), m_IDText(IDText), m_extractDataFormula(tExtractDataFormula),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
@@ -18,7 +23,7 @@ CEsquema::~CEsquema() {
         delete data;
     }
     // Delete dynamically allocated CFormula objects in t_extractDataFormula vector
-    for (auto formula : t_extractDataFormula) {
+    for (auto formula : m_extractDataFormula) {
         delete formula;
     }
 }
@@ -49,8 +54,8 @@ bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlace
 }
 
 void CEsquema::deleteFormula(int index) {
-    if (index >= 0 && index < t_extractDataFormula.size()) {
-        t_extractDataFormula.erase(t_extractDataFormula.begin() + index);
+    if (index >= 0 && index < m_extractDataFormula.size()) {
+        m_extractDataFormula.erase(m_extractDataFormula.begin() + index);
     } else {
         qDebug() << "index for formula is out of range of it's esquema t_extractorDataFormula vector";
     }
@@ -200,7 +205,7 @@ void CEsquema::serialize(std::ofstream& out) const {
 
     SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
     SerializationUtils::writeQString(out, m_IDText);                     // m_IDText
-    SerializationUtils::writeCustomContainer(out, t_extractDataFormula); // t_extractDataFormula
+    SerializationUtils::writeCustomContainer(out, m_extractDataFormula); // t_extractDataFormula
     SerializationUtils::writeCustomContainer(out, m_staticData);         // m_valorsEstatics
 
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1

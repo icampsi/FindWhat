@@ -1,26 +1,24 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef CMDOC_H
 #define CMDOC_H
 
 #include <vector>
-#include "CDocumentSubclasses.h"
+#include "CExportPathDoc.h"
 #include "src/CEsquema.h"
 #include "CDocument.h"
 
-class CEsquemaDoc;
 class CDocument;
 class CPdfDoc;
 
 class CMDoc { // Singleton class to hold and acces the document classes all together
 public:
-    static CMDoc& getMDoc() {
-        static CMDoc instance; // Initialized on first use
-        return instance;
-    }
-
-    ~CMDoc() {
-        for (auto* esquemaDoc : m_loadedEsquemaDocs) delete esquemaDoc;
-        m_loadedEsquemaDocs.clear();
-    }
+    // INDIRECT SINGLETON CONSTRUCTOR AND DESTURCTOR
+    static CMDoc& getMDoc();
+    ~CMDoc();
 
     // Delete copy constructor and assignment operator to prevent cloning and assignment
     CMDoc(const CMDoc&)          = delete;
@@ -40,14 +38,7 @@ public:
 
     CExportPathDoc& getExportPathDoc()  { return m_exportPathDoc; }
 
-    void deleteEsquema(int index) {
-        if (index < 0 || index >= m_loadedEsquemaDocs.size()) {
-            qDebug() << "Esquema out of range for deletition";
-            return;
-        }
-        delete m_loadedEsquemaDocs[index];
-        m_loadedEsquemaDocs.erase(m_loadedEsquemaDocs.begin() + index);
-    }
+    void deleteEsquema(int index);
 
     // SERIALIZATION
     void serializeFullEsquemaArray(std::ofstream& out);
@@ -60,8 +51,10 @@ public:
     // }
 
 private:
+    // PRIVATE SINGLETON CONSTRUCTOR
     CMDoc() : m_exportPathDoc(){}
 
+    // MEMBERS
     std::vector<CEsquemaDoc*> m_loadedEsquemaDocs; // Vector of all loaded esquemeaDocs
     std::vector<CPdfDoc*>     m_loadedPdfDocs;     // Vector of all loaded PDF docs (it mainly holds the extracted text of those docs)
     CExportPathDoc            m_exportPathDoc;     // Class to hold the only exportPathDoc that should be loaded. It is created empty on the constructor of CMDoc
@@ -78,11 +71,10 @@ private:
     void esquemaListUpdated();
 
 public:
-    void onDocumentDestroyed(CDocument *pDoc);
-
     // Register and unregister observers for Esquema document changes
-    void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); } 
+    void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); }
     void removeObserver(std::function<void(const std::vector<QString>&)> observer);
+    void onDocumentDestroyed(CDocument *pDoc);
 };
 
 #endif // CMDOC_H

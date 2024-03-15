@@ -1,12 +1,22 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "PEsquemaPage.h"
 #include "ui_PEsquemaPage.h"
 
 #include "QMenu"
-#include "mainWindow.h"
+
+#include "MainWindow.h"
 
 #include "utils/GeneralFunctions.h"
+
 #include "src/CData.h"
+
 #include "document/CMDoc.h"
+#include "document/CPdfDoc.h"
+#include "document/CEsquemaDoc.h"
 
 // From generalfunctions.h
 QString parseFromText(const QString& text);
@@ -28,7 +38,7 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     ui->treeView_Esquema->expandAll();
     
     connect(ui->treeView_Esquema, &WEsquemaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
-    connect(this, &PEsquemaPage::functionUpdated, static_cast<mainWindow*>(getLastParent(this)), &mainWindow::functionUpdated);
+    connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
     connect(ui->listWidget_formula->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
 }
 
@@ -91,7 +101,7 @@ void PEsquemaPage::loadFunction() {
 
     CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
-    CMathFunction       *mathFunction       = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
+    // CMathFunction       *mathFunction       = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     QString parsedText;
     switch (function->getFunctionType()) {
     case CFunction::Action::Find:
@@ -142,7 +152,7 @@ void PEsquemaPage::updateFunctionProcess() {
 
     // If there is no active doc we don't need to update anything in the preview;
     if(activePdfDoc) {
-        text = activePdfDoc->getText();
+        text = activePdfDoc->getFullText();
 
         m_loadedFormula->applyFormula(text, 0, functionIndex);
 
@@ -173,18 +183,18 @@ void PEsquemaPage::updateFunctionProcess() {
 void PEsquemaPage::loadEsquema() {
     CEsquema* esquema = m_esquemaDoc->getEsquema();
 
-    QStandardItem *staticData = new QStandardItem("Static Data");
+    QStandardItem *staticDataParentItem = new QStandardItem("Static Data");
     QStandardItem *formulas = new QStandardItem("Formulas");
     QStandardItem *rootItem = model_esquema->invisibleRootItem();
-    rootItem->appendRow(staticData);
+    rootItem->appendRow(staticDataParentItem);
     rootItem->appendRow(formulas);
     // Create third level items from esquema.m_staticData[] attached to "Static Data"
-    for(int i{0}; i < esquema->getStaticData().size(); i++) {
+    for(size_t i{0}; i < esquema->getStaticData().size(); i++) {
         QStandardItem *staticDataItem = new QStandardItem(esquema->getStaticData()[i]->getDataName()); // Create new item for each member of the vector
-        CData *data = esquema->getStaticData()[i];
-        staticDataItem->setData(QVariant::fromValue(data), Qt::UserRole);
-        m_itemDataMap[staticDataItem] = data;
-        staticData->appendRow(staticDataItem);
+        CData *staticData = esquema->getStaticData()[i];
+        staticDataItem->setData(QVariant::fromValue(staticData), Qt::UserRole);
+        m_itemDataMap[staticDataItem] = staticData;
+        staticDataParentItem->appendRow(staticDataItem);
     }
 
     // Create third level items from esquema.t_extractDataFormula[] attached to "Formulas"

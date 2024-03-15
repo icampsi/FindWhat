@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CFormula.h"
 
 #include <QDebug>
@@ -13,7 +18,7 @@ CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     for (CFunction *function : other.m_formulaPath) {
         CFunction *castedFunction = castedFunction = dynamic_cast<CIndexingFunction*>(function);
 
-        // I am creating a new function for ensuring livespan of it. Probably need to rethink this part when i understand better how QStandarditem works
+        // BOOKMARK - I am creating a new function for ensuring livespan of it. Probably need to rethink this part when i understand better how QStandarditem works
         if(castedFunction) {
             CIndexingFunction *indexFunction = new CIndexingFunction(*dynamic_cast<CIndexingFunction*>(function));
             indexFunction->setParent(this);
@@ -79,18 +84,35 @@ CFormula::~CFormula() {
     }
 }
 
-QString CFormula::applyFormula(const QString& text,  unsigned int from, int to) {
-    m_result = ""; // Reset result
-    if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
-    if(to < 0) to = m_formulaPath.size() - 1; // so you can specify -1 as a "go throwgh the full path"
-    if(from > m_formulaPath.size() - 1) { throw "out of range"; }
+QString CFormula::applyFormula(const QString& text, size_t from, int to) {
+    m_result.clear(); // Reset result
 
-    for (unsigned int i = from ; i <= to; i++) {
+    if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
+
+    // Check if 'from' is within the range of formula path
+    if (from > m_formulaPath.size() - 1) {
+        // Handle out-of-range error
+        qWarning() << "applyFormula: 'from' index is out of range.";
+        return "ERROR EXTRACTING VALUES";
+    }
+
+    if (to < 0) {
+        to = static_cast<int>(m_formulaPath.size()) - 1; // Allow "go through the full path" if to is negative
+    }
+
+    // Check if 'to' index is out of range
+    if (to >= static_cast<int>(m_formulaPath.size())) {
+        qWarning() << "applyFormula: 'to' index is out of range.";
+        return "ERROR EXTRACTING VALUES";
+    }
+
+    for (size_t i = from ; static_cast<int>(i) <= to; i++) {
         if(i == from) {
             m_indexPosition = {0, 0};
         }
+
         CIndexingFunction* pIndexingFunction = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
-        CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
+        // CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
 
         switch (m_formulaPath[i]->getFunctionType()) {
         case CFunction::Action::Find:
@@ -254,7 +276,7 @@ inline void CFormula::appendString(CIndexingFunction* pFunctionToApply) { //Appe
 }
 
 // Functions related to CMathFunction are still unused and not working
-inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer) {
+inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
 
     QString sortedVal2;
     QString unitatsStrVal1{ "0" };
@@ -521,8 +543,8 @@ void CFormula::serialize(std::ofstream& out) const {
 
     m_data.serialize(out);                                                             // m_data
     out.write(reinterpret_cast<const char*>(&m_indexPosition), sizeof(IndexPosition)); // m_indexPosition
-    int formulaPathSize = m_formulaPath.size();
-    out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(int));           // size of formulaPath
+    size_t formulaPathSize = m_formulaPath.size();
+    out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(size_t));           // size of formulaPath
 
     for (CFunction* function : m_formulaPath) {                                        // FunctionTye & m_formulaPath
         FunctionType type;

@@ -1,31 +1,33 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CExportCSV.h"
 
 #include "qcoreapplication.h"
 #include "qdir.h"
 #include "qfileinfo.h"
 
-#include "qregularexpression.h"
 #include "src/CEsquema.h"
-#include "utils/CTextExtractor.h"
-#include "CDocumentSubclasses.h"
+#include "CPdfDoc.h"
+#include "CEsquemaDoc.h"
 
-
-void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructure, ExportCSVProgressBar_dlg *progressDialog) {
-    QString text;
+void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructure, ProgBarExport_dlg *progressDialog) {
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 
-    for(auto& it : m_pdfFilePaths) {
-        text.clear();
-        CTextExtractor::PDFToTextPoppler(it, text);
-        esquema->generateXSVStringStructure(text);
+    for(QString& filePath : m_pdfFilePaths) {
+        CPdfDoc* pdfDoc = new CPdfDoc(filePath);
+        esquema->generateXSVStringStructure(pdfDoc->getFullText());
         for(auto& j : esquema->getXSVStringStructureResult()) {
             xsvStructure.push_back(j);
         }
-        if(m_renameParsedPDFFlag) renameFile(it); // Rename document if flag enabled
+        if(m_renameParsedPDFFlag) renameFile(filePath); // Rename document if flag enabled
 
         // Update progress bar
         QCoreApplication::processEvents();
         progressDialog->updateProgress();
+        delete pdfDoc;
     }
 }
 

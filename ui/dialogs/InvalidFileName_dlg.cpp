@@ -1,6 +1,13 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "InvalidFileName_dlg.h"
-#include "qpushbutton.h"
 #include "ui_InvalidFileName_dlg.h"
+
+#include "qpushbutton.h"
+
 #include "utils/GeneralFunctions.h"
 
 InvalidFileName_dlg::InvalidFileName_dlg(QWidget *parent, QString *fileName, const QString &oldFilePath)

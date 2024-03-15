@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "NewEsquema_dlg.h"
 #include "ui/mainwindow.h"
 #include "ui_NewEsquema_dlg.h"
@@ -21,7 +26,7 @@ void newEsquema_dlg::on_buttonBox_accepted() {
         QMessageBox::information(this, "Empty Name", "You need to specify a name for the esquema");
         return;
     }
-    mainWindow* mainWin = dynamic_cast<mainWindow*>(parent());
+    MainWindow* mainWin = dynamic_cast<MainWindow*>(parent());
     if(!mainWin) return;
 
     // Read fields values and store them inside the new esquema directly

@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CData.h"
 #include "CFormula.h"
 #include "utils/GeneralFunctions.h"
@@ -5,7 +10,7 @@
 #include <fstream>
 
 CData::CData(const CData& other, CFormula *parent) :
-    m_dataName(other.m_dataName), m_dataString(other.m_dataString) {
+    m_dataName(other.m_dataName), m_dataString(other.m_dataString), m_parentFormula(parent) {
 }
 
 CData& CData::operator=(const CData& other) {

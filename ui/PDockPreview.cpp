@@ -1,8 +1,14 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "PDockPreview.h"
 #include "ui_PDockPreview.h"
 
 #include "PEsquemaPage.h"
 #include "document/CMDoc.h"
+#include "document/CPdfDoc.h"
 
 PDockPreview::PDockPreview(QWidget *parent)
     : QDockWidget(parent), ui(new Ui::PDockPreview)
@@ -21,14 +27,13 @@ PDockPreview::~PDockPreview() { delete ui; }
 void PDockPreview::handleFilePathChanged(const QString &filePath) {
     CPdfDoc *pPdfDoc = CMDoc::getMDoc().newDoc(filePath);
     CMDoc::getMDoc().setActivePdfDoc(pPdfDoc);
-    QString docText = pPdfDoc->getText();
+    QString docText = pPdfDoc->getFullText();
     ui->TextDisplayer->setPlainText(docText);
 
     if(ui->tabWidget_preview->count() > 0) {
         PEsquemaPage *currentPage = dynamic_cast<PEsquemaPage*>(ui->tabWidget_preview->currentWidget());
         if(!currentPage) return;
         currentPage->loadFunction();
-        CEsquema* currentEsquema = currentPage->getEsquemaDoc()->getEsquema();
         // currentEsquema->generateXSVStructure(docText);
         QString text;
         // currentEsquema->xsvm_structureToString(&text, '\"', ',');

@@ -1,9 +1,15 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef CESQUEMA_H
 #define CESQUEMA_H
-#include <QString>
 
+#include <QString>
 #include <QMessageBox>
 #include <fstream>
+
 #include "CData.h"
 #include "CFormula.h"
 
@@ -22,14 +28,14 @@ protected:
     QString m_nameEsquema; // Name for the esquema
     QString m_IDText;      // Text que identifica el document
 
-    std::vector<CFormula*> t_extractDataFormula;         // Formula vector for each data to be extracted
+    std::vector<CFormula*> m_extractDataFormula;         // Formula vector for each data to be extracted
     std::vector<CData*>    m_staticData;                 // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
     std::vector<QString>   m_csvFormatFormulaStructure;  // { <dataName1>,<dataName2>,some_fixed_text,,,<dataName3> etc. } Specifies order of cells in the xsv exported file. Still want to add an option for "\n" for new row
 
     std::vector<std::vector<QString>> m_XSVStringStructureResult; // Stores the result as an xsv string structure
 
-    std::vector<unsigned int> m_dataForCheck1; // { 8, 9, 5} For the future. Índex dels valors que volem fer check. val1 + val2 == val 3? (molaria donar més opcions d'operacions complexes)
-    std::vector<unsigned int> m_dataForCheck2; // For the future. Índex dels valors que volem fer check. L'últim és el valor a comparar.
+    std::vector<size_t> m_dataForCheck1; // { 8, 9, 5} For the future. Índex dels valors que volem fer check. val1 + val2 == val 3? (molaria donar més opcions d'operacions complexes)
+    std::vector<size_t> m_dataForCheck2; // For the future. Índex dels valors que volem fer check. L'últim és el valor a comparar.
 
     QMap<QString, CData*>  m_dataMap;             // This maps every CData structure with it's name for efficient lookup. This includes also data from inside every CFormula in the t_extractDataFormula
     QString                m_outputDirectori;     // { "LLUM\\" }  // where to save the pdf file
@@ -51,10 +57,10 @@ public:
     void deleteStaticData(int index);
     void setStaticDataName(CData* data, QString name);
 
-    const std::vector<CFormula*>& getExtractDataFormula() const { return t_extractDataFormula; }
+    const std::vector<CFormula*>& getExtractDataFormula() const { return m_extractDataFormula; }
     void addExtractDataFormula(CFormula* formula) {
         m_dataMap.insert(formula->getDataName(), formula->getData());
-        t_extractDataFormula.push_back(formula);
+        m_extractDataFormula.push_back(formula);
     }
 
     void setFormulaName(CFormula* formula, QString name) {

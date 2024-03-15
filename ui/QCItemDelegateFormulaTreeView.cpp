@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "QCItemDelegateFormulaTreeView.h"
 
 QCItemDelegateFormulaTreeView::QCItemDelegateFormulaTreeView(QObject *parent) : QStyledItemDelegate(parent) {}

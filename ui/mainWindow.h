@@ -1,5 +1,10 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
+#ifndef MMAINWINDOW_H
+#define MMAINWINDOW_H
 
 #include <QMainWindow>
 #include <QString>
@@ -7,20 +12,21 @@
 #include "PDockPreview.h"
 
 #include "dialogs/NewEsquema_dlg.h"
-#include "document/CDocumentSubclasses.h"
-#include "ui/dialogs/exportEsquema_dlg.h"
+#include "dialogs/exportEsquema_dlg.h"
+
+#include "document/CEsquemaDoc.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class mainWindow; }
+namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class mainWindow : public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
     //Constructors and destructors
-    mainWindow(QWidget *parent = nullptr);
-    ~mainWindow();
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
 protected:
     // Members
@@ -49,8 +55,8 @@ public:
     void checkExortEsquemaActionEnable();
 
 private:
-    Ui::mainWindow *ui;
+    Ui::MainWindow *ui;
     QAction* m_exportEsquemaAction = nullptr; // Pointer to export esquema menu action for easy validate or invalidate depending on esquemes being loaded
 };
 
-#endif // MAINWINDOW_H
+#endif // MMAINWINDOW_H

@@ -1,5 +1,10 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CFunctionClasses.h"
-#include "src/CFormula.h"
+#include "CFormula.h"
 #include <fstream>
 #include "utils/GeneralFunctions.h"
 

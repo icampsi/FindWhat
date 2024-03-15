@@ -1,4 +1,11 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "WBrowserTreeView.h"
+#include "qmimedata.h"
+#include "utils/generalfunctions.h"
 
 WBrowserTreeView::WBrowserTreeView(QWidget *parent) : QTreeView(parent) {
     setAcceptDrops(true);

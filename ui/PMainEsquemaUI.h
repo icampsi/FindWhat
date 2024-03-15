@@ -1,10 +1,15 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef PMAINESQUEMAUI_H
 #define PMAINESQUEMAUI_H
 
 #include <QWidget>
 #include <QStackedWidget>
 
-#include "document/CDocumentSubclasses.h"
+#include "document/CExportPathDoc.h"
 #include "WToolBarEsquema.h"
 #include "PEsquemaPage.h"
 #include "ui_PMainEsquemaUI.h"

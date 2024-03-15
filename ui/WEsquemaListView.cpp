@@ -1,4 +1,9 @@
-#include "ui/WEsquemaListView.h"
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
+#include "WEsquemaListView.h"
 
 #include <QMessageBox>
 

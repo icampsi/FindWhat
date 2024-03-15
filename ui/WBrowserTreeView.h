@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef WBROWSERTREEVIEW_H
 #define WBROWSERTREEVIEW_H
 
@@ -5,10 +10,6 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include "qevent.h"
-#include "qmimedata.h"
-
-#include "utils/GeneralFunctions.h"
-
 
 class WBrowserTreeView : public QTreeView {
     Q_OBJECT

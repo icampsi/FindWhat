@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
 #include <QString>
@@ -24,8 +29,8 @@ namespace SerializationUtils {
 
     template<typename Container>
     void writeCustomContainer(std::ofstream& out, const Container& container) {
-        int size = container.size();
-        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        size_t size = container.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
         for (auto&& item : container) {
             item->serialize(out);
         }
@@ -33,9 +38,9 @@ namespace SerializationUtils {
 
     template<typename Container, typename item>
     void readCustomContainer(std::ifstream& in, Container& container, item* parent) {
-        int size;
-        in.read(reinterpret_cast<char*>(&size), sizeof(int));
-        for (int i = 0; i < size; ++i) {
+        size_t size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+        for (size_t i = 0; i < size; ++i) {
             typename item::value_type newItem(in, parent); // Create an instance of the item type by calling its constructor
             container.push_back(newItem);
         }
@@ -44,8 +49,8 @@ namespace SerializationUtils {
 
     template<typename primContainer>
     void writePrimitiveContainer(std::ofstream& out, const primContainer& container) {
-        int size = container.size();
-        out.write(reinterpret_cast<const char*>(&size), sizeof(int));
+        size_t size = container.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
         for (const auto& item : container) {
             out.write(reinterpret_cast<const char*>(&item), sizeof(typename primContainer::value_type));
         }

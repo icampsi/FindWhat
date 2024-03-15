@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef PESQUEMAPAGE_H
 #define PESQUEMAPAGE_H
 
@@ -9,7 +14,7 @@
 
 #include "src/CEsquema.h"
 #include "src/CFormula.h"
-#include "document/CDocumentSubclasses.h"
+#include "document/CExportPathDoc.h"
 
 namespace Ui { class PEsquemaPage; }
 

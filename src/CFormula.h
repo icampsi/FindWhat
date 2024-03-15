@@ -1,3 +1,8 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef CFORMULA_H
 #define CFORMULA_H
 
@@ -44,7 +49,7 @@ public:
     size_t          getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
-    QString applyFormula(const QString &text, unsigned int from = 0, int to = -1);
+    QString applyFormula(const QString &text, size_t from = 0, int to = -1);
 
     inline int  findText(const QString &text, CIndexingFunction* pFunctionToApply);
     inline void moveIndex(const QString& text, CIndexingFunction* pFunctionToApply);
@@ -54,7 +59,7 @@ public:
     inline void appendString(CIndexingFunction* pFunctionToApply);
 
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
-    inline bool MathData(CMathFunction* pMathFunctionToApply, std::vector<CData>* thisContainer);
+    inline bool MathData(CMathFunction* pMathFunctionToApply);
 
     void extractData(const QString &text, CExtractingFunction* pFunctionToApply);
     void extractDataInverted(const QString &text, CExtractingFunction* pFunctionToApply);

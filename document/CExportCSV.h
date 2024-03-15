@@ -1,9 +1,14 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #ifndef CEXPORTCSV_H
 #define CEXPORTCSV_H
 
 #include <QString>
 
-#include "ui/dialogs/ExportCSVProgressBar_dlg.h"
+#include "ui/dialogs/ProgBarExport_dlg.h"
 #include "ui/dialogs/InvalidFileName_dlg.h"
 
 class CEsquemaDoc;
@@ -17,11 +22,12 @@ public:
 protected:
     // MEMBERS
     std::vector<QString> m_pdfFilePaths;         // File Paths associated with the document
+
     CEsquemaDoc*         m_associatedEsquemaDoc; // Esquema to use
     QString              m_csvFormat;            // A string made of csv each having the name of a formula or static data. this data will be replaced with the extracted data
     QString              m_exportFileRename;     // A string with placeholders for renaming files
     bool                 m_renameParsedPDFFlag;  // A flag to state whether a pdf document should be renamed
-    QString              m_fileNamePlaceholder; // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
+    QString              m_fileNamePlaceholder;  // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
 
     InvalidFileName_dlg *m_invalidFileNameDlg;
 
@@ -58,7 +64,7 @@ public:
     void reOrderFiles(int fileToMoveIndex, int targetPositionIndex);
 
     // Function to build XSV structure
-    void buildXSVStructure(std::vector<std::vector<QString> > &xsvStructure, ExportCSVProgressBar_dlg *progressDialog = nullptr);
+    void buildXSVStructure(std::vector<std::vector<QString> > &xsvStructure, ProgBarExport_dlg *progressDialog = nullptr);
 
     // Function to rename in pdf file
     void renameFile(const QString &oldFilePath);

@@ -1,5 +1,12 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "CMDoc.h"
-#include "CDocumentSubclasses.h"
+
+#include "CPdfDoc.h"
+#include "CEsquemaDoc.h"
 
 CEsquemaDoc *CMDoc::newDoc(CEsquema *esquema) {
     CEsquemaDoc *pDoc = new CEsquemaDoc(esquema);
@@ -12,6 +19,16 @@ CPdfDoc* CMDoc::newDoc(const QString& filePath) {
     CPdfDoc *pDoc = new CPdfDoc(filePath);
     m_loadedPdfDocs.push_back(pDoc);
     return pDoc;
+}
+
+CMDoc& CMDoc::getMDoc() {
+    static CMDoc instance; // Initialized on first use
+    return instance;
+}
+
+CMDoc::~CMDoc() {
+    for (auto* esquemaDoc : m_loadedEsquemaDocs) delete esquemaDoc;
+    m_loadedEsquemaDocs.clear();
 }
 
 void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
@@ -29,10 +46,20 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
     }
 }
 
+void CMDoc::deleteEsquema(int index) {
+    if (index < 0 || index >= m_loadedEsquemaDocs.size()) {
+        qDebug() << "Esquema out of range for deletition";
+        return;
+    }
+    delete m_loadedEsquemaDocs[index];
+    m_loadedEsquemaDocs.erase(m_loadedEsquemaDocs.begin() + index);
+}
+
+
 // SERIALIZATOIN
 void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
-    int loadedEsquemaDocsSize = m_loadedEsquemaDocs.size();
-    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(int));
+    size_t loadedEsquemaDocsSize = m_loadedEsquemaDocs.size();
+    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(size_t));
 
     for(CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
         esquemaDoc->getEsquema()->serialize(out);
@@ -40,17 +67,17 @@ void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
 }
 
 void CMDoc::serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc) {
-    int loadedEsquemaDocsSize = 1;
-    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(int));
+    size_t loadedEsquemaDocsSize = 1;
+    out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(size_t));
 
     esquemaDoc->getEsquema()->serialize(out);
 }
 
 
 void CMDoc::deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
-    int loadedEsquemaDocsSize;
-    in.read(reinterpret_cast<char*>(&loadedEsquemaDocsSize), sizeof(int));
-    for (int i{0}; i < loadedEsquemaDocsSize; i++) {
+    size_t loadedEsquemaDocsSize;
+    in.read(reinterpret_cast<char*>(&loadedEsquemaDocsSize), sizeof(size_t));
+    for (size_t i{0}; i < loadedEsquemaDocsSize; i++) {
         CEsquema *esquema = new CEsquema(in);
         loadedEsquemaDocs.push_back(newDoc(esquema));
     }

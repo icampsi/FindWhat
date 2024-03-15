@@ -1,6 +1,11 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "PMainEsquemaUI.h"
 #include "qtpreprocessorsupport.h"
-#include "ui/mainWindow.h"
+#include "MainWindow.h"
 #include "ui_PMainEsquemaUI.h"
 
 #include <QToolBox>
@@ -8,6 +13,7 @@
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
 #include "document/CMDoc.h"
+#include "document/CEsquemaDoc.h"
 #include "utils/generalfunctions.h"
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
@@ -95,13 +101,13 @@ void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
     std::vector<CExportCSV*> exportCSVs = CMDoc::getMDoc().getExportPathDoc().getExportCSVs();
 
     // Checks the ammount of work that will be needed to set up the progress bar dialog (and to check if actually anything is needed)
-    int fileCount = 0;
+    size_t fileCount = 0;
     for (CExportCSV* it : exportCSVs) {
         fileCount += it->getFilePaths().size();
     }
     // Creates a progressBar dialog and sets its progress bar range to match fileCount
     if(fileCount > 0) {
-        ExportCSVProgressBar_dlg *progressDlg = new ExportCSVProgressBar_dlg(fileCount, this);
+        ProgBarExport_dlg *progressDlg = new ProgBarExport_dlg(fileCount, this);
         progressDlg->show();
         // Process pending events to update the UI
         QCoreApplication::processEvents();
@@ -142,7 +148,7 @@ void PMainEsquemaUI::handleDeleteEsquema(const int index) {
     ui->loadedEsquemes->deleteEsquema(index);
     CMDoc::getMDoc().deleteEsquema(index);
     // Perform a check in main window for disableing Export Esquema menu action if needed
-    qobject_cast<mainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
+    qobject_cast<MainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
     qDebug() << ui->stackedWidget_esquemaPage->count();
 }
 

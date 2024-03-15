@@ -1,7 +1,15 @@
+// =================================================== \\
+// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
+// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
+// =================================================== \\
+
 #include "PFormExpToolBoxPage.h"
 #include "ui_PFormExpToolBoxPage.h"
-#include "document/CMDoc.h"
+
 #include "QComboBox"
+
+#include "document/CMDoc.h"
+#include "document/CEsquemaDoc.h"
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::PExpFormToolBoxPage)
