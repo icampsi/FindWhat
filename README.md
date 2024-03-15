@@ -9,8 +9,6 @@ THIS PROGRAM IS CURRENTLY UNDER CONSTRUCTION and some functionalities may not wo
 - [Poppler](https://poppler.freedesktop.org/) (for converting PDF files into text)
 - [QT](https://www.qt.io)
 
-You can find poppler includes, libs and precompiled .dll's in "poppler" folder. Move it inside the compilation folder or change the .pro file if needed for compiling.
-
 # How to use
 The program is not yet intuitive and does not provide much guidance on how to use it. To get started, experiment with it and keep the following points in mind:
 
