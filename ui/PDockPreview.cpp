@@ -1,9 +1,11 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "PDockPreview.h"
+#include "qtpreprocessorsupport.h"
 #include "ui_PDockPreview.h"
 
 #include "PEsquemaPage.h"
@@ -60,3 +62,13 @@ void PDockPreview::handleFunctionUpdated(CFormula::IndexPosition index, QString 
     cursor.setPosition(index.final, QTextCursor::KeepAnchor);
     cursor.setCharFormat(format);
 }
+
+// BOOKMARK - needs finishing
+void PDockPreview::on_checkBox_showIndividualPages_stateChanged(int arg1) {
+    Q_UNUSED(arg1);
+    for(int i{0}; i < ui->tabWidget_preview->count(); i++) {
+        ui->tabWidget_preview->removeTab(i);
+    }
+
+}
+

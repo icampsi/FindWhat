@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CESQUEMADOC_H
 #define CESQUEMADOC_H

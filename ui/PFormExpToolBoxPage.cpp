@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "PFormExpToolBoxPage.h"
 #include "ui_PFormExpToolBoxPage.h"
@@ -54,7 +55,7 @@ void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updat
 }
 
 void PFormExpToolBoxPage::on_comboBox_esquemaName_currentIndexChanged(int index) { // Sets the associated esquema to the one that has the same index in loadedEsquemaDocs
-    if (index < 0 || index > CMDoc::getMDoc().getLoadedEsquemaDocs()->size()) {
+    if (index < 0 || static_cast<size_t>(index) > CMDoc::getMDoc().getLoadedEsquemaDocs()->size()) {
         m_exportCSV->setAsocEsquemaDoc(nullptr);
     }
     else {

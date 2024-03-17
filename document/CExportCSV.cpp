@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "CExportCSV.h"
 
@@ -31,9 +32,8 @@ void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructu
     }
 }
 
-void CExportCSV::reOrderFiles(int fileToMoveIndex, int targetPositionIndex) {
-    if (fileToMoveIndex < 0 || fileToMoveIndex >= m_pdfFilePaths.size() ||
-        targetPositionIndex < 0 || targetPositionIndex >= m_pdfFilePaths.size())
+void CExportCSV::reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex) {
+    if (fileToMoveIndex >= m_pdfFilePaths.size() || targetPositionIndex >= m_pdfFilePaths.size())
         return;
 
     std::rotate(m_pdfFilePaths.begin() + fileToMoveIndex,

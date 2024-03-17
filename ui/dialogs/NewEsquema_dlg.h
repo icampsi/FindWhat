@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef NEWESQUEMA_DLG_H
 #define NEWESQUEMA_DLG_H

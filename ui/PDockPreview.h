@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef PDOCKPREVIEW_H
 #define PDOCKPREVIEW_H
@@ -25,6 +26,8 @@ public slots:
 
 private slots:
     void previewOptionChanged(WToolBarPreview::PreviewOption option);
+
+    void on_checkBox_showIndividualPages_stateChanged(int arg1);
 
 private:
     Ui::PDockPreview *ui;

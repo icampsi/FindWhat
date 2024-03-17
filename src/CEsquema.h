@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CESQUEMA_H
 #define CESQUEMA_H
@@ -42,19 +42,19 @@ protected:
 
 public:
     void renameFile(const char* oldName, const char* newName);
-    bool createFileName(QString& newFileName, const QString& fileNamePlaceholder); // Return false if name contains any invalid naming character: < > " \ / | ? *
+    bool createFileName(QString& newFileName, const QString& fileNamePlaceholder) const; // Return false if name contains any invalid naming character: < > " \ / | ? *
 
     // Generates a string xsv Structure from the format specified in m_csvFormatFormula
     void generateXSVStringStructure(const QString &text);
     // Converts a xsv string structure into a full csv file string
     void xsv_stringStructureToString(QString* pFullFileString, char enclosureChar, char separator);
     // Deletes the formula at index pos and cleans
-    void deleteFormula(int index);
+    void deleteFormula(size_t index);
 
     // SETTERS AND GETTERS
     void addStaticData(CData* data );
     const std::vector<CData*>& getStaticData() const { return m_staticData; }
-    void deleteStaticData(int index);
+    void deleteStaticData(size_t index);
     void setStaticDataName(CData* data, QString name);
 
     const std::vector<CFormula*>& getExtractDataFormula() const { return m_extractDataFormula; }

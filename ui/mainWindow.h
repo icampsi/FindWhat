@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef MMAINWINDOW_H
 #define MMAINWINDOW_H
@@ -45,7 +46,6 @@ private slots:
 
     // Widget slots
     void on_btn_changeRoot_clicked();
-    void on_lineEdit_rowFormat_textChanged(const QString &arg1);
 
 public slots:
     void functionUpdated(CFormula::IndexPosition index, QString result);

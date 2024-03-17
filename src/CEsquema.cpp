@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "CEsquema.h"
 #include "utils/GeneralFunctions.h"
@@ -28,7 +29,7 @@ CEsquema::~CEsquema() {
     }
 }
 
-bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlaceholder) {
+bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlaceholder) const {
     QRegularExpression regex("<(.*?)>");
     QRegularExpressionMatchIterator matches = regex.globalMatch(fileNamePlaceholder);
 
@@ -53,8 +54,8 @@ bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlace
     else return true;
 }
 
-void CEsquema::deleteFormula(int index) {
-    if (index >= 0 && index < m_extractDataFormula.size()) {
+void CEsquema::deleteFormula(size_t index) {
+    if (index < m_extractDataFormula.size()) {
         m_extractDataFormula.erase(m_extractDataFormula.begin() + index);
     } else {
         qDebug() << "index for formula is out of range of it's esquema t_extractorDataFormula vector";
@@ -66,8 +67,8 @@ void CEsquema::addStaticData(CData* data ) {
     m_staticData.push_back(data);
 }
 
-void CEsquema::deleteStaticData(int index) {
-    if (index >= 0 && index < m_staticData.size()) {
+void CEsquema::deleteStaticData(size_t index) {
+    if (index < m_staticData.size()) {
         CData* data = m_staticData[index];
         m_dataMap.remove(data->getDataName()); // Update m_dataMap
         delete data;
@@ -119,8 +120,8 @@ void CEsquema::constructCsvFormatFormulaStructure(const QString& rLine, char enc
 }
 
 void CEsquema::xsv_stringStructureToString(QString* pFullFileString, char enclosureChar, char separator) {
-    for (int i{ 0 }; i < m_XSVStringStructureResult.size(); i++) {
-        for (int k{ 0 }; k < m_XSVStringStructureResult[i].size(); k++) {
+    for (size_t i{ 0 }; i < m_XSVStringStructureResult.size(); i++) {
+        for (size_t k{ 0 }; k < m_XSVStringStructureResult[i].size(); k++) {
             // Add enclosure char on both ends and start second loop for accessing individual chars from the string
             // of this cell. We copy each char and check if " is found, so we can add another one to keep it as a scape.
             const QString &cell = m_XSVStringStructureResult[i][k];
@@ -147,7 +148,7 @@ void CEsquema::generateXSVStringStructure(const QString &text) {
     m_XSVStringStructureResult.clear();
     std::vector<QString> row;
 
-    for(int i{0}; i < m_csvFormatFormulaStructure.size(); i++) {
+    for(size_t i{0}; i < m_csvFormatFormulaStructure.size(); i++) {
         QString cell = m_csvFormatFormulaStructure.at(i);
         QRegularExpression regex("<(.*?)>");
         QRegularExpressionMatchIterator matches = regex.globalMatch(cell);

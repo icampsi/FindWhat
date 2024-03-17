@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "CFormula.h"
 
@@ -16,7 +17,7 @@ CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
 
     // Deep copy of the formula path vector
     for (CFunction *function : other.m_formulaPath) {
-        CFunction *castedFunction = castedFunction = dynamic_cast<CIndexingFunction*>(function);
+        CFunction *castedFunction = dynamic_cast<CIndexingFunction*>(function);
 
         // BOOKMARK - I am creating a new function for ensuring livespan of it. Probably need to rethink this part when i understand better how QStandarditem works
         if(castedFunction) {
@@ -263,7 +264,7 @@ inline void CFormula::EndLine(const QString& text) { // Moves index to the endin
 }
 
 inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {
-    for (auto i = 0; i < thisContainer->size(); ++i) {
+    for (size_t i = 0; i < thisContainer->size(); ++i) {
         if (thisContainer->at(i).getDataName() == pFunctionToApply->getText()) {
             m_result += thisContainer->at(i).getDataString();
         }
@@ -304,7 +305,6 @@ inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
         }
     }
     bool comaAmountVal2 = false;
-    numStart = false;
 
     for (unsigned int i{ 0 }; i < pMathFunctionToApply->m_val2.size(); i++) {
         if (pMathFunctionToApply->m_val2[i] == ',' || pMathFunctionToApply->m_val2[i] == '.') {
@@ -488,7 +488,7 @@ void CFormula::extractDataInverted(const QString& text, CExtractingFunction* pFu
     m_indexPosition.final = indexInitialTemp;
 }
 
-void CFormula::deleteFunction(const int index) {
+void CFormula::deleteFunction(const size_t index) {
     // Check if the index is within bounds
     if (index >= 0 && index < m_formulaPath.size()) {
         // Check if the pointer at the specified index is valid
@@ -504,9 +504,8 @@ void CFormula::deleteFunction(const int index) {
     }
 }
 
-void CFormula::reorderFunctionPath(int objectToMoveIndex, int destinationIndex) {
-    if (objectToMoveIndex < 0 || objectToMoveIndex >= m_formulaPath.size() ||
-        destinationIndex  < 0 || destinationIndex >= m_formulaPath.size()) {
+void CFormula::reorderFunctionPath(size_t objectToMoveIndex, size_t destinationIndex) {
+    if (objectToMoveIndex >= m_formulaPath.size() || destinationIndex >= m_formulaPath.size()) {
         qDebug() << "Invalid object index or destination index";
         return;
     }

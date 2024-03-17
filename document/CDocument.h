@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CDOCUMENT_H
 #define CDOCUMENT_H
@@ -14,6 +14,7 @@ class CDocument {
 public:
     // Constructors and destructors
     CDocument();
+    CDocument(const QString& docName);
     virtual ~CDocument();
 
 protected:

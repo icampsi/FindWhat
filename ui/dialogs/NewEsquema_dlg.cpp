@@ -1,10 +1,11 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "NewEsquema_dlg.h"
-#include "ui/mainwindow.h"
+#include "ui/MainWindow.h"
 #include "ui_NewEsquema_dlg.h"
 
 #include <QAbstractButton>

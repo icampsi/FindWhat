@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -93,7 +94,7 @@ void MainWindow::action_loadSession() {
                                   QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) return;
 
-    for (int i{0}; i < CMDoc::getMDoc().getLoadedEsquemaDocs()->size(); i++) {
+    for (size_t i{0}; i < CMDoc::getMDoc().getLoadedEsquemaDocs()->size(); i++) {
         ui->mainEsquemaUI->handleDeleteEsquema(i);
     }
 
@@ -180,15 +181,6 @@ void MainWindow::on_btn_changeRoot_clicked() {
             ui->browserWidget->setRootIndex(model->index(newRootPath));
         }
     }
-}
-
-void MainWindow::on_lineEdit_rowFormat_textChanged(const QString &arg1) {
-    Q_UNUSED(arg1);
-    CEsquemaDoc *esquemaDoc     = CMDoc::getMDoc().getActiveEsquemaDoc();
-    CEsquema    *currentEsquema = nullptr;
-
-    if (esquemaDoc)     currentEsquema = esquemaDoc->getEsquema();
-    // if (currentEsquema) currentEsquema->constructCsvFormatFormulaStruct(ui->lineEdit_rowFormat->text(), '\"', ','); //set m_formatedFormula
 }
 
 void MainWindow::checkExortEsquemaActionEnable() {

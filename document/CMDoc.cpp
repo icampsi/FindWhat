@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "CMDoc.h"
 
@@ -46,8 +47,8 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
     }
 }
 
-void CMDoc::deleteEsquema(int index) {
-    if (index < 0 || index >= m_loadedEsquemaDocs.size()) {
+void CMDoc::deleteEsquema(size_t index) {
+    if (index >= m_loadedEsquemaDocs.size()) {
         qDebug() << "Esquema out of range for deletition";
         return;
     }

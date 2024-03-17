@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "PMainEsquemaUI.h"
 #include "qtpreprocessorsupport.h"
@@ -143,7 +144,7 @@ void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
     }
 }
 
-void PMainEsquemaUI::handleDeleteEsquema(const int index) {
+void PMainEsquemaUI::handleDeleteEsquema(const size_t index) {
     ui->stackedWidget_esquemaUI->setCurrentIndex(0);
     ui->loadedEsquemes->deleteEsquema(index);
     CMDoc::getMDoc().deleteEsquema(index);

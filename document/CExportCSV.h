@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CEXPORTCSV_H
 #define CEXPORTCSV_H
@@ -49,7 +49,7 @@ public:
     const QString& getExportFileRename() const        { return m_exportFileRename; }
 
     void setRenameParsedPDFFlag(bool isToBeRenamed) { m_renameParsedPDFFlag =  isToBeRenamed; }
-    const bool getRenameParsedPDFFlag() const { return m_renameParsedPDFFlag; }
+    bool getRenameParsedPDFFlag() const { return m_renameParsedPDFFlag; }
 
     void setFileNamePlaceholder(const QString& fileNamePlaceholder) { m_fileNamePlaceholder = fileNamePlaceholder; }
     const QString& getFileNamePlaceholder() const { return m_fileNamePlaceholder; }
@@ -61,7 +61,7 @@ public:
     void deletePdfFile(int index);
 
     // Function to reorder files inside the vector
-    void reOrderFiles(int fileToMoveIndex, int targetPositionIndex);
+    void reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex);
 
     // Function to build XSV structure
     void buildXSVStructure(std::vector<std::vector<QString> > &xsvStructure, ProgBarExport_dlg *progressDialog = nullptr);

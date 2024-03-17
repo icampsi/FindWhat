@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef PMAINESQUEMAUI_H
 #define PMAINESQUEMAUI_H
@@ -36,7 +37,7 @@ private slots:
     void on_pushButton_ExportCSV_clicked();
 
 public slots:
-    void handleDeleteEsquema(const int index);
+    void handleDeleteEsquema(const size_t index);
     void handleFilePathChanged(const QString &filePath);
     void setCurrentPageToEmptyPage(); // Sets the current page to empty page inc ase no esquemas are loaded
 

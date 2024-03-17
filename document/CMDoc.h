@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CMDOC_H
 #define CMDOC_H
@@ -38,7 +38,7 @@ public:
 
     CExportPathDoc& getExportPathDoc()  { return m_exportPathDoc; }
 
-    void deleteEsquema(int index);
+    void deleteEsquema(size_t index);
 
     // SERIALIZATION
     void serializeFullEsquemaArray(std::ofstream& out);

@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef WESQUEMALISTVIEW_H
 #define WESQUEMALISTVIEW_H
@@ -20,9 +21,9 @@ signals:
     void deleteEsquema(const int index);
 
 public slots:
-    void handleDeleteEsquema(const int index) {
+    void handleDeleteEsquema(const size_t index) {
         // Remove the item from the list widget
-        QListWidgetItem *item = takeItem(index);
+        QListWidgetItem *item = takeItem(static_cast<int>(index));
         delete item;
     }
 };

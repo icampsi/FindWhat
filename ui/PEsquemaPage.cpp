@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "PEsquemaPage.h"
 #include "ui_PEsquemaPage.h"
@@ -198,7 +199,7 @@ void PEsquemaPage::loadEsquema() {
     }
 
     // Create third level items from esquema.t_extractDataFormula[] attached to "Formulas"
-    for(int i{0}; i < esquema->getExtractDataFormula().size(); i++) {
+    for(size_t i{0}; i < esquema->getExtractDataFormula().size(); i++) {
         QStandardItem *formulaItem = new QStandardItem(esquema->getExtractDataFormula()[i]->getDataName()); // Create new item for each member of the vector
         CFormula *formula = esquema->getExtractDataFormula()[i];
         formulaItem->setData(QVariant::fromValue(formula), Qt::UserRole);
@@ -265,8 +266,8 @@ void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
 
         QString functionName;
         // Add function items to listWidget_formula
-        for(int i{0}; i < m_loadedFormula->getPathSize(); i++) {
-            CFunction* function = m_loadedFormula->getFunction(i);
+        for(size_t i{0}; i < m_loadedFormula->getPathSize(); i++) {
+            CFunction* function = m_loadedFormula->getFunction(static_cast<int>(i));
             functionName = function->getFunctionTypeName() + ": ";
             QListWidgetItem * functionItem = new QListWidgetItem(functionName);
             m_itemFunctionMap[functionItem] = function;

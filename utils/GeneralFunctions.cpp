@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #include "generalfunctions.h"
 
@@ -93,7 +94,7 @@ namespace SystemUtils {
     }
 
     bool containsInvalidFileNameChars(const QString& fileName) {
-        QRegularExpression regex("[<>:\"\\/\\\\|?*]");
+        static const QRegularExpression regex("[<>:\"\\/\\\\|?*]");
         return regex.match(fileName).hasMatch();
     }
 }

@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(FindWhat VERSION 0.1 LANGUAGES CXX)
+project(FindWhat VERSION 0.1.0 LANGUAGES CXX)
 
 # Enable all warnings and treat them as errors
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
+    add_compile_options(-Wall -Wextra -pedantic -Werror -Wno-nonportable-include-path -Wno-microsoft-include)
 endif()
 
 set(CMAKE_AUTOUIC ON)
@@ -64,7 +64,7 @@ set(UI_FILES
     ui/WEsquemaTreeView.cpp     ui/WEsquemaTreeView.h
     ui/WLoadedEsquemes.cpp      ui/WLoadedEsquemes.h
     ui/WLoadedFilesTreeView.cpp ui/WLoadedFilesTreeView.h
-    ui/WToolbarPreview.cpp      ui/WToolbarPreview.h
+    ui/WToolBarPreview.cpp      ui/WToolBarPreview.h
     ui/WToolBarEsquema.cpp      ui/WToolBarEsquema.h
 
     ui/dialogs/NewEsquema_dlg.cpp       ui/dialogs/NewEsquema_dlg.h      ui/dialogs/NewEsquema_dlg.ui
@@ -91,10 +91,20 @@ else()
     if(ANDROID)
         add_library(FindWhat SHARED
             ${PROJECT_SOURCES}
+            ${SRC_FILES}
+            ${DOCUMENT_FILES}
+            ${UTILS_FILES}
+            ${UI_FILES}
+            ${RESOURCE_FILES}
         )
     else()
         add_executable(FindWhat
             ${PROJECT_SOURCES}
+            ${SRC_FILES}
+            ${DOCUMENT_FILES}
+            ${UTILS_FILES}
+            ${UI_FILES}
+            ${RESOURCE_FILES}
         )
     endif()
 endif()

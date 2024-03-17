@@ -1,7 +1,7 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef CFORMULA_H
 #define CFORMULA_H
@@ -69,8 +69,8 @@ public:
         function->setParent(this);
         m_formulaPath.push_back(function);
     }
-    void deleteFunction(const int index);
-    void reorderFunctionPath(int objectToMoveIndex, int destinationIndex); // Moves object from one index to another
+    void deleteFunction(const size_t index);
+    void reorderFunctionPath(size_t objectToMoveIndex, size_t destinationIndex); // Moves object from one index to another
     void clearPath() { m_formulaPath.clear();}
 
     // SERIALIZATION

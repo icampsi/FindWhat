@@ -1,7 +1,8 @@
-// =================================================== \\
-// ====     Copyright (c) 2024 Ignasi Camps       ==== \\
-// ==== SPDX-License-Identifier: GPL-3.0-or-later ==== \\
-// =================================================== \\
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
 
 #ifndef PESQUEMAPAGE_H
 #define PESQUEMAPAGE_H
@@ -51,7 +52,7 @@ protected:
 public:
     void newFormula();
     void loadFunction();
-    inline void updateFunctionProcess(); // Launches apply formula, updates function editor general fields and paints displayed text to keep track of your results.
+    void updateFunctionProcess(); // Launches apply formula, updates function editor general fields and paints displayed text to keep track of your results.
 
 public slots:
     void handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex);
