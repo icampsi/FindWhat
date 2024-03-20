@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -43,13 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // CONNECTIONS
-    // Menú actions connections
+    // Menú File actions connections
     connect(ui->action_NewEsquema   , &QAction::triggered, this, &MainWindow::action_newEsquema);
     connect(ui->action_LoadSession  , &QAction::triggered, this, &MainWindow::action_loadSession);
     connect(ui->action_SaveSession  , &QAction::triggered, this, &MainWindow::action_saveSession);
     connect(ui->action_ImportEsquema, &QAction::triggered, this, &MainWindow::action_importEsquema);
     connect(ui->action_ExportEsquema, &QAction::triggered, this, &MainWindow::action_exportEsquema);
-
+    // Menú View action connections
+    connect(ui->action_ShowPreviewPanel    , &QAction::triggered, this, &MainWindow::action_showPreviewPanel);
+    connect(ui->action_ShowFileBrowserPanel, &QAction::triggered, this, &MainWindow::action_showFileBrowserPanel);
     // Mediate between browserWidget and dockPreview
     connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, m_dockPreview    , &PDockPreview::handleFilePathChanged);
     connect(ui->browserWidget, &WBrowserTreeView::filePathChanged, ui->mainEsquemaUI, &PMainEsquemaUI::handleFilePathChanged);
@@ -68,7 +69,7 @@ void MainWindow::loadEsquema(CEsquemaDoc* esquemaDoc) {
     ui->mainEsquemaUI->newEsquema(esquemaDoc);
 }
 
-void MainWindow::functionUpdated(CFormula::IndexPosition index, QString result) {
+void MainWindow::functionUpdated(CFormula::IndexPosition index, const QString& result) {
     m_dockPreview->handleFunctionUpdated(index, result);
 }
 
@@ -169,6 +170,16 @@ void MainWindow::action_exportEsquema() {
         QString errorString = "Couldn't save file " + fileName;
         QMessageBox::critical(this, "Error", errorString);
     }
+}
+
+void MainWindow::action_showPreviewPanel() {
+    if(m_dockPreview->isHidden()) m_dockPreview->show();
+    else                          m_dockPreview->hide();
+}
+
+void MainWindow::action_showFileBrowserPanel() {
+    if(ui->dockWidget_fileBrowser->isHidden()) ui->dockWidget_fileBrowser->show();
+    else                                       ui->dockWidget_fileBrowser->hide();
 }
 
 void MainWindow::on_btn_changeRoot_clicked() {

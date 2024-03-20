@@ -36,8 +36,17 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
+20/03/24
+- CPdfDoc has been remade entirely to be able to handle multiple pdf pages separately. This has been used to add an option to look for data on a specific page and to improve Preview window to be able to display the document broke in multiple pages.
+Note: Because of that, serialization temporaly doesen't work properly.
+- Improved extraction mechanism to be able to handle multiple ending strings (so user can now specify different ending strings and extraction wont stop until each one has been found. This way user can say, for example, that extraction will keep going until 3 '\n' are found).
+- Display textBox now shows formating symbols, so the user can know if the current index is on an end-of-line character.
+- Added a way to replace extracted characters (so now user can, for example, say that each extracted whitespace should be a "-").
+- Started a basic view menu to toggle visibility of docked windows.
+- Some minor code clean up.
+
 15/03/2024
-- Swutched from qmake to CMake build system.
+- Switched from qmake to CMake build system.
 - Cleaned code and made some re-estructuring.
 - Fixed minor bugs.
   

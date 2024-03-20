@@ -58,6 +58,8 @@ set(UI_FILES
     ui/PEsquemaPage.cpp        ui/PEsquemaPage.h        ui/PEsquemaPage.ui
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
     ui/PMainEsquemaUI.cpp      ui/PMainEsquemaUI.h      ui/PMainEsquemaUI.ui
+    ui/PTabTextPreview.cpp     ui/PTabTextPreview.h     ui/PTabTextPreview.ui
+
 
     ui/WBrowserTreeView.cpp     ui/WBrowserTreeView.h
     ui/WEsquemaListView.cpp     ui/WEsquemaListView.h
@@ -85,6 +87,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${UTILS_FILES}
         ${UI_FILES}
         ${RESOURCE_FILES}
+        ui/PEndingStringBlock.h ui/PEndingStringBlock.cpp
     )
 
 else()

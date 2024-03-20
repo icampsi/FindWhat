@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -31,8 +30,8 @@ public:
 
 protected:
     // Members
-    PDockPreview      *m_dockPreview = nullptr;
-    newEsquema_dlg    *newEsquemadlg = nullptr;
+    PDockPreview      *m_dockPreview    = nullptr;
+    newEsquema_dlg    *newEsquemadlg    = nullptr;
     exportEsquema_dlg *exportEsquemaDlg = nullptr;
 
 
@@ -43,12 +42,14 @@ private slots:
     void action_saveSession();
     void action_importEsquema();
     void action_exportEsquema();
+    void action_showPreviewPanel();
+    void action_showFileBrowserPanel();
 
     // Widget slots
     void on_btn_changeRoot_clicked();
 
 public slots:
-    void functionUpdated(CFormula::IndexPosition index, QString result);
+    void functionUpdated(CFormula::IndexPosition index, const QString &result);
 
 public:
     void loadEsquema(CEsquemaDoc* esquema);
@@ -57,6 +58,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QAction* m_exportEsquemaAction = nullptr; // Pointer to export esquema menu action for easy validate or invalidate depending on esquemes being loaded
+    bool showFormatingMarks; // Flag to show/hide formating marks
 };
 
 #endif // MMAINWINDOW_H

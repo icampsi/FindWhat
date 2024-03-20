@@ -9,12 +9,13 @@
 #include "CFunctionClasses.h"
 #include "CData.h"
 
-// EXTREU UNA ÚNICA DADA A PARTIR DELS PARÀMETRES DONATS
+class CPdfDoc;
+// EXTRACTS A DATA FROM GIVEN PARAMETERS (each formula extracts only one value)
 class CFormula {
 public:
     struct IndexPosition {
-        int initial = 0;
-        int final   = 0;
+        size_t initial = 0;
+        size_t final   = 0;
     };
     enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization purposes
 
@@ -42,27 +43,26 @@ public:
 
     void            setDataName(const QString& dataName) { m_data.setDataName(dataName); }
 
-    IndexPosition   getIndexPosition() const                 { return m_indexPosition; }
-    void            setIndexPosition(int initial, int final) { m_indexPosition = {initial, final}; }
+    IndexPosition   getIndexPosition() const                       { return m_indexPosition; }
+    void            setIndexPosition(size_t initial, size_t final) { m_indexPosition = {initial, final}; }
 
     CFunction*      getFunction(int index) const { return m_formulaPath[index]; }
     size_t          getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
-    QString applyFormula(const QString &text, size_t from = 0, int to = -1);
+    QString applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1);
 
-    inline int  findText(const QString &text, CIndexingFunction* pFunctionToApply);
-    inline void moveIndex(const QString& text, CIndexingFunction* pFunctionToApply);
-    inline void moveLine(const QString &text, CIndexingFunction* pFunctionToApply);
-    inline void BeginLine(const QString& text); // Sets index at the begining of current line
-    inline void EndLine(const QString&   text); // Sets index at the begining of current line
+    inline int  findText (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
+    inline void moveIndex(CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
+    inline void moveLine (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
+    inline void BeginLine(CPdfDoc *pPdfDoc); // Sets index at the begining of current line
+    inline void EndLine  (CPdfDoc *pPdfDoc); // Sets index at the begining of current line
     inline void appendString(CIndexingFunction* pFunctionToApply);
-
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     inline bool MathData(CMathFunction* pMathFunctionToApply);
 
-    void extractData(const QString &text, CExtractingFunction* pFunctionToApply);
-    void extractDataInverted(const QString &text, CExtractingFunction* pFunctionToApply);
+    void extractData        (CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
+    // void extractDataInverted(CPdfDoc *pPdfDoc, CExtractingFunction *pFunctionToApply);
 
     // m_formulaPath INTERFACE
     void addFunction(CFunction* function) {

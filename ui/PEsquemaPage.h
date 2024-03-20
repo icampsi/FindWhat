@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -15,7 +14,8 @@
 
 #include "src/CEsquema.h"
 #include "src/CFormula.h"
-#include "document/CExportPathDoc.h"
+
+class CEsquemaDoc;
 
 namespace Ui { class PEsquemaPage; }
 
@@ -56,6 +56,7 @@ public:
 
 public slots:
     void handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex);
+    void handleFunctionUpdated();
 
 private slots:
     // VIEWS
@@ -103,8 +104,16 @@ private slots:
     // Menú actions for the "New Function" push button
     void handle_newFunActions(CFunction::Action functionType);
 
+    void on_checkBox_lookOnlyAtPage_stateChanged(int arg1);
+
+    void on_spinBox_lookOnlyAtPage_valueChanged(int arg1);
+
+    void on_lineEdit_toReplace_textChanged(const QString &arg1);
+
+    void on_lineEdit_replaceFor_textChanged(const QString &arg1);
+
 signals:
-    void functionUpdated(CFormula::IndexPosition index, QString result);
+    void functionUpdated(CFormula::IndexPosition index, const QString& result);
 };
 
 #endif // PESQUEMAPAGE_H

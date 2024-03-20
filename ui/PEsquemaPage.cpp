@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -37,10 +36,11 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
 
     loadEsquema();
     ui->treeView_Esquema->expandAll();
-    
+
     connect(ui->treeView_Esquema, &WEsquemaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
     connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
     connect(ui->listWidget_formula->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
+    connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
@@ -79,6 +79,10 @@ void PEsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &p
         ui->treeView_Esquema->clearSelection();
         ui->stackedWidget_general->setCurrentIndex(0);
     }
+}
+
+void PEsquemaPage::handleFunctionUpdated() {
+    updateFunctionProcess();
 }
 
 void PEsquemaPage::loadFunction() {
@@ -122,10 +126,8 @@ void PEsquemaPage::loadFunction() {
         if(indexingFunction->getOption()) ui->radioButton_preppend->setChecked(true);
         break;
     case CFunction::Action::ExtractData:
-        parsedText = parseToText(extractingFunction->getEndingString());
-        ui->lineEdit_endingString->setText(parsedText);
-        ui->textEdit_extractedData->setText(function->getParent()->getResult());
-        ui->comboBox_readDirection->setCurrentIndex(extractingFunction->getInvertedDirection());
+        parsedText = parseToText(extractingFunction->getEndingStringBlock().at(0)); // BOOKMARK - at(0) added just for compilation but needs fixing
+        ui->comboBox_readDirection->setCurrentIndex(extractingFunction->isInverted());
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
@@ -149,21 +151,18 @@ void PEsquemaPage::updateFunctionProcess() {
     else functionIndex = -1; // if no item is provided the formula will go up to the end of the function path
 
     CPdfDoc *activePdfDoc = CMDoc::getMDoc().getActivePdfDoc();
-    QString text;
 
     // If there is no active doc we don't need to update anything in the preview;
     if(activePdfDoc) {
-        text = activePdfDoc->getFullText();
-
-        m_loadedFormula->applyFormula(text, 0, functionIndex);
+        m_loadedFormula->applyFormula(activePdfDoc, 0, functionIndex);
 
         // Update extracted data and result text widgets
         QString result = m_loadedFormula->getResult();
         ui->plainTextEdit_resultToSelectedFunction->setPlainText(result);
 
         {
-            int initialIndex = m_loadedFormula->getIndexPosition().initial;
-            int finalIndex   = m_loadedFormula->getIndexPosition().final;
+            size_t initialIndex = m_loadedFormula->getIndexPosition().initial;
+            size_t finalIndex   = m_loadedFormula->getIndexPosition().final;
             emit functionUpdated(CFormula::IndexPosition{ initialIndex, finalIndex },  result);
         }
 
@@ -173,9 +172,9 @@ void PEsquemaPage::updateFunctionProcess() {
         }
 
         if(functionIndex > -1) {
-            // Applay the formulaPath again, but through the complete formula, so we can see the final result
-            // and only if we haven't already gone through the full formula.
-            result = m_loadedFormula->applyFormula(text);
+            /* Applay the formulaPath again, but through the complete formula, so we can see the final result
+             * and only if we haven't already gone through the full formula. */
+            result = m_loadedFormula->applyFormula(activePdfDoc);
         }
         ui->textEdit_finalResult->setText(result);
     }
@@ -338,6 +337,8 @@ void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
             break;
         case CFunction::Action::ExtractData:
             newFunction = new CExtractingFunction(functionType);
+            ui->endingStringBlock->setParentFunction(static_cast<CExtractingFunction*>(newFunction)); // Pass the new function to PEndingStringBlock
+            connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
             break;
         }
 
@@ -423,10 +424,9 @@ void PEsquemaPage::on_lineEdit_endingString_textChanged(const QString &arg1) {
 
     // Set m_endingString value
     QString parsedText = parseFromText(arg1);
-    dynamic_cast<CExtractingFunction*>(function)->setEndingString(parsedText);
+    dynamic_cast<CExtractingFunction*>(function)->addEndingStringBlock(parsedText); // BOOKMARK - quick fix needs redoing
 
     updateFunctionProcess();
-    ui->textEdit_extractedData->setText(m_loadedFormula->getResult());
 }
 
 void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
@@ -442,7 +442,7 @@ void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
         return;
     }
 
-    static_cast<CExtractingFunction*>(function)->setInvertedDirection(index);
+    static_cast<CExtractingFunction*>(function)->setIsInverted(index);
     // Applay formula up to this selected function
     updateFunctionProcess();
 }
@@ -508,3 +508,38 @@ void PEsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
     QString text = ui->plainTextEdit_staticDataString->toPlainText();
     m_loadedStaticData->setDataString(text);
 }
+
+void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    if(arg1) {
+        ui->spinBox_lookOnlyAtPage->setEnabled(true);
+        function->setNum(ui->spinBox_lookOnlyAtPage->value());
+    }
+    else {
+        ui->spinBox_lookOnlyAtPage->setEnabled(false);
+        function->setNum(0);
+    }
+    updateFunctionProcess();
+}
+
+
+void PEsquemaPage::on_spinBox_lookOnlyAtPage_valueChanged(int arg1) {
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setNum(arg1);
+    updateFunctionProcess();
+}
+
+
+void PEsquemaPage::on_lineEdit_toReplace_textChanged(const QString &arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setToReplace(arg1);
+    updateFunctionProcess();
+}
+
+
+void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setReplaceFor(arg1);
+    updateFunctionProcess();
+}
+

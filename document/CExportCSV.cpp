@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -19,7 +18,7 @@ void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructu
 
     for(QString& filePath : m_pdfFilePaths) {
         CPdfDoc* pdfDoc = new CPdfDoc(filePath);
-        esquema->generateXSVStringStructure(pdfDoc->getFullText());
+        esquema->generateXSVStringStructure(pdfDoc);
         for(auto& j : esquema->getXSVStringStructureResult()) {
             xsvStructure.push_back(j);
         }

@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -18,7 +17,6 @@ CEsquemaDoc *CMDoc::newDoc(CEsquema *esquema) {
 
 CPdfDoc* CMDoc::newDoc(const QString& filePath) {
     CPdfDoc *pDoc = new CPdfDoc(filePath);
-    m_loadedPdfDocs.push_back(pDoc);
     return pDoc;
 }
 

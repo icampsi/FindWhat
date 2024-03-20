@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -8,6 +7,8 @@
 
 #include <QDebug>
 #include <fstream>
+
+#include "document/CPdfDoc.h"
 
 // Copy constructor
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
@@ -19,7 +20,7 @@ CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     for (CFunction *function : other.m_formulaPath) {
         CFunction *castedFunction = dynamic_cast<CIndexingFunction*>(function);
 
-        // BOOKMARK - I am creating a new function for ensuring livespan of it. Probably need to rethink this part when i understand better how QStandarditem works
+        // BOOKMARK - Probably need to rethink this bit
         if(castedFunction) {
             CIndexingFunction *indexFunction = new CIndexingFunction(*dynamic_cast<CIndexingFunction*>(function));
             indexFunction->setParent(this);
@@ -85,7 +86,7 @@ CFormula::~CFormula() {
     }
 }
 
-QString CFormula::applyFormula(const QString& text, size_t from, int to) {
+QString CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to) {
     m_result.clear(); // Reset result
 
     if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
@@ -118,20 +119,20 @@ QString CFormula::applyFormula(const QString& text, size_t from, int to) {
         switch (m_formulaPath[i]->getFunctionType()) {
         case CFunction::Action::Find:
             if (pIndexingFunction) {
-                if (findText(text, pIndexingFunction) == -1) return m_result;
+                if (findText(pPdfDoc, pIndexingFunction) == -1) return m_result;
             }
             break;
         case CFunction::Action::MoveIndex:
-            if (pIndexingFunction) { moveIndex(text, pIndexingFunction); }
+            if (pIndexingFunction) { moveIndex(pPdfDoc, pIndexingFunction); }
             break;
         case CFunction::Action::MoveLine:
-            if (pIndexingFunction) { moveLine(text, pIndexingFunction); }
+            if (pIndexingFunction) { moveLine(pPdfDoc, pIndexingFunction); }
             break;
         // case FunctionType::BeginLine:
-        //     BeginLine(text);
+        //     BeginLine(pPdfDoc);
         //     break;
         // case FunctionType::EndLine:
-        //     EndLine(text);
+        //     EndLine(pPdfDoc);
         //     break;
         case CFunction::Action::AppendString:
             appendString(pIndexingFunction); // I DONT LIKE IT BEING INDEXING FUNCTION. CREATE A SUBCLASS FOR APPENDING/SUBSTRACTING STRINGS?
@@ -146,8 +147,7 @@ QString CFormula::applyFormula(const QString& text, size_t from, int to) {
 
         case CFunction::Action::ExtractData:
             CExtractingFunction* pExctractingFunction = static_cast<CExtractingFunction*>(m_formulaPath[i]);
-            if (!pExctractingFunction->getInvertedDirection()) { extractData(text, pExctractingFunction); }
-            else { extractDataInverted(text, pExctractingFunction); }
+            extractData(pPdfDoc, pExctractingFunction);
             break;
         }
     }
@@ -156,36 +156,64 @@ QString CFormula::applyFormula(const QString& text, size_t from, int to) {
     return m_result;
 }
 
-inline int CFormula::findText(const QString& text, CIndexingFunction* pFunctionToApply) {
+inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
-    if (pFunctionToApply->getStartFromBeggining()) m_indexPosition = {0, 0};
+    QString text("");
+    size_t relativeIndexInitial = m_indexPosition.initial;
+    size_t relativeIndexFinal   = m_indexPosition.final;
+
+    if (pFunctionToApply->getStartFromBeggining()) {
+        relativeIndexInitial = 0;
+        relativeIndexFinal   = 0;
+    }
+
+    int pageToLook = pFunctionToApply->getNum();
+    if(pageToLook >= static_cast<int>(pPdfDoc->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
+
+    if(pageToLook < 0) { // whereas if negative, looks the entire document
+       text = pPdfDoc->getFullText();
+    }
+    else {
+        CPdfDoc::Page page = pPdfDoc->getPage(pageToLook);
+        text = pPdfDoc->getPage(pageToLook).pageText;
+        pPdfDoc->calculateComprehensiveIndex(relativeIndexInitial, pageToLook);
+        pPdfDoc->calculateComprehensiveIndex(relativeIndexFinal, pageToLook);
+    }
+
     // TRUE = end text. FALSE = begin text
     if (text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial) != -1) {
         if (pFunctionToApply->getOption()) {
-            m_indexPosition.initial = text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial) + pFunctionToApply->getText().length();
+            relativeIndexInitial = text.indexOf(pFunctionToApply->getText(), relativeIndexInitial) + pFunctionToApply->getText().length();
         }
         else {
-            m_indexPosition.initial = text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial);
+            relativeIndexInitial = text.indexOf(pFunctionToApply->getText(), relativeIndexInitial);
         }
-        m_indexPosition.final = m_indexPosition.initial;
+        relativeIndexFinal = relativeIndexInitial;
     }
     else {
         qDebug() << "Couldn't find string '" << pFunctionToApply->getText() << "' for: '" << m_data.getDataName() << "'";
         return -1;
     }
+    if(pageToLook >= 0) {
+        relativeIndexInitial += pPdfDoc->getPage(pageToLook).pageCharRange.from;
+        relativeIndexFinal   += pPdfDoc->getPage(pageToLook).pageCharRange.from;
+    }
+    m_indexPosition.initial = relativeIndexInitial;
+    m_indexPosition.final   = relativeIndexFinal;
     return 0;
 }
 
-inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToApply) {
+inline void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+    QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
     // Perform an initial check for index position. If final > initial means last function was extracting function and indexes need to be brought together now.
-    int newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
+    size_t newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
-    if (newIndex >= 0 && newIndex < text.size()) {
+    if (newIndex >= 0 && newIndex < static_cast<size_t>(text.size())) {
         m_indexPosition.initial = newIndex;
         m_indexPosition.final   = m_indexPosition.initial;
     }
@@ -194,7 +222,8 @@ inline void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctio
     }
 }
 
-void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply) {
+void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+    QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
@@ -215,9 +244,9 @@ void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply
     }
     else { // Case when we go up X linesToMove
         while (1) {
-            if (m_indexPosition.initial < text.size()) { m_indexPosition.initial++; }
+            if (m_indexPosition.initial < static_cast<size_t>(text.size())) { m_indexPosition.initial++; }
             else {
-                BeginLine(text);
+                BeginLine(pPdfDoc);
                 break;
             }
             if (text[m_indexPosition.initial] == '\n') {
@@ -230,10 +259,11 @@ void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply
         }
         m_indexPosition.final = m_indexPosition.initial;
     }
-    if(pFunctionToApply->getOption()) EndLine(text);
+    if(pFunctionToApply->getOption()) EndLine(pPdfDoc);
 }
 
-inline void CFormula::BeginLine(const QString &text) { // Moves index to the beggining of current line
+inline void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of current line
+    QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
@@ -248,11 +278,12 @@ inline void CFormula::BeginLine(const QString &text) { // Moves index to the beg
     m_indexPosition.final = m_indexPosition.initial;
 }
 
-inline void CFormula::EndLine(const QString& text) { // Moves index to the ending of current line
+inline void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of current line
+    QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
-    while (m_indexPosition.initial < text.size()) {
+    while (m_indexPosition.initial < static_cast<size_t>(text.size())) {
         m_indexPosition.initial++;
         if (text[m_indexPosition.initial] == '\n') {
             m_indexPosition.initial--;
@@ -348,24 +379,63 @@ inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     return true;
 }
 
-void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionToApply) {
+void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
+    QString text = pPdfDoc->getFullText();
+    bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
 
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
     int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
-    QString endingString = pFunctionToApply->getEndingString(); // String that marks the ending of the extraction
+    std::vector<QString> endingString = pFunctionToApply->getEndingStringBlock(); // Strings that marks the ending of the extraction
+    QString extractedText;      // Stores the stracted text before copying it to m_result
+    size_t endingStringIndex{0};
+    QString currentEndingString("");
+    if(!endingString.empty()) {
+        currentEndingString = endingString.at(0);
+    }
+    while(pFunctionToApply->getCharsToRead() != 0 && pFunctionToApply->getCharsToGet()  != 0) {
 
-    for (;
-         m_indexPosition.final < text.length()
-         && pFunctionToApply->getCharsToRead() != 0
-         && pFunctionToApply->getCharsToGet()  != 0;
+        if(!directionInverted && static_cast<int>(m_indexPosition.final) < text.length() - 1) {
+            m_indexPosition.final++;
+        }
+        else if (directionInverted && m_indexPosition.final > 0) {
+            m_indexPosition.final--;
+        }
+        else break;
 
-         m_indexPosition.final++)
-    {
-        // Check if endingString reached. If it's empty, read to the end of the string.
-        if (!endingString.isEmpty() && text.mid(m_indexPosition.final, endingString.length()) == endingString)  break; // Check if endingString reached. If it's empty, read to the end of the string.
+        int remainingText{0};
+        if(directionInverted) {
+            remainingText = static_cast<int>(m_indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
+        } else {
+            remainingText = static_cast<int>(m_indexPosition.final + currentEndingString.length() - 1);
+        }
+
+        if(remainingText >= 0 && remainingText < text.length()) {
+            // Check if currentEndingString reached.
+            if((directionInverted &&
+                 text.mid(static_cast<size_t>(remainingText), currentEndingString.length()) == currentEndingString) ||
+                (!directionInverted &&
+                 text.mid(m_indexPosition.final, currentEndingString.length()) == currentEndingString))
+            {
+                // If currentEndingString reached check next one. If there are no more, break
+                if(endingStringIndex < endingString.size()) {
+                    currentEndingString = endingString.at(endingStringIndex);
+                    ++endingStringIndex;
+                }
+                else break;
+            }
+        }
+
+        // else if (text.mid(m_indexPosition.final, currentEndingString.length()) == currentEndingString)  {
+        //     // If currentEndingString reached check next one. If there are no more, break
+        //     if(endingStringIndex < endingString.size()) {
+        //         currentEndingString = endingString.at(endingStringIndex);
+        //         ++endingStringIndex;
+        //     }
+        //     else break;
+        // }
 
         pFunctionToApply->setCharsToRead(pFunctionToApply->getCharsToRead() - 1); // m_charsToRead
         // CHECK IF IT'S ONE OF THE ALLOWED CHARACTERS: m_toAllow
@@ -391,101 +461,42 @@ void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionTo
 
         switch (pFunctionToApply->getCharTypeToGet()) {
         case CExtractingFunction::CharTypeToGet::digit:
-            if ((text[m_indexPosition.final].isDigit() && !avoided) || (allowed)) {
-                m_result.append(text[m_indexPosition.final]);
+            if ((text[m_indexPosition.final].isDigit() && !avoided) || allowed) {
+                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
+                else                                extractedText.prepend(text[m_indexPosition.final]);
                 extractedAmount++;
             }
             break;
         case CExtractingFunction::CharTypeToGet::letter:
             if ((!text[m_indexPosition.final].isDigit() && !avoided) || allowed) {
-                m_result.append(text[m_indexPosition.final]);
+                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
+                else                                extractedText.prepend(text[m_indexPosition.final]);
                 extractedAmount++;
             }
             break;
         case CExtractingFunction::CharTypeToGet::all:
             if (!avoided) {
-                m_result.append(text[m_indexPosition.final]);
+                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
+                else                                extractedText.prepend(text[m_indexPosition.final]);
                 extractedAmount++;
             }
         }
         if (pFunctionToApply->getCharsToGet() == extractedAmount) {
-            m_indexPosition.final++; // Cal fer aquesta última suma per tal que l'index es situi passat el caracter extret, sino la següent funció començaria aqui i es podria extreure dos vegades el mateix caracter.
+            m_indexPosition.final++; // Place index after the extracted string
             break;
         }
 
         allowed = false;
         avoided = false;
     }
-}
+    extractedText.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor());
+    m_result.append(std::move(extractedText));
 
-void CFormula::extractDataInverted(const QString& text, CExtractingFunction* pFunctionToApply) {
-    // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
-
-    bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
-    bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
-    int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
-    QString endingString = pFunctionToApply->getEndingString(); // String that marks the ending of the extraction
-
-    for (;
-         m_indexPosition.final > 0
-         && pFunctionToApply->getCharsToRead() != 0
-         && pFunctionToApply->getCharsToGet()  != 0;
-
-         m_indexPosition.final--)
-    {
-        // Check if endingString reached. If it's empty, read to the end of the string.
-        if (!endingString.isEmpty() && text.mid(m_indexPosition.final, endingString.length()) == endingString)  break;
-
-        pFunctionToApply->setCharsToRead(pFunctionToApply->getCharsToRead() - 1); // m_charsToRead--
-        // CHECK IF IT'S ONE OF THE ALLOWED CHARACTERS: m_toAllow
-        QString toAllow = pFunctionToApply->getToAllow();
-        if (toAllow.size() > 0) { // Si hem posat caracters a l'string fa el loop, sino ja no s'ho mira
-            for (short i{ 0 }; i < toAllow.size(); i++) {
-                if (text[m_indexPosition.final] == toAllow[i]) {
-                    allowed = true;
-                    break;
-                }
-            }
-        }
-        // CHECK IF IT'S ONE OF THE AVOIDED CHARACTERS: m_toAvoid
-        QString toAvoid = pFunctionToApply->getToAvoid();
-        if (toAvoid.size() > 0) { // Si hem posat caracters a l'string fa el loop, sino ja no s'ho mira
-            for (unsigned short i{ 0 }; i < toAvoid.size(); i++) {
-                if (text[m_indexPosition.final] == toAvoid[i]) {
-                    avoided = true;
-                    break;
-                }
-            }
-        }
-
-        switch (pFunctionToApply->getCharTypeToGet()) {
-        case CExtractingFunction::CharTypeToGet::digit:
-            if ((text[m_indexPosition.final].isDigit() && !avoided) || (allowed)) {
-                m_result.prepend(text[m_indexPosition.final]);
-                extractedAmount++;
-            }
-            break;
-        case CExtractingFunction::CharTypeToGet::letter:
-            if ((!text[m_indexPosition.final].isDigit() && !avoided) || allowed) {
-                m_result.prepend(text[m_indexPosition.final]);
-                extractedAmount++;
-            }
-            break;
-        case CExtractingFunction::CharTypeToGet::all:
-            if (!avoided) {
-                m_result.prepend(text[m_indexPosition.final]);
-                extractedAmount++;
-            }
-        }
-        if (pFunctionToApply->getCharsToGet() == extractedAmount) break;
-
-        allowed = false;
-        avoided = false;
+    if(directionInverted) {
+        size_t indexInitialTemp = m_indexPosition.initial;
+        m_indexPosition.initial = m_indexPosition.final + 1;
+        m_indexPosition.final = indexInitialTemp;
     }
-    int indexInitialTemp = m_indexPosition.initial;
-    m_indexPosition.initial = m_indexPosition.final;
-    m_indexPosition.final = indexInitialTemp;
 }
 
 void CFormula::deleteFunction(const size_t index) {

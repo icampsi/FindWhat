@@ -22,6 +22,19 @@
       </property>
       <widget class="QWidget" name="page_textPreview">
        <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="0" colspan="2">
+         <widget class="QTabWidget" name="tabWidget_preview">
+          <property name="tabPosition">
+           <enum>QTabWidget::West</enum>
+          </property>
+          <property name="tabShape">
+           <enum>QTabWidget::Rounded</enum>
+          </property>
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -43,36 +56,6 @@
           <property name="text">
            <string>Show individual pages</string>
           </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QTabWidget" name="tabWidget_preview">
-          <property name="tabPosition">
-           <enum>QTabWidget::West</enum>
-          </property>
-          <property name="tabShape">
-           <enum>QTabWidget::Rounded</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="textPreview">
-           <attribute name="title">
-            <string>Text Preview</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QPlainTextEdit" name="TextDisplayer">
-              <property name="lineWrapMode">
-               <enum>QPlainTextEdit::NoWrap</enum>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </item>
        </layout>

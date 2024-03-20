@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -144,7 +143,7 @@ void CEsquema::xsv_stringStructureToString(QString* pFullFileString, char enclos
 }
 
 
-void CEsquema::generateXSVStringStructure(const QString &text) {
+void CEsquema::generateXSVStringStructure(CPdfDoc *pPdfDoc) {
     m_XSVStringStructureResult.clear();
     std::vector<QString> row;
 
@@ -165,7 +164,7 @@ void CEsquema::generateXSVStringStructure(const QString &text) {
                 CFormula *formula = data->getParentFormula();
 
                 // If the data has a formula associated, it means that it is not a static data but a variable, so we extract the value first
-                if(formula) { formula->applyFormula(text); }
+                if(formula) { formula->applyFormula(pPdfDoc); }
                 // Replace the captured string with the corresponding value from the map
                 cell.replace(match.capturedStart(0), match.capturedLength(0), data->getDataString());
             }

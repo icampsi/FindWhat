@@ -45,7 +45,7 @@ public:
     bool createFileName(QString& newFileName, const QString& fileNamePlaceholder) const; // Return false if name contains any invalid naming character: < > " \ / | ? *
 
     // Generates a string xsv Structure from the format specified in m_csvFormatFormula
-    void generateXSVStringStructure(const QString &text);
+    void generateXSVStringStructure(CPdfDoc *pPdfDoc);
     // Converts a xsv string structure into a full csv file string
     void xsv_stringStructureToString(QString* pFullFileString, char enclosureChar, char separator);
     // Deletes the formula at index pos and cleans

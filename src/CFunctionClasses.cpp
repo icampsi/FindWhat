@@ -1,6 +1,5 @@
 /* =================================================== *
  * ====        Copyright (c) 2024 icampsi         ==== *
-
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
@@ -38,6 +37,7 @@ void CFunction::serialize(std::ofstream& out) const {
      * size of      m_functionTypeName
      * QString      m_functionTypeName
     */
+
     out.write(reinterpret_cast<const char*>(&m_action), sizeof(Action)); // m_action
     SerializationUtils::writeQString(out, m_functionTypeName);           // m_functionTypeName
 }
@@ -61,12 +61,11 @@ CMathFunction::CMathFunction(const CMathFunction &other)
 
 
 
-CIndexingFunction::CIndexingFunction(Action name) : CFunction(name) {}
-CIndexingFunction::CIndexingFunction(Action name, QString findText, int num, bool option) : CFunction(name), m_text{ findText }, m_num{ num }, m_option{ option } {};
+CIndexingFunction::CIndexingFunction(Action name) : CFunction(name) {
+    if (name == Action::Find) m_num = -1; // Set m_num to negative if it is a Find function so by default the full document is looked at instead of page 0;
+}
 CIndexingFunction::CIndexingFunction(const CIndexingFunction &other)
     : CFunction(other.m_action), m_text{other.m_text}, m_num{other.m_num}, m_option{other.m_option} {}
-
-
 
 void CIndexingFunction::serialize(std::ofstream& out) const {
     CFunction::serialize(out);
@@ -103,8 +102,8 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
 
 CExtractingFunction::CExtractingFunction(Action name) : CFunction(name) {}
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
-    : CFunction(other.m_action), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_endingString{other.m_endingString},
-    m_invertDirection{other.m_invertDirection}, m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid} {}
+    : CFunction(other.m_action), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_invertDirection{other.m_invertDirection},
+    m_endingStr{other.m_endingStr}, m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid} {}
 
 void CExtractingFunction::serialize(std::ofstream& out) const {
     CFunction::serialize(out);
@@ -120,15 +119,21 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
      * QString       m_toAllow
      * int           size of m_toAvoid
      * QString       m_toAvoid
+     * int           size of m_toReplace
+     * QString       m_toReplace
+     * int           size of m_replaceFor
+     * QString       m_replaceFor
      */
 
     out.write(reinterpret_cast<const char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
     out.write(reinterpret_cast<const char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::writeQString(out, m_endingString);                             // m_endingString
+    // SerializationUtils::writeQString(out, m_endingString);                             // m_endingString - BOOKMARK - NEEDS FIXING
     out.write(reinterpret_cast<const char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     out.write(reinterpret_cast<const char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::writeQString(out, m_toAllow);                                  // m_toAllow
     SerializationUtils::writeQString(out, m_toAvoid);                                  // m_toAvoid
+    SerializationUtils::writeQString(out, m_toReplace);                                // m_toReplace
+    SerializationUtils::writeQString(out, m_replaceFor);                               // m_replaceFor
 }
 
 void CExtractingFunction::deserialize(std::ifstream& in) {
@@ -144,13 +149,19 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
      * QString       m_toAllow
      * int           size of m_toAvoid
      * QString       m_toAvoid
+     * int           size of m_toReplace
+     * QString       m_toReplace
+     * int           size of m_replaceFor
+     * QString       m_replaceFor
      */
 
     in.read(reinterpret_cast<char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
     in.read(reinterpret_cast<char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::readQString(in, m_endingString);                       // m_endingString
+    // SerializationUtils::readQString(in, m_endingString);                       // m_endingString - BOOKMARK - NEEDS FIXING
     in.read(reinterpret_cast<char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     in.read(reinterpret_cast<char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::readQString(in, m_toAllow);                            // m_toAllow
     SerializationUtils::readQString(in, m_toAvoid);                            // m_toAvoid
+    SerializationUtils::readQString(in, m_toReplace);                          // m_toReplace
+    SerializationUtils::readQString(in, m_replaceFor);                         // m_replaceFor
 }
