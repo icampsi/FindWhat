@@ -21,7 +21,7 @@ InvalidFileName_dlg::InvalidFileName_dlg(QWidget *parent, QString *fileName, con
 InvalidFileName_dlg::~InvalidFileName_dlg() { delete ui; }
 
 void InvalidFileName_dlg::on_buttonBox_accepted() {
-    *m_fileName = ui->lineEdit_newFileName->text();
+    *m_fileName = ui->lineEdit_newFileName->text() + ".pdf";
 }
 
 

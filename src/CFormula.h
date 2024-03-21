@@ -25,9 +25,9 @@ public:
 
 protected:
     //QString       m_result = "";
-    CData    	  m_data;
+    CData  m_data;
     Result m_result;
-    std::vector<CFunction*> m_formulaPath; // succeció de CFunction que defineixen el recorregut que farà la fòrmula per extreure la dada.
+    std::vector<CFunction*> m_formulaPath; // Marc the path to find the variable data
 
 public:
     // CONSTRUCTORS AND DESTRUCTORS
@@ -41,17 +41,17 @@ public:
     CFormula& operator=(const CFormula& other); // Assignment operator to support assignment between CFormula instances
 
     // GETTERS AND SETTERS
-    Result          getResult() const   { return m_result; }
-    QString         getDataName() const { return m_data.getDataName();}
-    CData          *getData()           { return &m_data; }
+    Result   getResult() const   { return m_result; }
+    QString  getDataName() const { return m_data.getDataName();}
+    CData   *getData()           { return &m_data; }
 
     void            setDataName(const QString& dataName) { m_data.setDataName(dataName); }
 
     // Result   getIndexPosition() const                       { return m_indexPosition; }
-    void            setIndexPosition(size_t initial, size_t final) { m_result.indexPosition.initial = initial; m_result.indexPosition.final = final;}
+    void setIndexPosition(size_t initial, size_t final) { m_result.indexPosition.initial = initial; m_result.indexPosition.final = final;}
 
-    CFunction*      getFunction(int index) const { return m_formulaPath[index]; }
-    size_t          getPathSize() const          { return m_formulaPath.size(); }
+    CFunction* getFunction(int index) const { return m_formulaPath[index]; }
+    size_t     getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
     Result applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);

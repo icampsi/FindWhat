@@ -423,7 +423,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
                  text.mid(m_result.indexPosition.final, currentEndingString.length()) == currentEndingString))
             {
                 // If currentEndingString reached check next one. If there are no more, break
-                if(endingStringIndex < endingString.size()) {
+                if(endingStringIndex < endingString.size() - 1) {
                     currentEndingString = endingString.at(endingStringIndex);
                     ++endingStringIndex;
                 }

@@ -114,7 +114,6 @@ void PDockPreview::updateCursor(CFormula::IndexPosition index) {
     QTextEdit *textEdit = static_cast<PTabTextPreview*>(ui->tabWidget_preview->currentWidget());
     textEdit->setTextCursor(cursor);
     textEdit->ensureCursorVisible();
-    qDebug() << "Cursor updated";
 }
 
 void PDockPreview::on_checkBox_showIndividualPages_stateChanged(int arg1) {
