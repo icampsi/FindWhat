@@ -83,7 +83,6 @@ private slots:
     void on_comboBox_startFrom_currentIndexChanged(int index);
 
     // Extractinf function UI
-    void on_lineEdit_endingString_textChanged(const QString &arg1);
     void on_comboBox_readDirection_currentIndexChanged(int index);
     void on_lineEdit_charsToAllow_textEdited(const QString &arg1);
     void on_lineEdit_charsToAvoid_textEdited(const QString &arg1);

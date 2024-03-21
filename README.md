@@ -36,6 +36,11 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
+21/03/24
+- Fixed Serialization
+- Fixed a couple of things that werent updating when using multiple ending strings
+- Improved performance when using multiple ending strings. Still got a way to go.
+
 20/03/24
 - CPdfDoc has been remade entirely to be able to handle multiple pdf pages separately. This has been used to add an option to look for data on a specific page and to improve Preview window to be able to display the document broke in multiple pages.
 Note: Because of that, serialization temporaly doesen't work properly.

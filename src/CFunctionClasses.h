@@ -23,7 +23,7 @@ protected:
 public:
     // CONSTRUCTORS&DESTRUCTORS
     CFunction(Action functionType, CFormula* parent = nullptr);
-    CFunction(std::ifstream& in, CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
+    CFunction(std::ifstream& in,   CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
     virtual ~CFunction() {} // Virtual destructor
 
     //SETTERS&GETTERS
@@ -93,10 +93,10 @@ public:
 
 protected:
     // MEMBERS
-    int           m_charsToGet{ -1 };            // If negative, ignored. Stop when this amount of chars have been extracted.
-    int           m_charsToRead{ -1 };           // If negative, ignored. Stop when this amount of chars have been read.
-    bool          m_invertDirection{ false };    // Invert the direction in which the data is read.
-    std::vector<QString> m_endingStr{ "\n" }; // When this string is found, stop reading. Can be a single character, e.g., \n, space, ., etc.
+    int           m_charsToGet{ -1 };         // If negative, ignored. Stop when this amount of chars have been extracted.
+    int           m_charsToRead{ -1 };        // If negative, ignored. Stop when this amount of chars have been read.
+    bool          m_invertDirection{ false }; // Invert the direction in which the data is read.
+    std::vector<QString> m_endingStr; // When this string is found, stop reading. Can be a single character, e.g., \n, space, ., etc.
     CharTypeToGet m_charTypeToGet = CharTypeToGet::all; // Specifies if only numbers, characters, or all should be extracted
     QString       m_toAllow{ "" };    // Specifies characters to allow even if they are blocked by m_charTypeToGet
     QString       m_toAvoid{ "" };    // Specifies characters to avoid even if they are allowed by m_charTypeToGet

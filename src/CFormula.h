@@ -17,12 +17,16 @@ public:
         size_t initial = 0;
         size_t final   = 0;
     };
+    struct Result {
+        IndexPosition indexPosition;
+        QString result{""};
+    };
     enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization purposes
 
 protected:
-    QString       m_result = "";
+    //QString       m_result = "";
     CData    	  m_data;
-    IndexPosition m_indexPosition;
+    Result m_result;
     std::vector<CFunction*> m_formulaPath; // succeció de CFunction que defineixen el recorregut que farà la fòrmula per extreure la dada.
 
 public:
@@ -37,20 +41,20 @@ public:
     CFormula& operator=(const CFormula& other); // Assignment operator to support assignment between CFormula instances
 
     // GETTERS AND SETTERS
-    QString         getResult() const   { return m_result; }
+    Result          getResult() const   { return m_result; }
     QString         getDataName() const { return m_data.getDataName();}
     CData          *getData()           { return &m_data; }
 
     void            setDataName(const QString& dataName) { m_data.setDataName(dataName); }
 
-    IndexPosition   getIndexPosition() const                       { return m_indexPosition; }
-    void            setIndexPosition(size_t initial, size_t final) { m_indexPosition = {initial, final}; }
+    // Result   getIndexPosition() const                       { return m_indexPosition; }
+    void            setIndexPosition(size_t initial, size_t final) { m_result.indexPosition.initial = initial; m_result.indexPosition.final = final;}
 
     CFunction*      getFunction(int index) const { return m_formulaPath[index]; }
     size_t          getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
-    QString applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1);
+    Result applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
 
     inline int  findText (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
     inline void moveIndex(CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
@@ -61,8 +65,7 @@ public:
     inline void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     inline bool MathData(CMathFunction* pMathFunctionToApply);
 
-    void extractData        (CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
-    // void extractDataInverted(CPdfDoc *pPdfDoc, CExtractingFunction *pFunctionToApply);
+    void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
 
     // m_formulaPath INTERFACE
     void addFunction(CFunction* function) {

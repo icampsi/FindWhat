@@ -4,7 +4,7 @@
 
 #include "utils/generalfunctions.h"
 
-PEndingStringBlock::PEndingStringBlock(QWidget *parent) : QWidget(parent), m_Btn_addEndingString("+", this), m_label_addEndingString("Ending Strings:", this) {
+PEndingStringBlock::PEndingStringBlock(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("Ending Strings:", this) {
     setupUi();
 }
 
@@ -18,13 +18,13 @@ void PEndingStringBlock::setupUi() {
     setLayout(mainLayout);
 
     // Add a button to dynamically add more labels
-    QFontMetrics addButtonFontM(m_Btn_addEndingString.font());
-    int addButtonWidth = addButtonFontM.horizontalAdvance(m_Btn_addEndingString.text()) + 15;
-    m_Btn_addEndingString.setFixedWidth(addButtonWidth);
+    QFontMetrics addButtonFontM(m_Btn_addEndingStr.font());
+    int addButtonWidth = addButtonFontM.horizontalAdvance(m_Btn_addEndingStr.text()) + 15;
+    m_Btn_addEndingStr.setFixedWidth(addButtonWidth);
 
-    mainLayout->addWidget(&m_label_addEndingString);
-    mainLayout->addWidget(&m_Btn_addEndingString);
-    connect(&m_Btn_addEndingString, &QPushButton::clicked, this, [=](){ addNewLabel(true); });
+    mainLayout->addWidget(&m_lbl_addEndingStr);
+    mainLayout->addWidget(&m_Btn_addEndingStr);
+    connect(&m_Btn_addEndingStr, &QPushButton::clicked, this, [=](){ addNewLabel(true); });
 
     // Add the initial label, text edit, and button
     mainLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -44,7 +44,13 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn) {
     labelLayout->addWidget(textEdit);
     m_endingStrTxtBlock.push_back(textEdit);
 
-    if(m_function) m_function->addEndingStringBlock("");
+    if(attachRemoveBtn) m_addedLabelLayouts.push_back(labelLayout);
+
+    if(m_function) {
+        for(size_t i = m_function->getEndingStringBlock().size(); i <= m_addedLabelLayouts.size(); i++) {
+            m_function->addEndingStringBlock("");
+        }
+    }
 
     connect(textEdit, &QTextEdit::textChanged, this, [=]() {
         auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEdit);
@@ -53,7 +59,7 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn) {
 
             QString parsedText = parseFromText(textEdit->toPlainText());
             m_function->modifyEndingStringBlock(i, parsedText);
-            emit functionUpdated();
+            if (!m_blockUpdate) emit functionUpdated();
         }
     });
 
@@ -67,25 +73,9 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn) {
         removeButton->setFixedHeight(28);
 
         connect(removeButton, &QPushButton::clicked, this, [=](){
-            QLayoutItem *item;
-            while ((item = labelLayout->takeAt(0)) != nullptr) {
-                QWidget *widget = item->widget();
-
-                // Remove widgets. If it is the text edit, also remove it from m_endingStrTxtBlock;
-                QTextEdit* textEditW = qobject_cast<QTextEdit*>(widget);
-                if(textEditW) {
-                    auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEditW);
-                    if (it != m_endingStrTxtBlock.end()) {
-                        m_endingStrTxtBlock.erase(it);
-                        delete textEditW;
-                    }
-                }
-                else if (widget) {
-                    delete widget;
-                }
-                delete item;
-            }
-            emit functionUpdated();
+            size_t index = removeLabel(labelLayout);
+            m_function->deleteEndingStringBlockMember(index);
+            if (!m_blockUpdate) emit functionUpdated();
         });
 
         labelLayout->addWidget(removeButton);
@@ -94,4 +84,51 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn) {
     // Insert the "Add Label" button before the last widget in the main layout
     int lastWidgetIndex = mainLayout->count() - 2; // Index of the before-last widget
     mainLayout->insertLayout(lastWidgetIndex, labelLayout);
+}
+
+size_t PEndingStringBlock::removeLabel(QHBoxLayout *labelLayout) {
+    QLayoutItem *item;
+    int index = -1; // If still negative when returned something went wrong
+    while ((item = labelLayout->takeAt(0)) != nullptr) {
+        QWidget *widget = item->widget();
+
+        // Remove widgets. If it is the text edit, also remove it from m_endingStrTxtBlock;
+        QTextEdit* textEditW = qobject_cast<QTextEdit*>(widget);
+        if(textEditW) {
+            auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEditW);
+            if (it != m_endingStrTxtBlock.end()) {
+                index = std::distance(m_endingStrTxtBlock.begin(), it); // Get the index of "it"
+                m_endingStrTxtBlock.erase(it);
+                delete textEditW;
+            }
+        }
+        else if (widget) {
+            delete widget;
+        }
+        delete item;
+    }
+    return index;
+}
+
+void PEndingStringBlock::clearBlock() {
+    for (auto it = m_addedLabelLayouts.rbegin(); it != m_addedLabelLayouts.rend(); ++it) {
+        removeLabel(*it);
+    }
+    m_addedLabelLayouts.clear();
+}
+
+void PEndingStringBlock::updateBlock(CExtractingFunction *function) {
+    m_blockUpdate = true; // Blocks unnecessary function updates until every block is clear
+    clearBlock();
+    m_function = function;
+    for(size_t i{ 0 }; i < m_function->getEndingStringBlock().size(); i++) {
+        const QString& text = m_function->getEndingStringBlock().at(i);
+        if (i == 0) m_endingStrTxtBlock.at(0)->setText(text);
+        else {
+            addNewLabel(true);
+            m_endingStrTxtBlock.at(i)->setText(text);
+        }
+    }
+    m_blockUpdate = false;
+    emit functionUpdated();
 }

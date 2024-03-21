@@ -14,7 +14,6 @@
 CFormula::CFormula(const CFormula& other) : m_data(other.m_data) {
     // Copy simple members
     m_result        = other.m_result;
-    m_indexPosition = other.m_indexPosition;
 
     // Deep copy of the formula path vector
     for (CFunction *function : other.m_formulaPath) {
@@ -51,7 +50,6 @@ CFormula& CFormula::operator=(const CFormula& other) {
         // Copy simple members
         m_data          = other.m_data;
         m_result        = other.m_result;
-        m_indexPosition = other.m_indexPosition;
 
         // Deep copy of the formula path vector
         // Clear the existing formula path
@@ -86,16 +84,16 @@ CFormula::~CFormula() {
     }
 }
 
-QString CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to) {
-    m_result.clear(); // Reset result
-
+CFormula::Result CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to, CFormula::Result *halfWayResult) {
+    m_result.result.clear(); // Reset result
     if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
 
     // Check if 'from' is within the range of formula path
     if (from > m_formulaPath.size() - 1) {
         // Handle out-of-range error
         qWarning() << "applyFormula: 'from' index is out of range.";
-        return "ERROR EXTRACTING VALUES";
+        m_result.result = "ERROR EXTRACTING VALUES";
+        return m_result;
     }
 
     if (to < 0) {
@@ -105,12 +103,13 @@ QString CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to) {
     // Check if 'to' index is out of range
     if (to >= static_cast<int>(m_formulaPath.size())) {
         qWarning() << "applyFormula: 'to' index is out of range.";
-        return "ERROR EXTRACTING VALUES";
+        m_result.result = "ERROR EXTRACTING VALUES";
+        return m_result;
     }
 
-    for (size_t i = from ; static_cast<int>(i) <= to; i++) {
+    for (size_t i = from ; i < m_formulaPath.size(); i++) {
         if(i == from) {
-            m_indexPosition = {0, 0};
+            m_result.indexPosition = {0, 0};
         }
 
         CIndexingFunction* pIndexingFunction = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
@@ -150,19 +149,22 @@ QString CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to) {
             extractData(pPdfDoc, pExctractingFunction);
             break;
         }
+        if(static_cast<int>(m_formulaPath.size()) == to) *halfWayResult =  m_result;
     }
     //thisContainer	= nullptr;
-    m_data.setDataString(m_result);
+    m_data.setDataString(m_result.result);
     return m_result;
 }
 
 inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+    size_t indexPos_final   = m_result.indexPosition.final;
+    size_t indexPos_initial = m_result.indexPosition.initial;
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (indexPos_final > indexPos_initial) indexPos_initial = indexPos_final;
 
     QString text("");
-    size_t relativeIndexInitial = m_indexPosition.initial;
-    size_t relativeIndexFinal   = m_indexPosition.final;
+    size_t relativeIndexInitial = indexPos_initial;
+    size_t relativeIndexFinal   = indexPos_final;
 
     if (pFunctionToApply->getStartFromBeggining()) {
         relativeIndexInitial = 0;
@@ -183,7 +185,7 @@ inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToAp
     }
 
     // TRUE = end text. FALSE = begin text
-    if (text.indexOf(pFunctionToApply->getText(), m_indexPosition.initial) != -1) {
+    if (text.indexOf(pFunctionToApply->getText(), indexPos_initial) != -1) {
         if (pFunctionToApply->getOption()) {
             relativeIndexInitial = text.indexOf(pFunctionToApply->getText(), relativeIndexInitial) + pFunctionToApply->getText().length();
         }
@@ -200,22 +202,23 @@ inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToAp
         relativeIndexInitial += pPdfDoc->getPage(pageToLook).pageCharRange.from;
         relativeIndexFinal   += pPdfDoc->getPage(pageToLook).pageCharRange.from;
     }
-    m_indexPosition.initial = relativeIndexInitial;
-    m_indexPosition.final   = relativeIndexFinal;
+    m_result.indexPosition.initial = relativeIndexInitial;
+    m_result.indexPosition.final   = relativeIndexFinal;
+
     return 0;
 }
 
 inline void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
     // Perform an initial check for index position. If final > initial means last function was extracting function and indexes need to be brought together now.
-    size_t newIndex = m_indexPosition.initial + pFunctionToApply->getNum();
+    size_t newIndex = m_result.indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
     if (newIndex >= 0 && newIndex < static_cast<size_t>(text.size())) {
-        m_indexPosition.initial = newIndex;
-        m_indexPosition.final   = m_indexPosition.initial;
+        m_result.indexPosition.initial = newIndex;
+        m_result.indexPosition.final   = m_result.indexPosition.initial;
     }
     else {
         qDebug() << "New index out of bounds";
@@ -225,39 +228,39 @@ inline void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionTo
 void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
     int linesToMove = pFunctionToApply->getNum(); // utilitzem un número intern per evitar que canviï el valor dins CFormula, ja que formula ha de ser reutilitzable
     // Case when we go back X linesToMove
     if (linesToMove < 0) {
-        while (m_indexPosition.initial != 0) {
-            m_indexPosition.initial--;
-            if (text[m_indexPosition.initial] == '\n') {
+        while (m_result.indexPosition.initial != 0) {
+            m_result.indexPosition.initial--;
+            if (text[m_result.indexPosition.initial] == '\n') {
                 linesToMove++;
             }
             if (linesToMove == 1) {
-                m_indexPosition.initial++;
+                m_result.indexPosition.initial++;
                 break;
             }
         }
-        m_indexPosition.final = m_indexPosition.initial;
+        m_result.indexPosition.final = m_result.indexPosition.initial;
     }
     else { // Case when we go up X linesToMove
         while (1) {
-            if (m_indexPosition.initial < static_cast<size_t>(text.size())) { m_indexPosition.initial++; }
+            if (m_result.indexPosition.initial < static_cast<size_t>(text.size())) { m_result.indexPosition.initial++; }
             else {
                 BeginLine(pPdfDoc);
                 break;
             }
-            if (text[m_indexPosition.initial] == '\n') {
+            if (text[m_result.indexPosition.initial] == '\n') {
                 linesToMove--;
             }
             if (linesToMove == 0) {
-                m_indexPosition.initial++;
+                m_result.indexPosition.initial++;
                 break;
             }
         }
-        m_indexPosition.final = m_indexPosition.initial;
+        m_result.indexPosition.final = m_result.indexPosition.initial;
     }
     if(pFunctionToApply->getOption()) EndLine(pPdfDoc);
 }
@@ -265,46 +268,46 @@ void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
 inline void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of current line
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
-    while (m_indexPosition.initial != 0) {
-        m_indexPosition.initial--;
-        if (text[m_indexPosition.initial] == '\n') {
-            m_indexPosition.initial++;
+    while (m_result.indexPosition.initial != 0) {
+        m_result.indexPosition.initial--;
+        if (text[m_result.indexPosition.initial] == '\n') {
+            m_result.indexPosition.initial++;
             break;
         }
     }
     // Since this is an indexing function, we don't want the final index to be different than the starting index
-    m_indexPosition.final = m_indexPosition.initial;
+    m_result.indexPosition.final = m_result.indexPosition.initial;
 }
 
 inline void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of current line
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
-    while (m_indexPosition.initial < static_cast<size_t>(text.size())) {
-        m_indexPosition.initial++;
-        if (text[m_indexPosition.initial] == '\n') {
-            m_indexPosition.initial--;
+    while (m_result.indexPosition.initial < static_cast<size_t>(text.size())) {
+        m_result.indexPosition.initial++;
+        if (text[m_result.indexPosition.initial] == '\n') {
+            m_result.indexPosition.initial--;
             break;
         }
     }
     // Since this is an indexing function, we don't want the final index to be different than the starting index
-    m_indexPosition.final = m_indexPosition.initial;
+    m_result.indexPosition.final = m_result.indexPosition.initial;
 }
 
 inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {
     for (size_t i = 0; i < thisContainer->size(); ++i) {
         if (thisContainer->at(i).getDataName() == pFunctionToApply->getText()) {
-            m_result += thisContainer->at(i).getDataString();
+            m_result.result.append(thisContainer->at(i).getDataString());
         }
     }
 }
 
 inline void CFormula::appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends string to m_result
-    if(!pFunctionToApply->getOption()) m_result.append(pFunctionToApply->getText());
-    else                               m_result.prepend(pFunctionToApply->getText());
+    if(!pFunctionToApply->getOption()) m_result.result.append(pFunctionToApply->getText());
+    else                               m_result.result.prepend(pFunctionToApply->getText());
 }
 
 // Functions related to CMathFunction are still unused and not working
@@ -367,7 +370,7 @@ inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     switch(pMathFunctionToApply->m_operation)
     {
     case CMathFunction::Operation::add:
-        m_result += pMathFunctionToApply->m_val1 + pMathFunctionToApply->m_val2;
+        m_result.result += pMathFunctionToApply->m_val1 + pMathFunctionToApply->m_val2;
         break;
     case CMathFunction::Operation::subtract:
         break;
@@ -383,7 +386,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
     QString text = pPdfDoc->getFullText();
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
-    if (m_indexPosition.final > m_indexPosition.initial) m_indexPosition.initial = m_indexPosition.final;
+    if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
@@ -397,19 +400,19 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
     }
     while(pFunctionToApply->getCharsToRead() != 0 && pFunctionToApply->getCharsToGet()  != 0) {
 
-        if(!directionInverted && static_cast<int>(m_indexPosition.final) < text.length() - 1) {
-            m_indexPosition.final++;
+        if(!directionInverted && static_cast<int>(m_result.indexPosition.final) < text.length() - 1) {
+            m_result.indexPosition.final++;
         }
-        else if (directionInverted && m_indexPosition.final > 0) {
-            m_indexPosition.final--;
+        else if (directionInverted && m_result.indexPosition.final > 0) {
+            m_result.indexPosition.final--;
         }
         else break;
 
         int remainingText{0};
         if(directionInverted) {
-            remainingText = static_cast<int>(m_indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
+            remainingText = static_cast<int>(m_result.indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
         } else {
-            remainingText = static_cast<int>(m_indexPosition.final + currentEndingString.length() - 1);
+            remainingText = static_cast<int>(m_result.indexPosition.final + currentEndingString.length() - 1);
         }
 
         if(remainingText >= 0 && remainingText < text.length()) {
@@ -417,7 +420,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
             if((directionInverted &&
                  text.mid(static_cast<size_t>(remainingText), currentEndingString.length()) == currentEndingString) ||
                 (!directionInverted &&
-                 text.mid(m_indexPosition.final, currentEndingString.length()) == currentEndingString))
+                 text.mid(m_result.indexPosition.final, currentEndingString.length()) == currentEndingString))
             {
                 // If currentEndingString reached check next one. If there are no more, break
                 if(endingStringIndex < endingString.size()) {
@@ -428,21 +431,12 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
             }
         }
 
-        // else if (text.mid(m_indexPosition.final, currentEndingString.length()) == currentEndingString)  {
-        //     // If currentEndingString reached check next one. If there are no more, break
-        //     if(endingStringIndex < endingString.size()) {
-        //         currentEndingString = endingString.at(endingStringIndex);
-        //         ++endingStringIndex;
-        //     }
-        //     else break;
-        // }
-
         pFunctionToApply->setCharsToRead(pFunctionToApply->getCharsToRead() - 1); // m_charsToRead
         // CHECK IF IT'S ONE OF THE ALLOWED CHARACTERS: m_toAllow
         QString toAllow = pFunctionToApply->getToAllow();
-        if (toAllow.size() > 0) { // Si hem posat caracters a l'string fa el loop, sino ja no s'ho mira
+        if (toAllow.size() > 0) {
             for (short i{ 0 }; i < toAllow.size(); i++) {
-                if (text[m_indexPosition.final] == toAllow[i]) {
+                if (text[m_result.indexPosition.final] == toAllow[i]) {
                     allowed = true;
                     break;
                 }
@@ -452,7 +446,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         QString toAvoid = pFunctionToApply->getToAvoid();
         if (toAvoid.size() > 0) { // Si hem posat caracters a l'string fa el loop, sino ja no s'ho mira
             for (unsigned short i{ 0 }; i < toAvoid.size(); i++) {
-                if (text[m_indexPosition.final] == toAvoid[i]) {
+                if (text[m_result.indexPosition.final] == toAvoid[i]) {
                     avoided = true;
                     break;
                 }
@@ -461,28 +455,28 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
 
         switch (pFunctionToApply->getCharTypeToGet()) {
         case CExtractingFunction::CharTypeToGet::digit:
-            if ((text[m_indexPosition.final].isDigit() && !avoided) || allowed) {
-                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
-                else                                extractedText.prepend(text[m_indexPosition.final]);
+            if ((text[m_result.indexPosition.final].isDigit() && !avoided) || allowed) {
+                if(!directionInverted) extractedText.append(text[m_result.indexPosition.final]);
+                else                                extractedText.prepend(text[m_result.indexPosition.final]);
                 extractedAmount++;
             }
             break;
         case CExtractingFunction::CharTypeToGet::letter:
-            if ((!text[m_indexPosition.final].isDigit() && !avoided) || allowed) {
-                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
-                else                                extractedText.prepend(text[m_indexPosition.final]);
+            if ((!text[m_result.indexPosition.final].isDigit() && !avoided) || allowed) {
+                if(!directionInverted) extractedText.append(text[m_result.indexPosition.final]);
+                else                                extractedText.prepend(text[m_result.indexPosition.final]);
                 extractedAmount++;
             }
             break;
         case CExtractingFunction::CharTypeToGet::all:
             if (!avoided) {
-                if(!directionInverted) extractedText.append(text[m_indexPosition.final]);
-                else                                extractedText.prepend(text[m_indexPosition.final]);
+                if(!directionInverted) extractedText.append(text[m_result.indexPosition.final]);
+                else                                extractedText.prepend(text[m_result.indexPosition.final]);
                 extractedAmount++;
             }
         }
         if (pFunctionToApply->getCharsToGet() == extractedAmount) {
-            m_indexPosition.final++; // Place index after the extracted string
+            m_result.indexPosition.final++; // Place index after the extracted string
             break;
         }
 
@@ -490,12 +484,12 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         avoided = false;
     }
     extractedText.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor());
-    m_result.append(std::move(extractedText));
+    m_result.result.append(std::move(extractedText));
 
     if(directionInverted) {
-        size_t indexInitialTemp = m_indexPosition.initial;
-        m_indexPosition.initial = m_indexPosition.final + 1;
-        m_indexPosition.final = indexInitialTemp;
+        size_t indexInitialTemp = m_result.indexPosition.initial;
+        m_result.indexPosition.initial = m_result.indexPosition.final + 1;
+        m_result.indexPosition.final = indexInitialTemp;
     }
 }
 
@@ -545,16 +539,16 @@ void CFormula::serialize(std::ofstream& out) const {
     /*  - SERIALIZATION ORDER -
      *  CData                   m_data
      *  IndexPosition           m_indexPosition
-     *  int                     vector m_formulaPath size
+     *  size_t                  vector m_formulaPath size
      *  FunctionType            type
      *  std::vector<CFunction*> m_formulaPath
      *  NO NEED - m_result
      */
 
     m_data.serialize(out);                                                             // m_data
-    out.write(reinterpret_cast<const char*>(&m_indexPosition), sizeof(IndexPosition)); // m_indexPosition
+    out.write(reinterpret_cast<const char*>(&m_result.indexPosition), sizeof(Result)); // m_indexPosition
     size_t formulaPathSize = m_formulaPath.size();
-    out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(size_t));           // size of formulaPath
+    out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(size_t));        // size of formulaPath
 
     for (CFunction* function : m_formulaPath) {                                        // FunctionTye & m_formulaPath
         FunctionType type;
@@ -589,10 +583,10 @@ void CFormula::deserialize(std::ifstream& in) {
 
     m_formulaPath.clear();
 
-    in.read(reinterpret_cast<char*>(&m_indexPosition), sizeof(IndexPosition));  // m_indexPosition
-    int formulaPathSize;                                                        // Size of m_formulaPath
-    in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(int));
-    for (int i{0}; i < formulaPathSize; i++) {                                  // m_formulaPath
+    in.read(reinterpret_cast<char*>(&m_result.indexPosition), sizeof(Result));  // m_indexPosition
+    size_t formulaPathSize;                                                     // Size of m_formulaPath
+    in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(size_t));
+    for (size_t i{0}; i < formulaPathSize; i++) {                                  // m_formulaPath
         FunctionType type;
         in.read(reinterpret_cast<char*>(&type), sizeof(FunctionType));
 

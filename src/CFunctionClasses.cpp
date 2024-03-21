@@ -71,7 +71,7 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
     CFunction::serialize(out);
     /* - SERIALIZATION ORDER -
      *
-     * buffer   m_text
+     * size_t   size of m_text
      * QString  m_text
      * int      m_num
      * bool     m_option
@@ -87,7 +87,7 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
 void CIndexingFunction::deserialize(std::ifstream& in) {
     /* - DESERIALIZATION ORDER -
      *
-     * size of  m_text
+     * size_t   size of m_text
      * QString  m_text
      * int      m_num
      * bool     m_option
@@ -100,10 +100,18 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
 }
 
-CExtractingFunction::CExtractingFunction(Action name) : CFunction(name) {}
+CExtractingFunction::CExtractingFunction(Action name) : CFunction(name), m_endingStr{ "\n" } {}
+
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
-    : CFunction(other.m_action), m_charsToGet{other.m_charsToGet}, m_charsToRead{other.m_charsToRead}, m_invertDirection{other.m_invertDirection},
-    m_endingStr{other.m_endingStr}, m_charTypeToGet{other.m_charTypeToGet}, m_toAllow{other.m_toAllow}, m_toAvoid{other.m_toAvoid} {}
+    : CFunction(other.m_action),
+    m_charsToGet{other.m_charsToGet},
+    m_charsToRead{other.m_charsToRead},
+    m_invertDirection{other.m_invertDirection},
+    m_endingStr{other.m_endingStr},
+    m_charTypeToGet{other.m_charTypeToGet},
+    m_toAllow{other.m_toAllow},
+    m_toAvoid{other.m_toAvoid} {
+}
 
 void CExtractingFunction::serialize(std::ofstream& out) const {
     CFunction::serialize(out);
@@ -111,8 +119,9 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
      *
      * int           m_charsToGet
      * int           m_charsToRead
-     * int           size of m_endingString
-     * QString       m_endingString
+     * int           size of m_endingStr
+     * int           size of m_endingStr stored string
+     * QString       m_endingStr stored string
      * bool          m_invertDirection
      * CharTypeToGet m_charTypeToGet
      * int           size of m_toAllow
@@ -127,7 +136,7 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
 
     out.write(reinterpret_cast<const char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
     out.write(reinterpret_cast<const char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    // SerializationUtils::writeQString(out, m_endingString);                             // m_endingString - BOOKMARK - NEEDS FIXING
+    SerializationUtils::writeCustomQStringContainer(out, m_endingStr);                 // m_endingStr - BOOKMARK - NEEDS FIXING
     out.write(reinterpret_cast<const char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     out.write(reinterpret_cast<const char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::writeQString(out, m_toAllow);                                  // m_toAllow
@@ -141,8 +150,9 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
      *
      * int           m_charsToGet
      * int           m_charsToRead
-     * int           size of m_endingString
-     * QString       m_endingString
+     * int           size of m_endingStr
+     * int           size of m_endingStr stored string
+     * QString       m_endingStr stored string
      * bool          m_invertDirection
      * CharTypeToGet m_charTypeToGet
      * int           size of m_toAllow
@@ -155,9 +165,9 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
      * QString       m_replaceFor
      */
 
-    in.read(reinterpret_cast<char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
+    in.read(reinterpret_cast<char*>(&m_charsToGet) , sizeof(int));             // m_charsToGet
     in.read(reinterpret_cast<char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    // SerializationUtils::readQString(in, m_endingString);                       // m_endingString - BOOKMARK - NEEDS FIXING
+    SerializationUtils::readCustomQStringContainer(in, m_endingStr);           // m_endingStr - BOOKMARK - NEEDS FIXING
     in.read(reinterpret_cast<char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     in.read(reinterpret_cast<char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::readQString(in, m_toAllow);                            // m_toAllow

@@ -7,7 +7,10 @@
 #define GENERALFUNCTIONS_H
 #include <QString>
 #include <QWidget>
-#include "fstream"
+#include <fstream>
+
+#include <type_traits> // for std::is_same
+#include <QString>     // for QString
 
 
 QString getUserHomeDirectory();
@@ -25,27 +28,61 @@ namespace SerializationUtils {
     void writeQString(std::ofstream& out, const QString& str);
     void readQString(std::ifstream& in, QString& str);
 
-#include <fstream>
-
+    /* Function template for serialization containers of custom classes
+     * (only classes that include serialize(std::ofstream& out) and QString */
     template<typename Container>
     void writeCustomContainer(std::ofstream& out, const Container& container) {
         size_t size = container.size();
         out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
-        for (auto&& item : container) {
-            item->serialize(out);
+
+        for (const auto& item : container) {
+            // Check if the type of 'item' is QString
+            // if constexpr (std::is_same_v<typename q20::remove_cvref_t<decltype(item)>, QString>) {
+            //     writeQString(out, item);
+            // } else {
+                item->serialize(out); // If 'item' is not QString, use the custom serialization methot all my source classes have
+            // }
         }
     }
 
     template<typename Container, typename item>
-    void readCustomContainer(std::ifstream& in, Container& container, item* parent) {
+    void readCustomContainer(std::ifstream& in, const Container& container, item* parent) {
         size_t size;
         in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
-        for (size_t i = 0; i < size; ++i) {
-            typename item::value_type newItem(in, parent); // Create an instance of the item type by calling its constructor
-            container.push_back(newItem);
+        for (size_t i{ 0 }; i < size; ++i) {
+            typename item::value_type newItem(in, parent); // Use custom serialization constructor all my source classes have to create a new one
+            container.push_back(std::move(newItem));
         }
     }
 
+
+    template<typename Container>
+    void writeCustomQStringContainer(std::ofstream& out, const Container& container) {
+        size_t size = container.size();
+        out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+
+        for (const auto& item : container) {
+            SerializationUtils::writeQString(out, item);
+
+            // // Check if the type of 'item' is QString
+            // if constexpr (std::is_same_v<typename q20::remove_cvref_t<decltype(item)>, QString>) {
+            //     writeQString(out, item);
+            // } else {
+            //     item->serialize(out); // If 'item' is not QString, use the custom serialization methot all my source classes have
+            // }
+        }
+    }
+
+    template<typename Container>
+    void readCustomQStringContainer(std::ifstream& in, Container& container) {
+        size_t size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+        for (size_t i{ 0 }; i < size; ++i) {
+            QString tempStr;
+            readQString(in, tempStr);
+            container.push_back(std::move(tempStr));
+        }
+    }
 
     template<typename primContainer>
     void writePrimitiveContainer(std::ofstream& out, const primContainer& container) {
@@ -58,30 +95,14 @@ namespace SerializationUtils {
 
     template<typename primContainer>
     void readPrimitiveContainer(std::ifstream& in, primContainer& container) {
-        int size;
-        in.read(reinterpret_cast<char*>(&size), sizeof(int));
+        size_t size;
+        in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
         for (int i = 0; i < size; ++i) {
-            typename primContainer::value_type item; // Create an instance of the item type
+            typename primContainer::value_type item;
             in.read(reinterpret_cast<char*>(&item), sizeof(typename primContainer::value_type));
             container.push_back(item);
         }
     }
-
-
-    /*
-        template<typename InputIt>
-        void serializeContainer(std::ofstream& out, InputIt first, InputIt last) {
-            int size = std::distance(first, last);
-            out.write(reinterpret_cast<const char*>(&size), sizeof(int));
-            for (auto it = first; it != last; ++it) {
-                (*it)->serialize(out);
-            }
-        }
-
-     * serializeContainer(out, t_extractDataFormula.begin(), t_extractDataFormula.end());
-     * serializeContainer(out, m_valorsEstatics.begin(), m_valorsEstatics.end());
-    */
-
 }
 
 

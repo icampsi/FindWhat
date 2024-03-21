@@ -25,6 +25,9 @@ public:
 
     // Getters&Setters
     void setParentFunction(CExtractingFunction *pFunction) { m_function = pFunction; }
+    void updateBlock(CExtractingFunction *function);
+    size_t removeLabel(QHBoxLayout *labelLayout);
+    void clearBlock();
 
 signals:
     void functionUpdated();
@@ -33,10 +36,12 @@ private:
     CExtractingFunction *m_function = nullptr;
 
     QVBoxLayout *mainLayout;
-    QPushButton  m_Btn_addEndingString;
-    QLabel       m_label_addEndingString;
+    QPushButton  m_Btn_addEndingStr;
+    QLabel       m_lbl_addEndingStr;
+    bool m_blockUpdate = false; // Flag to avoid unnecessary updates
 
-    std::vector<QTextEdit*> m_endingStrTxtBlock{};
+    std::vector<QTextEdit*>   m_endingStrTxtBlock{};
+    std::vector<QHBoxLayout*> m_addedLabelLayouts;
 };
 
 #endif // PENDINGSTRINGBLOCK_H

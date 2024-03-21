@@ -157,7 +157,7 @@ void CEsquema::generateXSVStringStructure(CPdfDoc *pPdfDoc) {
             QRegularExpressionMatch match = matches.next();
             QString capturedString = match.captured(1);
 
-            // Finds the data either from static data or t_extractDataFormula
+            // Finds the data either from static data or m_extractDataFormula
             auto it = m_dataMap.find(capturedString);
             if (it != m_dataMap.end()) {
                 CData    *data    = it.value();
@@ -181,19 +181,19 @@ void CEsquema::generateXSVStringStructure(CPdfDoc *pPdfDoc) {
 
 void CEsquema::serialize(std::ofstream& out) const {
     /* - SERIALIZATION ORDER -
-     * int                              size of m_nameEsquema
+     * size_t                           size of m_nameEsquema
      * QString                          m_nameEsquema
-     * int                              size of m_IDText
+     * size_t                           size of m_IDText
      * QString                          m_IDText
-     * int                              size of t_extractDataFormula
+     * size_t                           size of t_extractDataFormula
      * std::vector<CFormula*>           t_extractDataFormula
-     * int                              size of m_valorsEstatics
+     * size_t                           size of m_valorsEstatics
      * std::vector<CData*>              m_valorsEstatics
-     * int                              size of m_dataForCheck1
+     * size_t                           size of m_dataForCheck1
      * std::vector<unsigned int>        m_dataForCheck1
-     * int                              size of m_dataForCheck2
+     * size_t                           size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * int                              size of m_outputDirectori
+     * size_t                           size of m_outputDirectori
      * QString                          m_outputDirectori
      *
      * - NO NEED -
@@ -215,19 +215,19 @@ void CEsquema::serialize(std::ofstream& out) const {
 
 void CEsquema::deserliazile(std::ifstream& in) {
     /* - DESERIALIZATION ORDER -
-     * int                              size of m_nameEsquema
+     * size_t                           size of m_nameEsquema
      * QString                          m_nameEsquema
-     * int                              size of m_IDText
+     * size_t                           size of m_IDText
      * QString                          m_IDText
-     * int                              size of t_extractDataFormula
-     * std::vector<CFormula*>           t_extractDataFormula
-     * int                              size of m_valorsEstatics
+     * size_t                           size of t_extractDataFormula
+     * std::vector<CFormula*>           m_extractDataFormula
+     * size_t                           size of m_valorsEstatics
      * std::vector<CData*>              m_valorsEstatics
-     * int                              size of m_dataForCheck1
+     * size_t                           size of m_dataForCheck1
      * std::vector<unsigned int>        m_dataForCheck1
-     * int                              size of m_dataForCheck2
+     * size_t                           size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * int                              size of m_outputDirectori
+     * size_t                           size of m_outputDirectori
      * QString                          m_outputDirectori
      *
      * - RECONSTRUCTION -
@@ -240,16 +240,16 @@ void CEsquema::deserliazile(std::ifstream& in) {
 
     SerializationUtils::readQString(in, m_nameEsquema);                // m_nameEsquema
     SerializationUtils::readQString(in, m_IDText);                     // m_nameEsquema
-    int extractDataFormulaSize;
-    in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(int));
-    for(int i{0}; i < extractDataFormulaSize; i++ ) {
+    size_t extractDataFormulaSize;
+    in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(size_t));
+    for(size_t i{0}; i < extractDataFormulaSize; i++ ) {
         CFormula* formula = new CFormula(in);
         addExtractDataFormula(formula);
     }
     // SerializationUtils::readCustomContainer(in, t_extractDataFormula, this); // t_extractDataFormula
-    int valorsEstaticsSize;
-    in.read(reinterpret_cast<char*>(&valorsEstaticsSize), sizeof(int));
-    for(int i{0}; i < valorsEstaticsSize; i++ ) {
+    size_t valorsEstaticsSize;
+    in.read(reinterpret_cast<char*>(&valorsEstaticsSize), sizeof(size_t));
+    for(size_t i{0}; i < valorsEstaticsSize; i++ ) {
         CData* data = new CData(in);
         addStaticData(data);
     }

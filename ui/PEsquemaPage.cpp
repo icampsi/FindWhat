@@ -126,11 +126,12 @@ void PEsquemaPage::loadFunction() {
         if(indexingFunction->getOption()) ui->radioButton_preppend->setChecked(true);
         break;
     case CFunction::Action::ExtractData:
-        parsedText = parseToText(extractingFunction->getEndingStringBlock().at(0)); // BOOKMARK - at(0) added just for compilation but needs fixing
         ui->comboBox_readDirection->setCurrentIndex(extractingFunction->isInverted());
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
+        ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
+
         break;
     }
 
@@ -154,29 +155,22 @@ void PEsquemaPage::updateFunctionProcess() {
 
     // If there is no active doc we don't need to update anything in the preview;
     if(activePdfDoc) {
-        m_loadedFormula->applyFormula(activePdfDoc, 0, functionIndex);
-
         // Update extracted data and result text widgets
-        QString result = m_loadedFormula->getResult();
-        ui->plainTextEdit_resultToSelectedFunction->setPlainText(result);
+        CFormula::Result halfResult;
+        CFormula::Result result = m_loadedFormula->applyFormula(activePdfDoc, 0, functionIndex, &halfResult);
+        ui->plainTextEdit_resultToSelectedFunction->setPlainText(result.result);
 
         {
-            size_t initialIndex = m_loadedFormula->getIndexPosition().initial;
-            size_t finalIndex   = m_loadedFormula->getIndexPosition().final;
-            emit functionUpdated(CFormula::IndexPosition{ initialIndex, finalIndex },  result);
+            size_t initialIndex = result.indexPosition.initial;
+            size_t finalIndex   = result.indexPosition.final;
+            emit functionUpdated(CFormula::IndexPosition{ initialIndex, finalIndex },  result.result); // BOOKMARK - Could change emit siognature to get onli CFormulaResult
         }
 
         CFunction* function = m_itemFunctionMap[item];
         if(function && function->getFunctionType() == CFunction::Action::ExtractData) {
-            ui->textEdit_extractedData->setText(result);
+            ui->textEdit_extractedData->setText(halfResult.result);
+            ui->textEdit_finalResult->setText(result.result);
         }
-
-        if(functionIndex > -1) {
-            /* Applay the formulaPath again, but through the complete formula, so we can see the final result
-             * and only if we haven't already gone through the full formula. */
-            result = m_loadedFormula->applyFormula(activePdfDoc);
-        }
-        ui->textEdit_finalResult->setText(result);
     }
 }
 
@@ -407,28 +401,6 @@ void PEsquemaPage::on_comboBox_startFrom_currentIndexChanged(int index) {
 }
 
 // EXTRACTING FUNCTION UI
-void PEsquemaPage::on_lineEdit_endingString_textChanged(const QString &arg1) {
-    // Get current item
-    QListWidgetItem *item = ui->listWidget_formula->currentItem();
-    if(!item) {
-        QMessageBox::information(nullptr, "Information", "No items selected.");
-        return;
-    }
-
-    // Map to function
-    CFunction *function = m_itemFunctionMap.value(item);
-    if(!function) {
-        QMessageBox::information(nullptr, "Information", "Function not found for the selected item.");
-        return;
-    }
-
-    // Set m_endingString value
-    QString parsedText = parseFromText(arg1);
-    dynamic_cast<CExtractingFunction*>(function)->addEndingStringBlock(parsedText); // BOOKMARK - quick fix needs redoing
-
-    updateFunctionProcess();
-}
-
 void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
     QListWidgetItem *item = ui->listWidget_formula->currentItem();
     if(!item) {
