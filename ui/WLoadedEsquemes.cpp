@@ -5,8 +5,10 @@
 
 #include "WLoadedEsquemes.h"
 #include "ui_WLoadedEsquemes.h"
-#include "QListWidgetItem"
+
+#include <QListWidgetItem>
 #include <QListWidget>
+
 #include "PMainEsquemaUI.h"
 #include "WEsquemaListView.h"
 
@@ -16,7 +18,6 @@ WLoadedEsquemes::WLoadedEsquemes(QWidget *parent)
 
     connect(ui->list_esquemes, &WEsquemaListView::deleteEsquema, static_cast<PMainEsquemaUI*>(parent), &PMainEsquemaUI::handleDeleteEsquema);
 }
-
 
 WLoadedEsquemes::~WLoadedEsquemes() { delete ui; }
 

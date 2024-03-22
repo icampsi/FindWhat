@@ -84,7 +84,7 @@ CFormula::~CFormula() {
     }
 }
 
-CFormula::Result CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to, CFormula::Result *halfWayResult) {
+const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to, CFormula::Result *halfWayResult) {
     m_result.result.clear(); // Reset result
     if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
 
@@ -149,7 +149,7 @@ CFormula::Result CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to, C
             extractData(pPdfDoc, pExctractingFunction);
             break;
         }
-        if(static_cast<int>(m_formulaPath.size()) == to) *halfWayResult =  m_result;
+        if(static_cast<int>(m_formulaPath.size() - 1) == to) *halfWayResult =  m_result;
     }
     //thisContainer	= nullptr;
     m_data.setDataString(m_result.result);
@@ -399,15 +399,6 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         currentEndingString = endingString.at(0);
     }
     while(pFunctionToApply->getCharsToRead() != 0 && pFunctionToApply->getCharsToGet()  != 0) {
-
-        if(!directionInverted && static_cast<int>(m_result.indexPosition.final) < text.length() - 1) {
-            m_result.indexPosition.final++;
-        }
-        else if (directionInverted && m_result.indexPosition.final > 0) {
-            m_result.indexPosition.final--;
-        }
-        else break;
-
         int remainingText{0};
         if(directionInverted) {
             remainingText = static_cast<int>(m_result.indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
@@ -482,6 +473,14 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
 
         allowed = false;
         avoided = false;
+
+        if(!directionInverted && static_cast<int>(m_result.indexPosition.final) < text.length() - 1) {
+            m_result.indexPosition.final++;
+        }
+        else if (directionInverted && m_result.indexPosition.final > 0) {
+            m_result.indexPosition.final--;
+        }
+        else break;
     }
     extractedText.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor());
     m_result.result.append(std::move(extractedText));
@@ -491,6 +490,11 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         m_result.indexPosition.initial = m_result.indexPosition.final + 1;
         m_result.indexPosition.final = indexInitialTemp;
     }
+}
+
+void CFormula::addFunction(CFunction* function) {
+    function->setParent(this);
+    m_formulaPath.push_back(function);
 }
 
 void CFormula::deleteFunction(const size_t index) {

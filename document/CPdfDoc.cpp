@@ -8,6 +8,9 @@
 #include <QFileInfo>
 #include <QFile>
 
+#include "poppler/cpp/poppler-document.h"
+#include "poppler/cpp/poppler-page.h"
+
 CPdfDoc::CPdfDoc(const QString& filePath) : m_fullText(""), m_filePath(filePath) {
     QFileInfo fileInfo(m_filePath);
     m_docName = fileInfo.fileName();
@@ -15,7 +18,7 @@ CPdfDoc::CPdfDoc(const QString& filePath) : m_fullText(""), m_filePath(filePath)
     // Loads PDF file into poppler
     poppler::document* m_doc = poppler::document::load_from_file(m_filePath.toStdString());
     const int pagesNbr = m_doc->pages(); // Number of pages
-    size_t charCount = 0;
+    size_t charCount   = 0;
     // Extracts text page by page and stores it inside m_pages
     for (int i = 0; i < pagesNbr; ++i) {
         QString line("");

@@ -17,8 +17,8 @@
 class CEsquema {
 public:
     // CONSTRUCTORS & DESTRUCTORS
-    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText);
-    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, QString IDText = "");
+    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, std::vector<CData*>& valorsEstatics);
+    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula);
     CEsquema(std::ifstream& in) { deserliazile(in); }
     CEsquema() = default;
     ~CEsquema();
@@ -26,7 +26,6 @@ public:
 protected:
     // MEMBERS
     QString m_nameEsquema; // Name for the esquema
-    QString m_IDText;      // Text que identifica el document
 
     std::vector<CFormula*> m_extractDataFormula;         // Formula vector for each data to be extracted
     std::vector<CData*>    m_staticData;                 // Static values for the esquema. They are not extracting text from a file but rather youcreate a variable with a fixed string attached
@@ -73,9 +72,6 @@ public:
         }
         formula->setDataName(name);
     }
-
-    void setIDText(const QString& idText)   { m_IDText = idText; }
-    const QString& getIDText() const        { return m_IDText; }
 
     const QString& getName() const      { return m_nameEsquema; }
     void setName(const QString& name)   { m_nameEsquema = name; }

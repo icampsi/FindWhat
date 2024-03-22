@@ -8,14 +8,9 @@
 
 #include "CDocument.h"
 
-#include "poppler/cpp/poppler-document.h"
-#include "poppler/cpp/poppler-page.h"
-
 class CPdfDoc : public CDocument {
 protected:
     struct PageCharRange { size_t from = 0; size_t to = 0; };
-
-
 public:
     struct RelativeIndex {
         size_t pageIndex = 0;

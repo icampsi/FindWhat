@@ -9,12 +9,12 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
 
-CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics, QString IDText)
-    : m_nameEsquema(nameEsquema), m_IDText(IDText), m_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
+CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics)
+    : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
-CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, QString IDText)
-    : m_nameEsquema(nameEsquema), m_IDText(IDText), m_extractDataFormula(tExtractDataFormula),
+CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula)
+    : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
 CEsquema::~CEsquema() {
@@ -183,8 +183,6 @@ void CEsquema::serialize(std::ofstream& out) const {
     /* - SERIALIZATION ORDER -
      * size_t                           size of m_nameEsquema
      * QString                          m_nameEsquema
-     * size_t                           size of m_IDText
-     * QString                          m_IDText
      * size_t                           size of t_extractDataFormula
      * std::vector<CFormula*>           t_extractDataFormula
      * size_t                           size of m_valorsEstatics
@@ -204,7 +202,6 @@ void CEsquema::serialize(std::ofstream& out) const {
      */
 
     SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
-    SerializationUtils::writeQString(out, m_IDText);                     // m_IDText
     SerializationUtils::writeCustomContainer(out, m_extractDataFormula); // t_extractDataFormula
     SerializationUtils::writeCustomContainer(out, m_staticData);         // m_valorsEstatics
 
@@ -217,8 +214,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
     /* - DESERIALIZATION ORDER -
      * size_t                           size of m_nameEsquema
      * QString                          m_nameEsquema
-     * size_t                           size of m_IDText
-     * QString                          m_IDText
      * size_t                           size of t_extractDataFormula
      * std::vector<CFormula*>           m_extractDataFormula
      * size_t                           size of m_valorsEstatics
@@ -239,7 +234,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
      */
 
     SerializationUtils::readQString(in, m_nameEsquema);                // m_nameEsquema
-    SerializationUtils::readQString(in, m_IDText);                     // m_nameEsquema
     size_t extractDataFormulaSize;
     in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(size_t));
     for(size_t i{0}; i < extractDataFormulaSize; i++ ) {

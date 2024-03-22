@@ -6,7 +6,7 @@
 #include "PEsquemaPage.h"
 #include "ui_PEsquemaPage.h"
 
-#include "QMenu"
+#include <QMenu>
 
 #include "MainWindow.h"
 
@@ -50,9 +50,7 @@ PEsquemaPage::PEsquemaPage(QWidget *parent)
     ui->stackedWidget_general->setCurrentIndex(0);
 }
 
-PEsquemaPage::~PEsquemaPage() {
-    delete ui;
-}
+PEsquemaPage::~PEsquemaPage() { delete ui; }
 
 // PUBLIC FUNCTIONS ----------------------------------------------------
 void PEsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex) {

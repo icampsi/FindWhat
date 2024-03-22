@@ -13,14 +13,14 @@
 #include "CPdfDoc.h"
 #include "CEsquemaDoc.h"
 
-void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> &xsvStructure, ProgBarExport_dlg *progressDialog) {
+void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog) {
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 
     for(QString& filePath : m_pdfFilePaths) {
         CPdfDoc* pdfDoc = new CPdfDoc(filePath);
         esquema->generateXSVStringStructure(pdfDoc);
         for(auto& j : esquema->getXSVStringStructureResult()) {
-            xsvStructure.push_back(j);
+            xsvStructure->push_back(j);
         }
         if(m_renameParsedPDFFlag) renameFile(filePath); // Rename document if flag enabled
 

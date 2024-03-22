@@ -36,8 +36,8 @@ public:
     CEsquemaDoc* getAsocEsquemaDoc() const    { return m_associatedEsquemaDoc; }
     void setAsocEsquemaDoc(CEsquemaDoc* pDoc) { m_associatedEsquemaDoc = pDoc; }
 
+    const QString& getCSVFormat() const      { return m_csvFormat; }
     void setCSVFormat(const QString& string) { m_csvFormat = string; }
-    const QString& getCSVFormat()            { return m_csvFormat; }
 
     std::vector<QString> getPathFiles() const { return m_pdfFilePaths; }
     void setPathFiles(const std::vector<QString>& paths) {
@@ -45,18 +45,18 @@ public:
         m_pdfFilePaths = paths;
     }
 
-    void setExportFileRename(const QString& fileName) { m_exportFileRename = fileName; }
     const QString& getExportFileRename() const        { return m_exportFileRename; }
+    void setExportFileRename(const QString& fileName) { m_exportFileRename = fileName; }
 
-    void setRenameParsedPDFFlag(bool isToBeRenamed) { m_renameParsedPDFFlag =  isToBeRenamed; }
-    bool getRenameParsedPDFFlag() const { return m_renameParsedPDFFlag; }
+    bool getRenameParsedPDFFlag() const             { return m_renameParsedPDFFlag; }
+    void setRenameParsedPDFFlag(bool isToBeRenamed) { m_renameParsedPDFFlag = isToBeRenamed; }
 
-    void setFileNamePlaceholder(const QString& fileNamePlaceholder) { m_fileNamePlaceholder = fileNamePlaceholder; }
     const QString& getFileNamePlaceholder() const { return m_fileNamePlaceholder; }
+    void setFileNamePlaceholder(const QString& fileNamePlaceholder) { m_fileNamePlaceholder = fileNamePlaceholder; }
 
     // PUBLIC FUNCTIONS
     // Functions to add and delete PDF file paths
-    void addPdfFile(const QString& path)             { m_pdfFilePaths.push_back(path); }
+    void addPdfFile(const QString& path)             { m_pdfFilePaths.push_back(std::move(path)); }
     const std::vector<QString>& getFilePaths() const { return m_pdfFilePaths; }
     void deletePdfFile(int index);
 
@@ -64,7 +64,7 @@ public:
     void reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex);
 
     // Function to build XSV structure
-    void buildXSVStructure(std::vector<std::vector<QString> > &xsvStructure, ProgBarExport_dlg *progressDialog = nullptr);
+    void buildXSVStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog = nullptr);
 
     // Function to rename in pdf file
     void renameFile(const QString &oldFilePath);

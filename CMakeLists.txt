@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-
 project(FindWhat VERSION 0.1.0 LANGUAGES CXX)
 
 # Warning level
@@ -37,12 +36,12 @@ set(MAIN_FILES
     src/CFunctionClasses.cpp    src/CFunctionClasses.h
 
     # DOCUMENT
-    document/CMDoc.cpp                  document/CMDoc.h
-    document/CDocument.cpp              document/CDocument.h
-    document/CEsquemaDoc.cpp            document/CEsquemaDoc.h
-    document/CExportPathDoc.cpp         document/CExportPathDoc.h
-    document/CExportCSV.cpp             document/CExportCSV.h
-    document/CPdfDoc.cpp                document/CPdfDoc.h
+    document/CMDoc.cpp              document/CMDoc.h
+    document/CDocument.cpp          document/CDocument.h
+    document/CEsquemaDoc.cpp        document/CEsquemaDoc.h
+    document/CExportPathDoc.cpp     document/CExportPathDoc.h
+    document/CExportCSV.cpp         document/CExportCSV.h
+    document/CPdfDoc.cpp            document/CPdfDoc.h
 
     # UTILS
     utils/GeneralFunctions.cpp  utils/GeneralFunctions.h
@@ -55,7 +54,7 @@ set(MAIN_FILES
     ui/PEsquemaPage.cpp        ui/PEsquemaPage.h        ui/PEsquemaPage.ui
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
     ui/PMainEsquemaUI.cpp      ui/PMainEsquemaUI.h      ui/PMainEsquemaUI.ui
-    ui/PTabTextPreview.cpp     ui/PTabTextPreview.h     ui/PTabTextPreview.ui
+    ui/PTabTextPreview.cpp     ui/PTabTextPreview.h
     ui/PEndingStringBlock.cpp  ui/PEndingStringBlock.h
 
     ui/WBrowserTreeView.cpp     ui/WBrowserTreeView.h

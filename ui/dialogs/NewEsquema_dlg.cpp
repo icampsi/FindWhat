@@ -4,12 +4,11 @@
  * =================================================== */
 
 #include "NewEsquema_dlg.h"
-#include "ui/MainWindow.h"
 #include "ui_NewEsquema_dlg.h"
 
 #include <QAbstractButton>
-#include "qmessagebox.h"
 
+#include "ui/MainWindow.h"
 #include "document/CMDoc.h"
 
 newEsquema_dlg::newEsquema_dlg(QWidget *parent, const std::vector<QString>& loadedEsquemaNames)
@@ -42,7 +41,6 @@ void newEsquema_dlg::on_buttonBox_accepted() {
     // Creates and sets-up the document
     CEsquema* esquema = new CEsquema();
     esquema->setName(esquemaName);
-    esquema->setIDText(ui->lineEdit_idString->text().toUtf8());
 
     // Creates a esquemaDoc, passes ownership of the esquema and stores it in the CMDoc singleton.
     CEsquemaDoc* esquemaDoc = CMDoc::getMDoc().newDoc(esquema);

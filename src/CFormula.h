@@ -10,23 +10,23 @@
 #include "CData.h"
 
 class CPdfDoc;
+
 // EXTRACTS A DATA FROM GIVEN PARAMETERS (each formula extracts only one value)
 class CFormula {
 public:
-    struct IndexPosition {
+    struct IndexPosition { // Marks the first and last current position of the searched text index
         size_t initial = 0;
         size_t final   = 0;
     };
-    struct Result {
+    struct Result { // Stores the current index and extracted text
         IndexPosition indexPosition;
         QString result{""};
     };
     enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization purposes
 
 protected:
-    //QString       m_result = "";
-    CData  m_data;
     Result m_result;
+    CData  m_data;
     std::vector<CFunction*> m_formulaPath; // Marc the path to find the variable data
 
 public:
@@ -41,20 +41,17 @@ public:
     CFormula& operator=(const CFormula& other); // Assignment operator to support assignment between CFormula instances
 
     // GETTERS AND SETTERS
-    Result   getResult() const   { return m_result; }
-    QString  getDataName() const { return m_data.getDataName();}
-    CData   *getData()           { return &m_data; }
+    const Result&  getResult() const { return m_result; }
+    CData   *getData()               { return &m_data; }
 
-    void            setDataName(const QString& dataName) { m_data.setDataName(dataName); }
-
-    // Result   getIndexPosition() const                       { return m_indexPosition; }
-    void setIndexPosition(size_t initial, size_t final) { m_result.indexPosition.initial = initial; m_result.indexPosition.final = final;}
+    const QString& getDataName() const        { return m_data.getDataName();}
+    void setDataName(const QString& dataName) { m_data.setDataName(dataName); }
 
     CFunction* getFunction(int index) const { return m_formulaPath[index]; }
     size_t     getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
-    Result applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
+    const Result& applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
 
     inline int  findText (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
     inline void moveIndex(CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
@@ -68,13 +65,10 @@ public:
     void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
 
     // m_formulaPath INTERFACE
-    void addFunction(CFunction* function) {
-        function->setParent(this);
-        m_formulaPath.push_back(function);
-    }
+    void addFunction(CFunction* function);
     void deleteFunction(const size_t index);
     void reorderFunctionPath(size_t objectToMoveIndex, size_t destinationIndex); // Moves object from one index to another
-    void clearPath() { m_formulaPath.clear();}
+    void clearPath() { m_formulaPath.clear(); }
 
     // SERIALIZATION
     void serialize(std::ofstream& out) const;

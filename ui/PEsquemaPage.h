@@ -7,10 +7,9 @@
 #define PESQUEMAPAGE_H
 
 #include <QWidget>
-
-#include "qfilesystemmodel.h"
-#include "qlistwidget.h"
-#include "qstandarditemmodel.h"
+#include <QFileSystemModel>
+#include <QListWidget>
+#include <QStandardItemModel>
 
 #include "src/CEsquema.h"
 #include "src/CFormula.h"
@@ -102,13 +101,9 @@ private slots:
 
     // Menú actions for the "New Function" push button
     void handle_newFunActions(CFunction::Action functionType);
-
     void on_checkBox_lookOnlyAtPage_stateChanged(int arg1);
-
     void on_spinBox_lookOnlyAtPage_valueChanged(int arg1);
-
     void on_lineEdit_toReplace_textChanged(const QString &arg1);
-
     void on_lineEdit_replaceFor_textChanged(const QString &arg1);
 
 signals:

@@ -117,7 +117,7 @@ void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
             // Pass the string taken from the textedit in the WFormExpToolBoxPage to the selected esquema
             it->getAsocEsquemaDoc()->getEsquema()->constructCsvFormatFormulaStructure(it->getCSVFormat(), '\"',',');
             // Build the structure
-            it->buildXSVStructure(newData, progressDlg);
+            it->buildXSVStructure(&newData, progressDlg);
             // Append it to the global xsvm structure
             xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
         }
