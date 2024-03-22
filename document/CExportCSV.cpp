@@ -43,6 +43,11 @@ void CExportCSV::reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex
 
 void CExportCSV::renameFile(const QString &oldFilePath) {
     QFileInfo fileInfo(oldFilePath);
+    if (!fileInfo.exists()) {
+        qDebug() << "Source file does not exist:" << oldFilePath;
+        return;
+    }
+
     QString newFileName;
     if (!m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName, m_fileNamePlaceholder)) {
         m_invalidFileNameDlg = new InvalidFileName_dlg(nullptr, &newFileName, oldFilePath);
@@ -60,3 +65,4 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
         qDebug() << "Failed to rename file:" << file.errorString();
     }
 }
+

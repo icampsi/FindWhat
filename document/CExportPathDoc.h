@@ -9,7 +9,6 @@
 #include "CExportCSV.h"
 #include <vector>
 
-#include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
 

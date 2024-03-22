@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 project(FindWhat VERSION 0.1.0 LANGUAGES CXX)
 
-# Enable all warnings and treat them as errors
+# Warning level
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
@@ -27,30 +27,27 @@ else()
     message(FATAL_ERROR "Qt Widgets not found")
 endif()
 
-# FILES TO COMPILE (Organized following the folder structure of the project)
-set(SRC_FILES
+set(MAIN_FILES
+    # SRC
     src/main.cpp
 
     src/CData.cpp               src/CData.h
     src/CEsquema.cpp            src/CEsquema.h
     src/CFormula.cpp            src/CFormula.h
     src/CFunctionClasses.cpp    src/CFunctionClasses.h
-)
 
-set(DOCUMENT_FILES
+    # DOCUMENT
     document/CMDoc.cpp                  document/CMDoc.h
     document/CDocument.cpp              document/CDocument.h
     document/CEsquemaDoc.cpp            document/CEsquemaDoc.h
     document/CExportPathDoc.cpp         document/CExportPathDoc.h
     document/CExportCSV.cpp             document/CExportCSV.h
     document/CPdfDoc.cpp                document/CPdfDoc.h
-)
 
-set(UTILS_FILES
+    # UTILS
     utils/GeneralFunctions.cpp  utils/GeneralFunctions.h
-)
 
-set(UI_FILES
+    # UI
     ui/MainWindow.cpp         ui/MainWindow.h           ui/MainWindow.ui
     ui/QCItemDelegateFormulaTreeView.cpp
 
@@ -59,7 +56,7 @@ set(UI_FILES
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
     ui/PMainEsquemaUI.cpp      ui/PMainEsquemaUI.h      ui/PMainEsquemaUI.ui
     ui/PTabTextPreview.cpp     ui/PTabTextPreview.h     ui/PTabTextPreview.ui
-
+    ui/PEndingStringBlock.cpp  ui/PEndingStringBlock.h
 
     ui/WBrowserTreeView.cpp     ui/WBrowserTreeView.h
     ui/WEsquemaListView.cpp     ui/WEsquemaListView.h
@@ -73,41 +70,24 @@ set(UI_FILES
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui
     ui/dialogs/ProgBarExport_dlg.cpp    ui/dialogs/ProgBarExport_dlg.h   ui/dialogs/ProgBarExport_dlg.ui
     ui/dialogs/InvalidFileName_dlg.cpp  ui/dialogs/InvalidFileName_dlg.h ui/dialogs/InvalidFileName_dlg.ui
-)
 
-set(RESOURCE_FILES
+    # RESOURCE
     res/icons.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(FindWhat
         MANUAL_FINALIZATION
-        ${SRC_FILES}
-        ${DOCUMENT_FILES}
-        ${UTILS_FILES}
-        ${UI_FILES}
-        ${RESOURCE_FILES}
-        ui/PEndingStringBlock.h ui/PEndingStringBlock.cpp
+        ${MAIN_FILES}
     )
 
 else()
     if(ANDROID)
         add_library(FindWhat SHARED
-            ${PROJECT_SOURCES}
-            ${SRC_FILES}
-            ${DOCUMENT_FILES}
-            ${UTILS_FILES}
-            ${UI_FILES}
-            ${RESOURCE_FILES}
         )
     else()
         add_executable(FindWhat
-            ${PROJECT_SOURCES}
-            ${SRC_FILES}
-            ${DOCUMENT_FILES}
-            ${UTILS_FILES}
-            ${UI_FILES}
-            ${RESOURCE_FILES}
+            ${MAIN_FILES}
         )
     endif()
 endif()
@@ -118,7 +98,6 @@ set_target_properties(FindWhat PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINA
 set_target_properties(FindWhat PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )
 # Add current source dir as a include path
 target_include_directories(FindWhat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
 
 # LINK LIBRARIES
 #QT

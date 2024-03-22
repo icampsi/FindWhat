@@ -48,7 +48,6 @@ protected:
     QString m_filePath;        // Path to pdf file
     long long m_textSize;
     std::vector<Page> m_pages; // Pdf extracted text divided in pages. Created and populated on constructor
-    poppler::document* m_doc;  // Loads it from static constructor
 };
 
 #endif // CPDFDOC_H

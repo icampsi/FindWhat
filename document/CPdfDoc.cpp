@@ -4,8 +4,8 @@
  * =================================================== */
 
 #include "CPdfDoc.h"
-#include <QFileInfo>
 
+#include <QFileInfo>
 #include <QFile>
 
 CPdfDoc::CPdfDoc(const QString& filePath) : m_fullText(""), m_filePath(filePath) {
@@ -13,7 +13,7 @@ CPdfDoc::CPdfDoc(const QString& filePath) : m_fullText(""), m_filePath(filePath)
     m_docName = fileInfo.fileName();
 
     // Loads PDF file into poppler
-    m_doc = poppler::document::load_from_file(m_filePath.toStdString());
+    poppler::document* m_doc = poppler::document::load_from_file(m_filePath.toStdString());
     const int pagesNbr = m_doc->pages(); // Number of pages
     size_t charCount = 0;
     // Extracts text page by page and stores it inside m_pages
@@ -53,11 +53,10 @@ CPdfDoc::CPdfDoc(const QString& filePath) : m_fullText(""), m_filePath(filePath)
         m_pages.push_back(std::move(newPage)); // Saves page individually to acces specific pages later
     }
     m_textSize = --charCount;
-}
-
-CPdfDoc::~CPdfDoc() {
     delete m_doc;
 }
+
+CPdfDoc::~CPdfDoc() {}
 
 const QString &CPdfDoc::getFilePath() const {
     return m_filePath;
