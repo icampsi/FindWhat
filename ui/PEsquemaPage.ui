@@ -618,20 +618,6 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="2">
-                      <widget class="QComboBox" name="comboBox_readDirection">
-                       <item>
-                        <property name="text">
-                         <string>Forward</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>Backward</string>
-                        </property>
-                       </item>
-                      </widget>
-                     </item>
                      <item row="2" column="0" rowspan="2" colspan="4">
                       <widget class="QScrollArea" name="scrollArea">
                        <property name="widgetResizable">
@@ -646,8 +632,50 @@
                           <height>171</height>
                          </rect>
                         </property>
-                        <layout class="QVBoxLayout" name="verticalLayout_3">
-                         <item>
+                        <layout class="QGridLayout" name="gridLayout_2">
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="text">
+                            <string>Extract up to</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="2">
+                          <widget class="QLabel" name="label_2">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="text">
+                            <string>chars</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="1">
+                          <widget class="QSpinBox" name="spinBox_extractAmmount">
+                           <property name="toolTip">
+                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extraction will stop after so many characters have been extracted, even if ending string hasn't been reached. -1 To ignore.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                           </property>
+                           <property name="minimum">
+                            <number>-1</number>
+                           </property>
+                           <property name="maximum">
+                            <number>9999</number>
+                           </property>
+                           <property name="singleStep">
+                            <number>1</number>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="0" colspan="3">
                           <widget class="PEndingStringBlock" name="endingStringBlock" native="true"/>
                          </item>
                         </layout>
@@ -664,19 +692,6 @@
                        </property>
                        <property name="text">
                         <string>Extracted Data</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QLabel" name="label_readDirection">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Read Direction</string>
                        </property>
                       </widget>
                      </item>
@@ -781,6 +796,33 @@
                          <widget class="QLineEdit" name="lineEdit_replaceFor"/>
                         </item>
                        </layout>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_readDirection">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Read Direction</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="comboBox_readDirection">
+                       <item>
+                        <property name="text">
+                         <string>Forward</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Backward</string>
+                        </property>
+                       </item>
                       </widget>
                      </item>
                     </layout>

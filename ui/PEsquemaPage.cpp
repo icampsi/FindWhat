@@ -129,6 +129,7 @@ void PEsquemaPage::loadFunction() {
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
         ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
+        ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
 
         break;
     }
@@ -510,6 +511,13 @@ void PEsquemaPage::on_lineEdit_toReplace_textChanged(const QString &arg1) {
 void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
     CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
     function->setReplaceFor(arg1);
+    updateFunctionProcess();
+}
+
+
+void PEsquemaPage::on_spinBox_extractAmmount_valueChanged(int arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setCharsToGet(arg1);
     updateFunctionProcess();
 }
 

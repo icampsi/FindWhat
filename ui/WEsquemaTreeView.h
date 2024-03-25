@@ -27,9 +27,8 @@ signals:
     void removeSecondLevel(const int index, const QModelIndex &parentIndex);
 
 private slots:
-    void showContextMenu(const QPoint &pos);
     void handleDoubleClick(const QModelIndex &index);
-    void handleEditingFinished(const QModelIndex &index, const QString &text);    
+    void handleEditingFinished(const QModelIndex &index, const QString &text);
 };
 
 #endif // WESQUEMATREEVIEW_H

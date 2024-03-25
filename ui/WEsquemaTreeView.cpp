@@ -12,12 +12,11 @@
 
 WEsquemaTreeView::WEsquemaTreeView(QWidget *parent) : QTreeView(parent) {
     setStyleSheet("QTreeView::branch {background-color: #A9A9A9;}");
-    QCItemDelegateFormulaTreeView *delegate = new QCItemDelegateFormulaTreeView(this); // Assuming EsquemaPage is a QObject
+    QCItemDelegateFormulaTreeView *delegate = new QCItemDelegateFormulaTreeView(this);
     setItemDelegate(delegate);
 
     connect(this, &QTreeView::doubleClicked, this, &WEsquemaTreeView::handleDoubleClick);
     connect(delegate, &QCItemDelegateFormulaTreeView::editingFinished, this, &WEsquemaTreeView::handleEditingFinished);
-    connect(this, &QTreeView::customContextMenuRequested, this, &WEsquemaTreeView::showContextMenu);
 }
 
 void WEsquemaTreeView::keyPressEvent(QKeyEvent *event) {
@@ -43,22 +42,6 @@ void WEsquemaTreeView::keyPressEvent(QKeyEvent *event) {
         }
     } else {
         QTreeView::keyPressEvent(event);
-    }
-}
-
-void WEsquemaTreeView::showContextMenu(const QPoint &pos) {
-    QModelIndex index = indexAt(pos); // Get the index of the item at the clicked position
-
-    if (index.isValid()) {
-        QMenu contextMenu(this);
-        QAction action("Do Something", this);
-        // Connect the action to a slot to perform some action
-        // connect(&action, &QAction::triggered, this, &YourClass::handleContextMenuAction);
-        QMessageBox::information(this, "title", "hi");
-        contextMenu.addAction(&action);
-
-        // Show the context menu at the clicked position
-        contextMenu.exec(viewport()->mapToGlobal(pos));
     }
 }
 

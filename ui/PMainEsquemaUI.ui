@@ -22,8 +22,34 @@
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0" columnstretch="0,0">
+   <item row="1" column="0" rowspan="3">
+    <widget class="WEsqList" name="esqList">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_loadedEsquemes">
+     <property name="text">
+      <string>Loaded Esquemes</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="1">
+    <widget class="WToolBarEsquema" name="toolBar" native="true"/>
+   </item>
+   <item row="3" column="1">
     <widget class="QStackedWidget" name="stackedWidget_esquemaUI">
      <property name="minimumSize">
       <size>
@@ -157,8 +183,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>1069</width>
-               <height>362</height>
+               <width>515</width>
+               <height>335</height>
               </rect>
              </property>
              <property name="minimumSize">
@@ -193,7 +219,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>1030</width>
+                   <width>476</width>
                    <height>500</height>
                   </rect>
                  </property>
@@ -220,12 +246,6 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="WToolBarEsquema" name="toolBar" native="true"/>
-   </item>
-   <item row="0" column="0" rowspan="3">
-    <widget class="WLoadedEsquemes" name="loadedEsquemes" native="true"/>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -236,10 +256,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>WLoadedEsquemes</class>
-   <extends>QWidget</extends>
-   <header>WLoadedEsquemes.h</header>
-   <container>1</container>
+   <class>WEsqList</class>
+   <extends>QListWidget</extends>
+   <header>WEsqList.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

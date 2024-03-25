@@ -387,10 +387,13 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
-
+    if(directionInverted && m_result.indexPosition.final > 0) {
+        m_result.indexPosition.final--; // If direction is inverted we start from one char before.
+        m_result.indexPosition.initial--;
+    }
     bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
     bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
-    int extractedAmount{ 0 };   // Conta quants caracters hem llegit: m_charsToGet
+    int extractedAmount{ 0 };   // Counts how many characters we have extracted already: m_charsToGet
     std::vector<QString> endingString = pFunctionToApply->getEndingStringBlock(); // Strings that marks the ending of the extraction
     QString extractedText;      // Stores the stracted text before copying it to m_result
     size_t endingStringIndex{0};
@@ -399,7 +402,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         currentEndingString = endingString.at(0);
     }
     while(pFunctionToApply->getCharsToRead() != 0 && pFunctionToApply->getCharsToGet()  != 0) {
-        int remainingText{0};
+        int remainingText{ 0 };
         if(directionInverted) {
             remainingText = static_cast<int>(m_result.indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
         } else {
@@ -409,7 +412,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         if(remainingText >= 0 && remainingText < text.length()) {
             // Check if currentEndingString reached.
             if((directionInverted &&
-                 text.mid(static_cast<size_t>(remainingText), currentEndingString.length()) == currentEndingString) ||
+                 text.mid(static_cast<size_t>(m_result.indexPosition.final), currentEndingString.length()) == currentEndingString) ||
                 (!directionInverted &&
                  text.mid(m_result.indexPosition.final, currentEndingString.length()) == currentEndingString))
             {
@@ -462,7 +465,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         case CExtractingFunction::CharTypeToGet::all:
             if (!avoided) {
                 if(!directionInverted) extractedText.append(text[m_result.indexPosition.final]);
-                else                                extractedText.prepend(text[m_result.indexPosition.final]);
+                else                   extractedText.prepend(text[m_result.indexPosition.final]);
                 extractedAmount++;
             }
         }
@@ -486,9 +489,8 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
     m_result.result.append(std::move(extractedText));
 
     if(directionInverted) {
-        size_t indexInitialTemp = m_result.indexPosition.initial;
-        m_result.indexPosition.initial = m_result.indexPosition.final + 1;
-        m_result.indexPosition.final = indexInitialTemp;
+        m_result.indexPosition.initial = m_result.indexPosition.final - 1;
+        m_result.indexPosition.final =  m_result.indexPosition.initial;
     }
 }
 
@@ -542,15 +544,16 @@ void CFormula::reorderFunctionPath(size_t objectToMoveIndex, size_t destinationI
 void CFormula::serialize(std::ofstream& out) const {
     /*  - SERIALIZATION ORDER -
      *  CData                   m_data
-     *  IndexPosition           m_indexPosition
      *  size_t                  vector m_formulaPath size
      *  FunctionType            type
      *  std::vector<CFunction*> m_formulaPath
-     *  NO NEED - m_result
+     *
+     *  NO NEED
+     *  m_result
+     *  m_indexPosition
      */
 
     m_data.serialize(out);                                                             // m_data
-    out.write(reinterpret_cast<const char*>(&m_result.indexPosition), sizeof(Result)); // m_indexPosition
     size_t formulaPathSize = m_formulaPath.size();
     out.write(reinterpret_cast<const char*>(&formulaPathSize), sizeof(size_t));        // size of formulaPath
 
@@ -576,21 +579,21 @@ void CFormula::serialize(std::ofstream& out) const {
 }
 
 void CFormula::deserialize(std::ifstream& in) {
+    qDebug() << "deserialize";
     /*  - DESERIALIZATION ORDER -
      *
      *  CData    	  m_data
-     *  IndexPosition m_indexPosition
      *  std::vector<CFunction*> m_formulaPath
      *
-     *  NO NEED - m_result
+     *  NO NEED
+     *  - m_result
      */
 
     m_formulaPath.clear();
 
-    in.read(reinterpret_cast<char*>(&m_result.indexPosition), sizeof(Result));  // m_indexPosition
     size_t formulaPathSize;                                                     // Size of m_formulaPath
     in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(size_t));
-    for (size_t i{0}; i < formulaPathSize; i++) {                                  // m_formulaPath
+    for (size_t i{0}; i < formulaPathSize; i++) {                               // m_formulaPath
         FunctionType type;
         in.read(reinterpret_cast<char*>(&type), sizeof(FunctionType));
 

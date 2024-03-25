@@ -42,7 +42,7 @@ public:
 
     // GETTERS AND SETTERS
     const Result&  getResult() const { return m_result; }
-    CData   *getData()               { return &m_data; }
+    CData         *getData()         { return &m_data; }
 
     const QString& getDataName() const        { return m_data.getDataName();}
     void setDataName(const QString& dataName) { m_data.setDataName(dataName); }

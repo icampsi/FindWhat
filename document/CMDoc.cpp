@@ -52,6 +52,7 @@ void CMDoc::deleteEsquema(size_t index) {
     }
     delete m_loadedEsquemaDocs[index];
     m_loadedEsquemaDocs.erase(m_loadedEsquemaDocs.begin() + index);
+    esquemaListUpdated();
 }
 
 
@@ -84,7 +85,7 @@ void CMDoc::deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsqu
 
 void CMDoc::esquemaListUpdated() {
     std::vector<QString> updatedEsquemaDocList;
-    for (auto& esquemaDoc : m_loadedEsquemaDocs) {
+    for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
         updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
     }
 

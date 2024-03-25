@@ -30,13 +30,14 @@ public:
 
     // GETTERS AND SETTERS
     CEsquemaDoc *getActiveEsquemaDoc() const { return m_activeEsquema; }
+    CEsquemaDoc *getEsquemaFromIndex(int index) const { return m_loadedEsquemaDocs.at(index); }
     CPdfDoc     *getActivePdfDoc()     const { return m_activePdfDoc; }
     const std::vector<CEsquemaDoc*> *getLoadedEsquemaDocs() const { return &m_loadedEsquemaDocs; }
 
     void setActiveEsquemaDoc(CEsquemaDoc* esquema) { m_activeEsquema = esquema; }
     void setActivePdfDoc(CPdfDoc* pdfDoc) { m_activePdfDoc = pdfDoc; }
 
-    CExportPathDoc& getExportPathDoc()  { return m_exportPathDoc; }
+    CExportPathDoc& getExportPathDoc() { return m_exportPathDoc; }
 
     void deleteEsquema(size_t index);
 

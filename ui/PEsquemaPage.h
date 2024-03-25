@@ -106,6 +106,8 @@ private slots:
     void on_lineEdit_toReplace_textChanged(const QString &arg1);
     void on_lineEdit_replaceFor_textChanged(const QString &arg1);
 
+    void on_spinBox_extractAmmount_valueChanged(int arg1);
+
 signals:
     void functionUpdated(CFormula::IndexPosition index, const QString& result);
 };

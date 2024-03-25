@@ -11,10 +11,10 @@
 
 #include "PDockPreview.h"
 
-#include "dialogs/NewEsquema_dlg.h"
-#include "dialogs/exportEsquema_dlg.h"
-
-#include "document/CEsquemaDoc.h"
+class CMDoc;
+class CEsquemaDoc;
+class newEsquema_dlg;
+class exportEsquema_dlg;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,7 +33,13 @@ protected:
     PDockPreview      *m_dockPreview    = nullptr;
     newEsquema_dlg    *newEsquemadlg    = nullptr;
     exportEsquema_dlg *exportEsquemaDlg = nullptr;
+    CMDoc& m_cmdoc;
 
+private:
+    Ui::MainWindow *ui;
+
+    QAction* m_exportEsquemaAction; // Pointer to export esquema menu action for easy validate or invalidate depending on esquemes being loaded
+    bool     showFormatingMarks;    // Flag to show/hide formating marks
 
 private slots:
     // Menú actions
@@ -42,23 +48,21 @@ private slots:
     void action_saveSession();
     void action_importEsquema();
     void action_exportEsquema();
-    void action_showPreviewPanel();
-    void action_showFileBrowserPanel();
+    void inline action_showPreviewPanel();
+    void inline action_showFileBrowserPanel();
 
     // Widget slots
     void on_btn_changeRoot_clicked();
 
 public slots:
-    void functionUpdated(CFormula::IndexPosition index, const QString &result);
+    void functionUpdated(CFormula::IndexPosition index, const QString& result) {
+        m_dockPreview->handleFunctionUpdated(index, result);
+    }
+
+    void inline checkExortEsquemaActionEnable();
 
 public:
-    void loadEsquema(CEsquemaDoc* esquema);
-    void checkExortEsquemaActionEnable();
-
-private:
-    Ui::MainWindow *ui;
-    QAction* m_exportEsquemaAction = nullptr; // Pointer to export esquema menu action for easy validate or invalidate depending on esquemes being loaded
-    bool showFormatingMarks; // Flag to show/hide formating marks
+    void inline loadEsquema(CEsquemaDoc* esquema);
 };
 
 #endif // MMAINWINDOW_H

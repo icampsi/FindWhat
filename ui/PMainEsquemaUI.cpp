@@ -42,7 +42,7 @@ void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
     PEsquemaPage *newPage = new PEsquemaPage(esquemaDoc, this);
     ui->stackedWidget_esquemaPage->addWidget(newPage);
     ui->stackedWidget_esquemaPage->setCurrentWidget(newPage);
-    ui->loadedEsquemes->newEsquema(newPage, esquema);
+    ui->esqList->newEsquema(newPage, esquema);
 }
 
 void PMainEsquemaUI::on_pushButton_addEsquema_clicked() {
@@ -144,12 +144,11 @@ void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
 }
 
 void PMainEsquemaUI::handleDeleteEsquema(const size_t index) {
-    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
-    ui->loadedEsquemes->deleteEsquema(index);
+    // Delete esquema from ui and document
+    ui->esqList->delEsq(index);
     CMDoc::getMDoc().deleteEsquema(index);
     // Perform a check in main window for disableing Export Esquema menu action if needed
     qobject_cast<MainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
-    qDebug() << ui->stackedWidget_esquemaPage->count();
 }
 
 void PMainEsquemaUI::setCurrentPageToEmptyPage() {
