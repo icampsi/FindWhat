@@ -25,7 +25,3 @@ PTabTextPreview::PTabTextPreview(const QString &text, QWidget *parent) : QTextEd
 }
 
 PTabTextPreview::~PTabTextPreview() {}
-
-void PTabTextPreview::setPreviewText(const QString& text) {
-    setPlainText(text);
-}

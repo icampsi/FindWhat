@@ -6,6 +6,8 @@
 #ifndef MMAINWINDOW_H
 #define MMAINWINDOW_H
 
+#include "ui/ui_MainWindow.h"
+
 #include <QMainWindow>
 #include <QString>
 
@@ -55,14 +57,13 @@ private slots:
     void on_btn_changeRoot_clicked();
 
 public slots:
-    void functionUpdated(CFormula::IndexPosition index, const QString& result) {
+    inline void functionUpdated(CFormula::IndexPosition index, const QString& result) {
         m_dockPreview->handleFunctionUpdated(index, result);
     }
 
-    void inline checkExortEsquemaActionEnable();
+    void checkExortEsquemaActionEnable();
 
 public:
-    void inline loadEsquema(CEsquemaDoc* esquema);
-};
+    void loadEsquema(CEsquemaDoc* esquemaDoc) { ui->mainEsquemaUI->newEsquema(esquemaDoc); }};
 
 #endif // MMAINWINDOW_H

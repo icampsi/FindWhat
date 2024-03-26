@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QMessageBox>
 
 // EXPORTPATHDOC
 CExportPathDoc::~CExportPathDoc() {
@@ -20,10 +21,6 @@ CExportPathDoc::~CExportPathDoc() {
 CExportCSV* CExportPathDoc::createExportCSV() {
     m_exportCSVs.emplace_back(new CExportCSV());
     return m_exportCSVs.back();
-}
-
-size_t CExportPathDoc::getExportCSVCount() const {
-    return m_exportCSVs.size();
 }
 
 CExportCSV* CExportPathDoc::getExportCSVByIndex(size_t index) {

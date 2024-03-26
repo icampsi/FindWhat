@@ -15,11 +15,11 @@ WToolBarEsquema::WToolBarEsquema(QWidget* parent) : QToolBar(parent), m_toggleBu
     m_parseDoc.setCheckable(true);
     m_toggleButtonsGroup.addAction(&m_parseDoc);
     addAction(&m_parseDoc);
-    connect(&m_toggleButtonsGroup, &QActionGroup::triggered, this, &WToolBarEsquema::handleActionTriggered);
-    m_editEsquema.trigger();
-}
 
-void WToolBarEsquema::handleActionTriggered(QAction *action) {
-    if      (action == &m_editEsquema) emit previewOptionChanged(EsquemaOption::EditEsquema);
-    else if (action == &m_parseDoc)    emit previewOptionChanged(EsquemaOption::ParseDocument);
+    connect(&m_toggleButtonsGroup, &QActionGroup::triggered, this, [=](QAction* action) {
+        if      (action == &m_editEsquema) emit previewOptionChanged(EsquemaOption::EditEsquema);
+        else if (action == &m_parseDoc)    emit previewOptionChanged(EsquemaOption::ParseDocument);
+    });
+
+    m_editEsquema.trigger();
 }

@@ -6,15 +6,17 @@
 #ifndef PESQUEMAPAGE_H
 #define PESQUEMAPAGE_H
 
+#include "src/CFormula.h"
+#include "src/CFunctionClasses.h"
+
 #include <QWidget>
 #include <QFileSystemModel>
 #include <QListWidget>
 #include <QStandardItemModel>
 
-#include "src/CEsquema.h"
-#include "src/CFormula.h"
-
 class CEsquemaDoc;
+class CEsquema;
+class CData;
 
 namespace Ui { class PEsquemaPage; }
 

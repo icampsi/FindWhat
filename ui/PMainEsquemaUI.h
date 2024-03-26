@@ -9,7 +9,6 @@
 #include <QWidget>
 #include <QStackedWidget>
 
-#include "document/CExportPathDoc.h"
 #include "WToolBarEsquema.h"
 #include "PEsquemaPage.h"
 #include "ui_PMainEsquemaUI.h"

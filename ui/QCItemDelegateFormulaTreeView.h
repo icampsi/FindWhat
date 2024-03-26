@@ -11,7 +11,7 @@ signals:
     void editingFinished(const QModelIndex &index, const QString &text) const;
 
 public:
-    QCItemDelegateFormulaTreeView(QObject *parent = nullptr);
+    explicit QCItemDelegateFormulaTreeView(QObject *parent = nullptr);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };

@@ -8,9 +8,8 @@
 
 #include <QString>
 
-#include "ui/dialogs/ProgBarExport_dlg.h"
-#include "ui/dialogs/InvalidFileName_dlg.h"
-
+class InvalidFileName_dlg;
+class ProgBarExport_dlg;
 class CEsquemaDoc;
 
 class CExportCSV {
@@ -29,7 +28,7 @@ protected:
     bool                 m_renameParsedPDFFlag;  // A flag to state whether a pdf document should be renamed
     QString              m_fileNamePlaceholder;  // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
 
-    InvalidFileName_dlg *m_invalidFileNameDlg;
+    InvalidFileName_dlg *m_invalidFileNameDlg;   // Dialog that pops up if the resulting new file name contains invalid characters
 
 public:
     // GETTERS AND SETTERS
@@ -39,7 +38,7 @@ public:
     const QString& getCSVFormat() const      { return m_csvFormat; }
     void setCSVFormat(const QString& string) { m_csvFormat = string; }
 
-    std::vector<QString> getPathFiles() const { return m_pdfFilePaths; }
+    const std::vector<QString>& getPathFiles() const { return m_pdfFilePaths; }
     void setPathFiles(const std::vector<QString>& paths) {
         m_pdfFilePaths.clear();
         m_pdfFilePaths = paths;
@@ -58,7 +57,7 @@ public:
     // Functions to add and delete PDF file paths
     void addPdfFile(const QString& path)             { m_pdfFilePaths.push_back(std::move(path)); }
     const std::vector<QString>& getFilePaths() const { return m_pdfFilePaths; }
-    void deletePdfFile(int index);
+    void deletePdfFile(int index); // BOOKMARK - Need implementation
 
     // Function to reorder files inside the vector
     void reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex);

@@ -13,12 +13,15 @@
 #include "CData.h"
 #include "CFormula.h"
 
+class CData;
+class CPdfDoc;
+
 // Stores all necessary informacion for extracting specified values from a PDF and make CData from each
 class CEsquema {
 public:
     // CONSTRUCTORS & DESTRUCTORS
-    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula, std::vector<CData*>& valorsEstatics);
-    CEsquema(const QString nameEsquema, std::vector<CFormula *> tExtractDataFormula);
+    CEsquema(const QString& nameEsquema, const std::vector<CFormula *> &tExtractDataFormula, const std::vector<CData*>& valorsEstatics);
+    CEsquema(const QString &nameEsquema, const std::vector<CFormula *> &tExtractDataFormula);
     CEsquema(std::ifstream& in) { deserliazile(in); }
     CEsquema() = default;
     ~CEsquema();
@@ -48,30 +51,22 @@ public:
     // Converts a xsv string structure into a full csv file string
     void xsv_stringStructureToString(QString* pFullFileString, char enclosureChar, char separator);
     // Deletes the formula at index pos and cleans
-    void deleteFormula(size_t index);
+    void deleteFormula(const size_t index);
 
     // SETTERS AND GETTERS
     void addStaticData(CData* data );
     const std::vector<CData*>& getStaticData() const { return m_staticData; }
     void deleteStaticData(size_t index);
-    void setStaticDataName(CData* data, QString name);
+    void setStaticDataName(CData* data, const QString &name);
 
     const std::vector<CFormula*>& getExtractDataFormula() const { return m_extractDataFormula; }
+
     void addExtractDataFormula(CFormula* formula) {
         m_dataMap.insert(formula->getDataName(), formula->getData());
         m_extractDataFormula.push_back(formula);
     }
 
-    void setFormulaName(CFormula* formula, QString name) {
-        m_dataMap.insert(name, formula->getData());
-        // Update m_dataMap
-        QString oldName = formula->getDataName();
-        if (m_dataMap.contains(oldName)) {
-            m_dataMap.take(oldName);  // Remove the old key-value pair and get the value
-            m_dataMap.insert(name, formula->getData()); // Insert the value with the new key
-        }
-        formula->setDataName(name);
-    }
+    void setFormulaName(CFormula* formula, const QString &name);
 
     const QString& getName() const      { return m_nameEsquema; }
     void setName(const QString& name)   { m_nameEsquema = name; }

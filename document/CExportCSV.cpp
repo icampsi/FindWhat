@@ -13,6 +13,9 @@
 #include "CPdfDoc.h"
 #include "CEsquemaDoc.h"
 
+#include "ui/dialogs/ProgBarExport_dlg.h"
+#include "ui/dialogs/InvalidFileName_dlg.h"
+
 void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog) {
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 

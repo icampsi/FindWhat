@@ -13,14 +13,11 @@
 class WToolBarEsquema : public QToolBar {
     Q_OBJECT
 public:
-    WToolBarEsquema(QWidget* parent);
+    explicit WToolBarEsquema(QWidget* parent);
     enum class EsquemaOption { EditEsquema, ParseDocument };
 
 signals:
     void previewOptionChanged(WToolBarEsquema::EsquemaOption option);
-
-private slots:
-    void handleActionTriggered(QAction *action);
 
 private:
     QActionGroup m_toggleButtonsGroup;

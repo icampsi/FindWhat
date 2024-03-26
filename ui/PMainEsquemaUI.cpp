@@ -4,16 +4,22 @@
  * =================================================== */
 
 #include "PMainEsquemaUI.h"
-#include "qtpreprocessorsupport.h"
+
 #include "MainWindow.h"
+#include "ui/dialogs/ProgBarExport_dlg.h"
 #include "ui_PMainEsquemaUI.h"
 
 #include <QToolBox>
+#include <QtPreprocessorSupport>
 
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
+#include "WEsqList.h"
+
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
+#include "document/CExportPathDoc.h"
+
 #include "utils/generalfunctions.h"
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)

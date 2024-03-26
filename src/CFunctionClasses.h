@@ -22,13 +22,12 @@ protected:
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    CFunction(Action functionType, CFormula* parent = nullptr);
-    CFunction(std::ifstream& in,   CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
+    explicit CFunction(Action functionType, CFormula* parent = nullptr);
+    explicit CFunction(std::ifstream& in,   CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
     virtual ~CFunction() {} // Virtual destructor
 
     //SETTERS&GETTERS
     virtual Action getFunctionType() const { return m_action; }
-
     const QString& getFunctionTypeName() const { return m_functionTypeName;  }
 
     CFormula* getParent() const          {return m_parent;}
@@ -49,7 +48,7 @@ protected:
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    CIndexingFunction(Action name);
+    explicit CIndexingFunction(Action name);
     CIndexingFunction(const CIndexingFunction &other);
     CIndexingFunction(std::ifstream& in, CFormula* parent = nullptr)
         : CFunction(in, parent) { CIndexingFunction::deserialize(in); } // Serialization constructor
@@ -82,8 +81,8 @@ public:
     QString   m_val2{ "" };
     Operation m_operation{ Operation::add };
 
-    CMathFunction(Action name);
-    CMathFunction(const CMathFunction &other);
+    explicit CMathFunction(Action name);
+    explicit CMathFunction(const CMathFunction &other);
     virtual ~CMathFunction() {} // Virtual destructor
 };
 
@@ -105,45 +104,45 @@ protected:
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    CExtractingFunction(Action name);
-    CExtractingFunction(const CExtractingFunction &other);
-    CExtractingFunction(std::ifstream& in, CFormula* parent = nullptr)
+    explicit CExtractingFunction(Action name);
+    explicit CExtractingFunction(const CExtractingFunction &other);
+    explicit CExtractingFunction(std::ifstream& in, CFormula* parent = nullptr)
         : CFunction(in, parent) { CExtractingFunction::deserialize(in); } // Serialization constructor
     virtual ~CExtractingFunction() {}
 
     // GETTERS&SETTERS
-    int  getCharsToGet() const         { return m_charsToGet; }
-    void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
+    inline int  getCharsToGet() const         { return m_charsToGet; }
+    inline void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
 
-    int  getCharsToRead() const          { return m_charsToRead; }
-    void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
+    inline int  getCharsToRead() const          { return m_charsToRead; }
+    inline void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
 
-    const std::vector<QString>& getEndingStringBlock() const            { return m_endingStr; }
-    void addEndingStringBlock(const QString& endingString) { m_endingStr.push_back(std::move(endingString)); }
-    void deleteEndingStringBlockMember(size_t index) {
+    inline const std::vector<QString>& getEndingStringBlock() const { return m_endingStr; }
+    inline void addEndingStringBlock(const QString& endingString) { m_endingStr.push_back(std::move(endingString)); }
+    inline void deleteEndingStringBlockMember(size_t index) {
         if (index < m_endingStr.size()) {
             m_endingStr.erase(m_endingStr.begin() + index);
         }
     }
-    void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }
+    inline void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }
 
-    bool isInverted() const                          { return m_invertDirection; }
-    void setIsInverted(const bool invertedDirection) { m_invertDirection = invertedDirection; }
+    inline bool isInverted() const                          { return m_invertDirection; }
+    inline void setIsInverted(const bool invertedDirection) { m_invertDirection = invertedDirection; }
 
-    CharTypeToGet getCharTypeToGet() const             { return m_charTypeToGet; }
-    void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
+    inline CharTypeToGet getCharTypeToGet() const             { return m_charTypeToGet; }
+    inline void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
 
-    const QString& getToAllow() const { return m_toAllow; }
-    void setToAllow(QString toAllow)  { m_toAllow = toAllow; }
+    inline const QString& getToAllow() const { return m_toAllow; }
+    inline void setToAllow(QString toAllow)  { m_toAllow = toAllow; }
 
-    const QString& getToAvoid() const       { return m_toAvoid; }
-    void setToAvoid(const QString& toAvoid) { m_toAvoid = toAvoid; }
+    inline const QString& getToAvoid() const       { return m_toAvoid; }
+    inline void setToAvoid(const QString& toAvoid) { m_toAvoid = toAvoid; }
 
-    const QString& getToReplace() const         { return m_toReplace; }
-    void setToReplace(const QString& toReplace) { m_toReplace = toReplace; }
+    inline const QString& getToReplace() const         { return m_toReplace; }
+    inline void setToReplace(const QString& toReplace) { m_toReplace = toReplace; }
 
-    const QString& getReplaceFor() const          { return m_replaceFor; }
-    void setReplaceFor(const QString& replaceFor) { m_replaceFor = replaceFor; }
+    inline const QString& getReplaceFor() const          { return m_replaceFor; }
+    inline void setReplaceFor(const QString& replaceFor) { m_replaceFor = replaceFor; }
 
     // SERIALIZATION
     void serialize(std::ofstream& out)  const override;

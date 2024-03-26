@@ -14,7 +14,7 @@ class CDocument {
 public:
     // Constructors and destructors
     CDocument();
-    CDocument(const QString& docName);
+    explicit CDocument(const QString& docName);
     virtual ~CDocument();
 
 protected:
@@ -23,8 +23,8 @@ protected:
 
 public:
     // Getters and setters
-    QString getDocName()             { return m_docName; }
-    void setDocName(QString docName) { m_docName = docName; }
+    const QString& getDocName() const       { return m_docName; }
+    void setDocName(const QString& docName) { m_docName = docName; }
 };
 
 #endif // CDOCUMENT_H

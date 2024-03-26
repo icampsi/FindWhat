@@ -5,13 +5,10 @@
 
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
+
 #include <QString>
 #include <QWidget>
 #include <fstream>
-
-#include <type_traits> // for std::is_same
-#include <QString>     // for QString
-
 
 QString getUserHomeDirectory();
 
@@ -55,7 +52,6 @@ namespace SerializationUtils {
         }
     }
 
-
     template<typename Container>
     void writeCustomQStringContainer(std::ofstream& out, const Container& container) {
         size_t size = container.size();
@@ -97,14 +93,13 @@ namespace SerializationUtils {
     void readPrimitiveContainer(std::ifstream& in, primContainer& container) {
         size_t size;
         in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
-        for (int i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             typename primContainer::value_type item;
             in.read(reinterpret_cast<char*>(&item), sizeof(typename primContainer::value_type));
             container.push_back(item);
         }
     }
 }
-
 
 namespace SystemUtils {
 // Declaration of global variable

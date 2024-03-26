@@ -13,7 +13,7 @@
 class WEsquemaListView : public QListWidget {
     Q_OBJECT
 public:
-    WEsquemaListView(QWidget *parent);
+    explicit WEsquemaListView(QWidget *parent);
     void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting elements
 
 signals:
@@ -21,7 +21,6 @@ signals:
 
 public slots:
     void handleDeleteEsquema(const size_t index) {
-        // Remove the item from the list widget
         QListWidgetItem *item = takeItem(static_cast<int>(index));
         delete item;
     }

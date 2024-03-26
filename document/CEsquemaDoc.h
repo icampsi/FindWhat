@@ -15,12 +15,11 @@ public:
     ~CEsquemaDoc() override;
 
     // Getters
-    CEsquema* getEsquema() const;
+    CEsquema* getEsquema() const { return m_esquema; }
 
 protected:
     // Members
     CEsquema* m_esquema = nullptr; // The associated esquema to this doc.
 };
-
 
 #endif // CESQUEMADOC_H

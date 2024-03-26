@@ -11,5 +11,3 @@ CEsquemaDoc::~CEsquemaDoc()  {
     delete m_esquema;
     m_esquema = nullptr;
 }
-
-CEsquema* CEsquemaDoc::getEsquema() const { return m_esquema; }

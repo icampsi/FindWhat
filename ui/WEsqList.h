@@ -19,7 +19,10 @@ signals:
 
 public:
     void newEsquema(PEsquemaPage *page, CEsquema *esquema);
-    void delEsq(const size_t index);
+    void delEsq(const size_t index) {
+        QListWidgetItem *item = takeItem(static_cast<int>(index));
+        delete item;
+    }
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

@@ -4,9 +4,11 @@
  * =================================================== */
 
 #include "CFunctionClasses.h"
-#include "CFormula.h"
+
 #include <fstream>
+
 #include "utils/GeneralFunctions.h"
+#include "CFormula.h"
 
 CFunction::CFunction(Action functionType, CFormula *parent) : m_action{ functionType }, m_parent{parent} {
     switch(m_action) {

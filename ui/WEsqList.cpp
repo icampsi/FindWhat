@@ -52,12 +52,6 @@ void WEsqList::newEsquema(PEsquemaPage *page, CEsquema *esquema) {
     setCurrentItem(esquemaItem);
 }
 
-void WEsqList::delEsq(const size_t index) {
-    // Remove the item from the list widget
-    QListWidgetItem *item = takeItem(static_cast<int>(index));
-    delete item;
-}
-
 void WEsqList::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton) {
         QListWidgetItem *item = itemAt(event->pos());

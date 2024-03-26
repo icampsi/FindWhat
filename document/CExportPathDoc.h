@@ -7,10 +7,9 @@
 #define CEXPORTPATHDOC_H
 
 #include "CExportCSV.h"
-#include <vector>
 
+#include <vector>
 #include <QTextStream>
-#include <QMessageBox>
 
 // Document to hold all the information for the export path to follow
 class CExportPathDoc {
@@ -28,7 +27,7 @@ public:
     CExportCSV* createExportCSV();
 
     // Get the size of the vector
-    size_t getExportCSVCount() const;
+    size_t getExportCSVCount() const { return m_exportCSVs.size(); }
 
     // Get a pointer to a specific CExportCSV object by index
     CExportCSV* getExportCSVByIndex(size_t index);

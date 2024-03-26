@@ -9,11 +9,11 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatchIterator>
 
-CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula, std::vector<CData*>& valorsEstatics)
+CEsquema::CEsquema(const QString &nameEsquema, const std::vector<CFormula*>& tExtractDataFormula, const std::vector<CData *> &valorsEstatics)
     : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
-CEsquema::CEsquema(const QString nameEsquema, std::vector<CFormula*> tExtractDataFormula)
+CEsquema::CEsquema(const QString &nameEsquema, const std::vector<CFormula*> &tExtractDataFormula)
     : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula),
     m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
 
@@ -53,7 +53,7 @@ bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlace
     else return true;
 }
 
-void CEsquema::deleteFormula(size_t index) {
+void CEsquema::deleteFormula(const size_t index) {
     if (index < m_extractDataFormula.size()) {
         m_extractDataFormula.erase(m_extractDataFormula.begin() + index);
     } else {
@@ -76,7 +76,7 @@ void CEsquema::deleteStaticData(size_t index) {
     else qDebug() << "Index out of bounds for m_valorsEstatics vector";
 }
 
-void CEsquema::setStaticDataName(CData* data, QString name) {
+void CEsquema::setStaticDataName(CData* data, const QString &name) {
     // Update m_dataMap
     QString oldName = data->getDataName();
     m_dataMap.insert(name, data);
@@ -85,6 +85,17 @@ void CEsquema::setStaticDataName(CData* data, QString name) {
         m_dataMap.insert(name, data);   // Insert the value with the new key
     }
     data->setDataName(name);
+}
+
+void CEsquema::setFormulaName(CFormula* formula, const QString &name) {
+    m_dataMap.insert(name, formula->getData());
+    // Update m_dataMap
+    QString oldName = formula->getDataName();
+    if (m_dataMap.contains(oldName)) {
+        m_dataMap.take(oldName);  // Remove the old key-value pair and get the value
+        m_dataMap.insert(name, formula->getData()); // Insert the value with the new key
+    }
+    formula->setDataName(name);
 }
 
 void CEsquema::constructCsvFormatFormulaStructure(const QString& rLine, char enclosureChar, char separator) {
@@ -256,7 +267,7 @@ void CEsquema::deserliazile(std::ifstream& in) {
 
 // FUTURE UPDATES
 
-// void inline CEsquema::formatDate(QString& data) {
+// void CEsquema::formatDate(QString& data) {
 //     for (unsigned int i{ 0 }; i < data.size(); i++)
 //         if (data.at(i) == '-') data[i] = '/';
 

@@ -5,18 +5,18 @@
 
 #ifndef WESQUEMATREEVIEW_H
 #define WESQUEMATREEVIEW_H
-#include <QApplication>
+
 #include <QTreeView>
+#include <QApplication>
 #include <QStandardItem>
 #include <QKeyEvent>
 #include <QDebug>
-
-#include "QStandardItemModel"
+#include <QStandardItemModel>
 
 class WEsquemaTreeView : public QTreeView {
     Q_OBJECT
 public:
-    WEsquemaTreeView(QWidget *parent = nullptr);
+    explicit WEsquemaTreeView(QWidget *parent = nullptr);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting child elements
@@ -27,8 +27,12 @@ signals:
     void removeSecondLevel(const int index, const QModelIndex &parentIndex);
 
 private slots:
-    void handleDoubleClick(const QModelIndex &index);
-    void handleEditingFinished(const QModelIndex &index, const QString &text);
+    void handleDoubleClick(const QModelIndex &index) {
+        if (index.isValid() && index.parent().isValid()) // Only second level items will be able to be eddited
+            edit(index);
+    }
+
+    void handleEditingFinished(const QModelIndex &index, const QString &text) { emit itemEditingFinished(index, text); }
 };
 
 #endif // WESQUEMATREEVIEW_H

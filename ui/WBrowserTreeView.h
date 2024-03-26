@@ -14,7 +14,7 @@
 class WBrowserTreeView : public QTreeView {
     Q_OBJECT
 public:
-    WBrowserTreeView(QWidget *parent);
+    explicit WBrowserTreeView(QWidget *parent);
 
 protected:
     // Override the selectionChanged method to emit the filePathChanged signal

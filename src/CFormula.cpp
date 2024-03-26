@@ -156,7 +156,7 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
     return m_result;
 }
 
-inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     size_t indexPos_final   = m_result.indexPosition.final;
     size_t indexPos_initial = m_result.indexPosition.initial;
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
@@ -208,7 +208,7 @@ inline int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToAp
     return 0;
 }
 
-inline void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
@@ -265,7 +265,7 @@ void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     if(pFunctionToApply->getOption()) EndLine(pPdfDoc);
 }
 
-inline void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of current line
+void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of current line
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
@@ -281,7 +281,7 @@ inline void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggin
     m_result.indexPosition.final = m_result.indexPosition.initial;
 }
 
-inline void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of current line
+void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of current line
     QString text = pPdfDoc->getFullText();
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
@@ -297,7 +297,7 @@ inline void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending o
     m_result.indexPosition.final = m_result.indexPosition.initial;
 }
 
-inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {
+void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {
     for (size_t i = 0; i < thisContainer->size(); ++i) {
         if (thisContainer->at(i).getDataName() == pFunctionToApply->getText()) {
             m_result.result.append(thisContainer->at(i).getDataString());
@@ -305,13 +305,9 @@ inline void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vecto
     }
 }
 
-inline void CFormula::appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends string to m_result
-    if(!pFunctionToApply->getOption()) m_result.result.append(pFunctionToApply->getText());
-    else                               m_result.result.prepend(pFunctionToApply->getText());
-}
 
 // Functions related to CMathFunction are still unused and not working
-inline bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
+bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
 
     QString sortedVal2;
     QString unitatsStrVal1{ "0" };
@@ -515,7 +511,7 @@ void CFormula::deleteFunction(const size_t index) {
     }
 }
 
-void CFormula::reorderFunctionPath(size_t objectToMoveIndex, size_t destinationIndex) {
+void CFormula::reorderFunctionPath(const size_t objectToMoveIndex, const size_t destinationIndex) {
     if (objectToMoveIndex >= m_formulaPath.size() || destinationIndex >= m_formulaPath.size()) {
         qDebug() << "Invalid object index or destination index";
         return;

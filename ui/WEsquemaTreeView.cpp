@@ -44,14 +44,3 @@ void WEsquemaTreeView::keyPressEvent(QKeyEvent *event) {
         QTreeView::keyPressEvent(event);
     }
 }
-
-void WEsquemaTreeView::handleDoubleClick(const QModelIndex &index) {
-    // Only second level items will be able to be eddited
-    if (index.isValid() && index.parent().isValid())
-        edit(index);
-}
-
-void WEsquemaTreeView::handleEditingFinished(const QModelIndex &index, const QString &text) {
-    // Emit a new signal to send the information further
-    emit itemEditingFinished(index, text);
-}

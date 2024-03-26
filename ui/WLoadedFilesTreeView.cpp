@@ -4,8 +4,11 @@
  * =================================================== */
 
 #include "WLoadedFilesTreeView.h"
-#include "qfileinfo.h"
-#include "qmimedata.h"
+
+#include <QMessageBox>
+#include <QKeyEvent>
+#include <QMimeData>
+#include <QFileInfo>
 
 WLoadedFilesTreeView::WLoadedFilesTreeView(QWidget* parent) : QTreeView(parent), m_model() {
     setModel(&m_model);

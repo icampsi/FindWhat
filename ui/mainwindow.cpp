@@ -4,7 +4,6 @@
  * =================================================== */
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -68,13 +67,6 @@ MainWindow::~MainWindow() {
     delete ui;
     delete m_dockPreview;
 }
-
-// PUBLIC FUNCTIONS ----------------------------------------------------
-void MainWindow::loadEsquema(CEsquemaDoc* esquemaDoc) {
-    ui->mainEsquemaUI->newEsquema(esquemaDoc);
-}
-
-
 
 // MENU ACTIONS --------------------------------------------------------
 void MainWindow::action_newEsquema() {

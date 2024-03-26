@@ -13,6 +13,7 @@
 #include "utils/GeneralFunctions.h"
 
 #include "src/CData.h"
+#include "src/CEsquema.h"
 
 #include "document/CMDoc.h"
 #include "document/CPdfDoc.h"

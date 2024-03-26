@@ -5,6 +5,7 @@
 
 #include "CDocument.h"
 #include "CMDoc.h"
+
 CDocument::CDocument() {}
 
 CDocument::CDocument(const QString& docName) : m_docName{docName} {}

@@ -18,7 +18,7 @@ public:
 
     ~PTabTextPreview();
 
-    void setPreviewText(const QString& text);
+    void setPreviewText(const QString& text) { setPlainText(text); }
 
     // BOOKMARK - Needs real implementation
     void setShowWS_NL_T(const bool enable);

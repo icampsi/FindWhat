@@ -12,16 +12,16 @@ class CFormula;
 
 class CData {
 protected:
-    QString   m_dataName{ "" };   // Nom de la dada
-    QString   m_dataString{ "" }; // Dada
+    QString   m_dataName{ "" };   // Data Name
+    QString   m_dataString{ "" }; // Value
     CFormula *m_parentFormula = nullptr;
 
 public:
     // CONSTURCTORS AND DESTRUCTORS
-    CData(const QString& dataName, const QString& dataString = "", CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{dataString}, m_parentFormula{parent} {}
-    CData(const QString& dataName, CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{""}, m_parentFormula{parent} {}
-    CData(std::ifstream& in, CFormula* parent = nullptr) : m_parentFormula{parent} { CData::deserialize(in); } // Serialization constructor
-    CData(const CData& other, CFormula *parent = nullptr);
+    explicit CData(const QString& dataName, const QString& dataString = "", CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{dataString}, m_parentFormula{parent} {}
+    explicit CData(const QString& dataName, CFormula* parent = nullptr) : m_dataName{dataName}, m_dataString{""}, m_parentFormula{parent} {}
+    explicit CData(std::ifstream& in, CFormula* parent = nullptr) : m_parentFormula{parent} { CData::deserialize(in); } // Serialization constructor
+    explicit CData(const CData& other, CFormula *parent = nullptr);
     ~CData() = default;
 
     CData& operator=(const CData& other);
@@ -30,8 +30,8 @@ public:
     const QString& getDataName() const        { return m_dataName;     }
     void setDataName(const QString& dataName) { m_dataName = dataName; }
 
-    const QString& getDataString() const      { return m_dataString;       }
-    void setDataString(QString dataString)    { m_dataString = dataString; }
+     const QString& getDataString() const          { return m_dataString;       }
+    void setDataString(const QString& dataString) { m_dataString = dataString; }
 
     CFormula *getParentFormula() const       { return m_parentFormula;   }
     void setParentFormula(CFormula* parent)  { m_parentFormula = parent; }
@@ -52,9 +52,6 @@ public:
 
     // void setData(QString data);
     // void comaToDot(QString& textWithComa, QString& emptyStr);
-
-    // CData(QString dataName, QString dataString, DataType dataType, QString assocBegin, QString assocEnd);
-    // CData(QString dataName, QString dataString, DataType dataType);
 };
 
 #endif // CDATA_H
