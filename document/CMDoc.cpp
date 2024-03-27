@@ -45,7 +45,7 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
     }
 }
 
-void CMDoc::deleteEsquema(size_t index) {
+void CMDoc::deleteEsquema(const size_t index) {
     if (index >= m_loadedEsquemaDocs.size()) {
         qDebug() << "Esquema out of range for deletition";
         return;
@@ -58,12 +58,17 @@ void CMDoc::deleteEsquema(size_t index) {
 
 // SERIALIZATOIN
 void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
+    // BOOKMARK - use template function but neeed to add serialization to esquema doc
+    // SerializationUtils::writeCustomContainer(out, m_loadedEsquemaDocs);
+
     size_t loadedEsquemaDocsSize = m_loadedEsquemaDocs.size();
     out.write(reinterpret_cast<const char*>(&loadedEsquemaDocsSize), sizeof(size_t));
 
     for(CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
         esquemaDoc->getEsquema()->serialize(out);
     }
+
+    m_exportPathDoc.serialize(out);
 }
 
 void CMDoc::serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc) {
@@ -74,7 +79,12 @@ void CMDoc::serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc) {
 }
 
 
-void CMDoc::deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
+void CMDoc::deserializeSession(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
+    deserializeEsquema(in, loadedEsquemaDocs);
+    m_exportPathDoc.deserialize(in);
+}
+
+void CMDoc::deserializeEsquema(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs) {
     size_t loadedEsquemaDocsSize;
     in.read(reinterpret_cast<char*>(&loadedEsquemaDocsSize), sizeof(size_t));
     for (size_t i{0}; i < loadedEsquemaDocsSize; i++) {

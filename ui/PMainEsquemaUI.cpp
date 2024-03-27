@@ -31,7 +31,10 @@ PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     connect(ui->toolBar, &WToolBarEsquema::previewOptionChanged, this, &PMainEsquemaUI::esquemaOptionChanged);
 
     // Set esquemaPage to empty and remove .ui generated toolBox_formatEsquema page
+    ui->stackedWidget_esquemaPage->addWidget(&m_emptyPage);
     setCurrentPageToEmptyPage();
+    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+
     ui->toolBox_formatEsquema->removeItem(0); // Needed since the .ui file interface doesent allow for empty pages in the toolbox widget
 
     // Disable "export CSV" and "delete esquema" buttons if no toolbox pages are loaded
@@ -51,12 +54,11 @@ void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
     ui->esqList->newEsquema(newPage, esquema);
 }
 
-void PMainEsquemaUI::on_pushButton_addEsquema_clicked() {
-    // Disable the button until actions are finished so there are no conflicts witht he document types we acces on the toolboxpage constructor
-    ui->pushButton_addEsquema->setEnabled(false);
+void PMainEsquemaUI::addExportCSV(CExportCSV *exportCSV) {
+
     // Create a new CExport and a ToolBox page instances and binds them together
-    PFormExpToolBoxPage *newToolBoxPage = new PFormExpToolBoxPage(ui->toolBox_formatEsquema);
-    ui->toolBox_formatEsquema->addItem(newToolBoxPage, "New Page"); // Still need a way to rename pages so it has more sense. Maybe with the name of the used Esquema on this page
+    PFormExpToolBoxPage *newToolBoxPage = new PFormExpToolBoxPage(ui->toolBox_formatEsquema, exportCSV);
+    ui->toolBox_formatEsquema->addItem(newToolBoxPage, "New Page"); // BOOKMARK - Still need a way to rename pages so it has more sense. Maybe with the name of the used Esquema on this page
     ui->toolBox_formatEsquema->setCurrentWidget(newToolBoxPage);
 
     // Enable export esquema button if any page is loaded
@@ -69,8 +71,15 @@ void PMainEsquemaUI::on_pushButton_addEsquema_clicked() {
         ui->DeleteEsquema->setEnabled(true);
         break;
     }
+}
 
-    ui->pushButton_addEsquema->setEnabled(true);
+void PMainEsquemaUI::on_pushButton_addPage_clicked() {
+    // Disable the button until actions are finished so there are no conflicts witht he document types we acces on the toolboxpage constructor
+    ui->pushButton_addPage->setEnabled(false);
+
+    addExportCSV(nullptr);
+
+    ui->pushButton_addPage->setEnabled(true);
 }
 
 void PMainEsquemaUI::on_DeleteEsquema_clicked() {
@@ -155,10 +164,4 @@ void PMainEsquemaUI::handleDeleteEsquema(const size_t index) {
     CMDoc::getMDoc().deleteEsquema(index);
     // Perform a check in main window for disableing Export Esquema menu action if needed
     qobject_cast<MainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
-}
-
-void PMainEsquemaUI::setCurrentPageToEmptyPage() {
-    ui->stackedWidget_esquemaPage->addWidget(&m_emptyPage);
-    ui->stackedWidget_esquemaPage->setCurrentWidget(&m_emptyPage);
-    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
 }

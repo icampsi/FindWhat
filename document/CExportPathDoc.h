@@ -24,7 +24,10 @@ private:
 public:
     // INTERFACE FOR m_exportCSVs
     // Create a new CExportCSV object and return a pointer to it
-    CExportCSV* createExportCSV();
+    CExportCSV* createExportCSV() {
+        m_exportCSVs.emplace_back(new CExportCSV());
+        return m_exportCSVs.back();
+    }
 
     // Get the size of the vector
     size_t getExportCSVCount() const { return m_exportCSVs.size(); }
@@ -36,5 +39,9 @@ public:
 
     // Creates a .csv File from a xsvStringStructure
     void xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator);
+
+    // SERIALIZATION
+    void serialize(std::ofstream &out) const;
+    void deserialize(std::ifstream &in);
 };
 #endif // CEXPORTPATHDOC_H

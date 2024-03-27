@@ -10,17 +10,13 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QMessageBox>
+#include <fstream>
 
 // EXPORTPATHDOC
 CExportPathDoc::~CExportPathDoc() {
     for (auto* exportCSV : m_exportCSVs) {
         delete exportCSV;
     }
-}
-
-CExportCSV* CExportPathDoc::createExportCSV() {
-    m_exportCSVs.emplace_back(new CExportCSV());
-    return m_exportCSVs.back();
 }
 
 CExportCSV* CExportPathDoc::getExportCSVByIndex(size_t index) {
@@ -64,4 +60,24 @@ void CExportPathDoc::xsvm_stringStructureToFile(const QString& fileName, std::ve
         out << '\n';
     }
     QMessageBox::information(nullptr, "Succes!", ".csv file created succesfully");
+}
+
+// SERIALIZATION
+void CExportPathDoc::serialize(std::ofstream &out) const {
+    size_t m_exportCSVsSize = m_exportCSVs.size();
+    out.write(reinterpret_cast<const char*>(&m_exportCSVsSize), sizeof(size_t));
+
+    for(CExportCSV *exportCSV : m_exportCSVs) {
+        exportCSV->serialize(out);
+    }
+}
+
+void CExportPathDoc::deserialize(std::ifstream &in) {
+    size_t m_exportCSVsSize;
+    in.read(reinterpret_cast<char*>(&m_exportCSVsSize), sizeof(size_t));
+
+    for(size_t i{ 0 }; i < m_exportCSVsSize; i++) {
+        CExportCSV *exportCSV = new CExportCSV(in);
+        m_exportCSVs.push_back(exportCSV);
+    }
 }

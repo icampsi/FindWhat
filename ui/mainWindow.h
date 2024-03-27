@@ -50,17 +50,22 @@ private slots:
     void action_saveSession();
     void action_importEsquema();
     void action_exportEsquema();
-    void inline action_showPreviewPanel();
-    void inline action_showFileBrowserPanel();
+
+    void action_showPreviewPanel() {
+        if(m_dockPreview->isHidden()) m_dockPreview->show();
+        else                          m_dockPreview->hide();
+    }
+
+    void action_showFileBrowserPanel() {
+        if(ui->dockWidget_fileBrowser->isHidden()) ui->dockWidget_fileBrowser->show();
+        else                                       ui->dockWidget_fileBrowser->hide();
+    }
 
     // Widget slots
     void on_btn_changeRoot_clicked();
 
 public slots:
-    inline void functionUpdated(CFormula::IndexPosition index, const QString& result) {
-        m_dockPreview->handleFunctionUpdated(index, result);
-    }
-
+    void functionUpdated(CFormula::IndexPosition index, const QString& result) { m_dockPreview->handleFunctionUpdated(index, result); }
     void checkExortEsquemaActionEnable();
 
 public:

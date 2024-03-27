@@ -10,16 +10,19 @@
 
 class CEsquemaDoc : public CDocument {
 public:
-    // Constructors and destructors
+    // CONSTRUCTORS&DESTRUCTORS
     CEsquemaDoc(CEsquema* esquema);
     ~CEsquemaDoc() override;
 
-    // Getters
+    // GETTERS
     CEsquema* getEsquema() const { return m_esquema; }
 
 protected:
-    // Members
+    // MEMBERS
     CEsquema* m_esquema = nullptr; // The associated esquema to this doc.
+
+    // SERIALIZATION
+
 };
 
 #endif // CESQUEMADOC_H

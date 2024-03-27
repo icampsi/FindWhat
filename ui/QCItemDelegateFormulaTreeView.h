@@ -7,6 +7,7 @@
 
 class QCItemDelegateFormulaTreeView : public QStyledItemDelegate {
     Q_OBJECT
+
 signals:
     void editingFinished(const QModelIndex &index, const QString &text) const;
 

@@ -4,43 +4,50 @@
  * =================================================== */
 
 #include "PFormExpToolBoxPage.h"
-#include "ui_PFormExpToolBoxPage.h"
 
-#include "QComboBox"
+#include <QComboBox>
 
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
 
-PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::PExpFormToolBoxPage)
+PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
+    : QWidget(parent), ui(new Ui::PExpFormToolBoxPage), m_exportCSV{exportCSV}
 {
+    // BOOKMARK - Right now this constructor is used whether we are creating a new page or loading it. Maybe I should create one for each of those cases.
     ui->setupUi(this);
+    ui->lineEdit_renameDocs->setEnabled(false);
 
-    // Initiallize m_exportCSV
-    m_exportCSV = CMDoc::getMDoc().getExportPathDoc().createExportCSV();
-    // Set up observer for changes in the esquema list,
-    // so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index
-    CMDoc::getMDoc().addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1));
-    connect(ui->TreeList_files, &WLoadedFilesTreeView::contentChanged, this, &PFormExpToolBoxPage::handlePathContentChanged);
+    CMDoc &cmdoc = CMDoc::getMDoc();
+    // Initialize m_exportCSV
+    if(!m_exportCSV) m_exportCSV = cmdoc.getExportPathDoc().createExportCSV();
 
     // Get all loaded esquemes for initial comboBox setup
-    const std::vector<CEsquemaDoc*> *esquemadocs = CMDoc::getMDoc().getLoadedEsquemaDocs();
+    const std::vector<CEsquemaDoc*> *esquemadocs = cmdoc.getLoadedEsquemaDocs();
+
+    {
+        QString assocEsquemaName("");
+        if(exportCSV) {
+            assocEsquemaName = exportCSV->getAsocEsquemaDoc()->getEsquema()->getName();
+            updateFields();
+        }
+        // Add Esquema names to the combo box
+        for (const CEsquemaDoc *esquemaDoc : *esquemadocs) {
+            ui->comboBox_esquemaName->addItem(esquemaDoc->getEsquema()->getName());
+        }
+        if(!assocEsquemaName.isEmpty()) { // Update esquema name if there was any
+            ui->comboBox_esquemaName->setCurrentText(assocEsquemaName);
+        }
+    }
+
+    // Set up observer for changes in the esquema list,
+    // so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index
+    cmdoc.addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1));
+    connect(ui->TreeList_files, &WLoadedFilesTreeView::contentChanged, this, &PFormExpToolBoxPage::handlePathContentChanged);
 
     // If there are loaded Esquema documents, associate the first one with the export CSV
-    if (!esquemadocs->empty()) {
+    if (!esquemadocs->empty() && m_exportCSV->getAsocEsquemaDoc() == nullptr) {
         m_exportCSV->setAsocEsquemaDoc(esquemadocs->front());
     }
-
-    // Add Esquema names to the combo box
-    for (const auto esquemaDoc : *esquemadocs) {
-        ui->comboBox_esquemaName->addItem(esquemaDoc->getEsquema()->getName());
-    }
-
-    ui->lineEdit_renameDocs->setEnabled(false);
-}
-
-PFormExpToolBoxPage::~PFormExpToolBoxPage() {
-    delete ui;
 }
 
 void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updatedEsquemaDocList) {
@@ -51,6 +58,17 @@ void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updat
     for(auto& it : updatedEsquemaDocList) {
         ui->comboBox_esquemaName->addItem(it);
     }
+}
+
+void PFormExpToolBoxPage::updateFields() {
+    // Esquema Name
+    ui->comboBox_esquemaName->setCurrentText(m_exportCSV->getAsocEsquemaDoc()->getEsquema()->getName());
+    // Format String
+    ui->lineEdit_formatString->setText(m_exportCSV->getCSVFormat());
+    // Rename Checkbox
+    ui->checkBox_renameDocs->setChecked(m_exportCSV->getRenameParsedPDFFlag());
+    // Rename text formula
+    ui->lineEdit_renameDocs->setText(m_exportCSV->getFileNamePlaceholder());
 }
 
 void PFormExpToolBoxPage::on_comboBox_esquemaName_currentIndexChanged(int index) { // Sets the associated esquema to the one that has the same index in loadedEsquemaDocs
@@ -74,8 +92,4 @@ void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
     }
 }
 
-
-void PFormExpToolBoxPage::on_lineEdit_renameDocs_textChanged(const QString &arg1) {
-    m_exportCSV->setFileNamePlaceholder(arg1);
-}
 

@@ -30,7 +30,7 @@
     <widget class="QComboBox" name="comboBox_esquemaName"/>
    </item>
    <item row="3" column="0">
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="lineEdit_formatString">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Defines formating of the csv exported doc. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Use ',' as a cell separator.&lt;/p&gt;&lt;p&gt;- Use &amp;lt;dataName&amp;gt; to specify placeholders to be replaced&lt;/p&gt;&lt;p&gt;- You can use empty cells by concatenating ','&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Example&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;&amp;lt;data1&amp;gt; someFixedText,&amp;lt;data2&amp;gt;,,,&amp;lt;data3&amp;gt; someMoreFixedText &amp;lt;data2&amp;gt; etc.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>

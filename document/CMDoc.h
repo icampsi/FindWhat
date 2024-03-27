@@ -29,27 +29,23 @@ public:
     CPdfDoc     *newDoc(const QString& filePath);
 
     // GETTERS AND SETTERS
-    CEsquemaDoc *getActiveEsquemaDoc() const { return m_activeEsquema; }
-    CEsquemaDoc *getEsquemaFromIndex(int index) const { return m_loadedEsquemaDocs.at(index); }
-    CPdfDoc     *getActivePdfDoc()     const { return m_activePdfDoc; }
-    const std::vector<CEsquemaDoc*> *getLoadedEsquemaDocs() const { return &m_loadedEsquemaDocs; }
+    CEsquemaDoc *getActiveEsquemaDoc() const                        { return m_activeEsquema; }
+    CEsquemaDoc *getEsquemaFromIndex(const size_t index) const      { return m_loadedEsquemaDocs.at(index); }
+    CPdfDoc     *getActivePdfDoc() const                            { return m_activePdfDoc; }
+    const std::vector<CEsquemaDoc*> *getLoadedEsquemaDocs() const   { return &m_loadedEsquemaDocs; }
 
     void setActiveEsquemaDoc(CEsquemaDoc* esquema) { m_activeEsquema = esquema; }
     void setActivePdfDoc(CPdfDoc* pdfDoc) { m_activePdfDoc = pdfDoc; }
 
     CExportPathDoc& getExportPathDoc() { return m_exportPathDoc; }
 
-    void deleteEsquema(size_t index);
+    void deleteEsquema(const size_t index);
 
     // SERIALIZATION
     void serializeFullEsquemaArray(std::ofstream& out);
     void serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc);
-    void deserialize(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs);
-
-    // No need for that until serialization is fully applied
-    // void loadExportPathDoc(CExportPathDoc exportDoc) {
-    //     m_exportPathDoc = exportDoc;
-    // }
+    void deserializeSession(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs);
+    void deserializeEsquema(std::ifstream& in, std::vector<CEsquemaDoc*> &loadedEsquemaDocs);
 
 private:
     // PRIVATE SINGLETON CONSTRUCTOR
@@ -63,11 +59,11 @@ private:
     CEsquemaDoc *m_activeEsquema = nullptr; // For easy and shared acces on the previewDocWindow only
     CPdfDoc     *m_activePdfDoc  = nullptr; // For easy and shared acces on the previewDocWindow only
 
+    // OBSERVERS ARCHITECTURE
+private:   
     // Vector to store observer functions for Esquema document changes
     std::vector<std::function<void(const std::vector<QString>&)>> m_esquemaDocObservers;
 
-    // OBSERVERS ARCHITECTURE
-private:
     // Notify all registered Esquema document observers
     void esquemaListUpdated();
 

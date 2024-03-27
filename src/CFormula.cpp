@@ -149,7 +149,9 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
             extractData(pPdfDoc, pExctractingFunction);
             break;
         }
-        if(static_cast<int>(m_formulaPath.size() - 1) == to) *halfWayResult =  m_result;
+        if(halfWayResult) {
+            if(static_cast<int>(m_formulaPath.size() - 1) == to) *halfWayResult =  m_result;
+        }
     }
     //thisContainer	= nullptr;
     m_data.setDataString(m_result.result);

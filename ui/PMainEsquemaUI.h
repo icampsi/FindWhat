@@ -13,6 +13,8 @@
 #include "PEsquemaPage.h"
 #include "ui_PMainEsquemaUI.h"
 
+class CExportCSV;
+
 namespace Ui { class PMainEsquemaUI; }
 
 // Edition interface for esquema. Each esquema would have it's own instance of this widget
@@ -27,17 +29,18 @@ public:
     // PUBLIC FUNCTIONS
     void newEsquema(CEsquemaDoc* esquemaDoc);
     void changeCurrentPage(PEsquemaPage* page) { ui->stackedWidget_esquemaPage->setCurrentWidget(page); }
+    void addExportCSV(CExportCSV *exportCSV);
 
 private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
-    void on_pushButton_addEsquema_clicked();
+    void on_pushButton_addPage_clicked();
     void on_DeleteEsquema_clicked();
     void on_pushButton_ExportCSV_clicked();
 
 public slots:
     void handleDeleteEsquema(const size_t index);
     void handleFilePathChanged(const QString &filePath);
-    void setCurrentPageToEmptyPage(); // Sets the current page to empty page inc ase no esquemas are loaded
+    void setCurrentPageToEmptyPage() { ui->stackedWidget_esquemaPage->setCurrentWidget(&m_emptyPage); } // Sets the current page to empty page in case no esquemas are loaded
 
 private:
     Ui::PMainEsquemaUI *ui;

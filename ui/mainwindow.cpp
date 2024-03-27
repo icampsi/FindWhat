@@ -9,7 +9,6 @@
 #include <QFileDialog>
 #include <fstream>
 #include <QMessageBox>
-#include <QFileDialog>
 
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
@@ -97,7 +96,7 @@ void MainWindow::action_loadSession() {
     std::ifstream file(fileName.toStdString(), std::ios::binary);
     if (file.is_open()) {
         std::vector<CEsquemaDoc*> loadedEsquemaDocs;
-        m_cmdoc.deserialize(file, loadedEsquemaDocs);
+        m_cmdoc.deserializeSession(file, loadedEsquemaDocs);
         file.close();
         for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
             loadEsquema(esquemaDoc);
@@ -107,6 +106,12 @@ void MainWindow::action_loadSession() {
         QString errorString = "Couldn't open file " + fileName;
         QMessageBox::critical(this, "Error", errorString);
     }
+
+    for(size_t i{ 0 }; i < m_cmdoc.getExportPathDoc().getExportCSVs().size(); i++) {
+        CExportCSV* exportCSV = m_cmdoc.getExportPathDoc().getExportCSVByIndex(i);
+        ui->mainEsquemaUI->addExportCSV(exportCSV);
+    }
+
 }
 
 void MainWindow::action_saveSession() {
@@ -128,7 +133,7 @@ void MainWindow::action_importEsquema() {
     std::ifstream file(fileName.toStdString(), std::ios::binary);
     if (file.is_open()) {
         std::vector<CEsquemaDoc*> loadedEsquemaDocs;
-        m_cmdoc.deserialize(file, loadedEsquemaDocs);
+        m_cmdoc.deserializeEsquema(file, loadedEsquemaDocs);
         file.close();
         for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
             loadEsquema(esquemaDoc);
@@ -165,16 +170,6 @@ void MainWindow::action_exportEsquema() {
         QString errorString = "Couldn't save file " + fileName;
         QMessageBox::critical(this, "Error", errorString);
     }
-}
-
-void MainWindow::action_showPreviewPanel() {
-    if(m_dockPreview->isHidden()) m_dockPreview->show();
-    else                          m_dockPreview->hide();
-}
-
-void MainWindow::action_showFileBrowserPanel() {
-    if(ui->dockWidget_fileBrowser->isHidden()) ui->dockWidget_fileBrowser->show();
-    else                                       ui->dockWidget_fileBrowser->hide();
 }
 
 void MainWindow::on_btn_changeRoot_clicked() {

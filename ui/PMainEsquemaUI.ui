@@ -110,7 +110,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton_addEsquema">
+              <widget class="QPushButton" name="pushButton_addPage">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
