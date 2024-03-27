@@ -32,6 +32,7 @@ private slots:
     void on_checkBox_renameDocs_stateChanged(int arg1);
     void on_lineEdit_formatString_textChanged(const QString &arg1) { m_exportCSV->setCSVFormat(arg1); }
     void on_lineEdit_renameDocs_textChanged(const QString &arg1)   { m_exportCSV->setFileNamePlaceholder(arg1); }
+    void on_lineEdit_actOnlyIf_textChanged(const QString &arg1)    { m_exportCSV->setIdText(arg1); }
 
 private:
     // MEMBERS

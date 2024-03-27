@@ -40,7 +40,6 @@ protected:
     std::vector<size_t> m_dataForCheck2; // For the future. Índex dels valors que volem fer check. L'últim és el valor a comparar.
 
     QMap<QString, CData*>  m_dataMap;             // This maps every CData structure with it's name for efficient lookup. This includes also data from inside every CFormula in the t_extractDataFormula
-    QString                m_outputDirectori;     // { "LLUM\\" }  // where to save the pdf file
 
 public:
     void renameFile(const char* oldName, const char* newName);

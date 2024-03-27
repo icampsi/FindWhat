@@ -20,22 +20,42 @@
 void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog) {
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
 
+    int iteration{ 0 };
     for (QString& filePath : m_pdfFilePaths) {
-        CPdfDoc* pdfDoc = new CPdfDoc(filePath);
+        CPdfDoc* pdfDoc = nullptr; // Initialize pointer to nullptr
+
+        try {
+            pdfDoc = new CPdfDoc(filePath); // Attempt to create pdfDoc
+        }
+        catch (const std::exception& e) {
+            // Handle any exceptions that occurred during CPdfDoc construction
+            delete pdfDoc; // Clean up allocated memory
+            QMessageBox::warning(nullptr, "Error", QString("Failed to process file: %1\nError: %2").arg(filePath, e.what()));
+            continue; // Move to the next iteration
+        }
+
+        // check if ID text is present, else break iteration
+        if (!m_idText.isEmpty() && std::find(pdfDoc->getFullText().begin(), pdfDoc->getFullText().end(), m_idText) != pdfDoc->getFullText().end()) {
+            delete pdfDoc;
+            continue;
+        }
+
+        // Add extracted structure to the vector
         esquema->generateXSVStringStructure(pdfDoc);
         for (auto& j : esquema->getXSVStringStructureResult()) {
             xsvStructure->push_back(j);
         }
-        if (m_renameParsedPDFFlag) {
-            renameFile(filePath); // Rename document if flag enabled
-        }
 
-        // Update progress bar and process events at regular intervals
-        progressDialog->updateProgress();
+        // Rename document if flag enabled
+        if (m_renameParsedPDFFlag) renameFile(filePath);
+        // Update progress bar every other iteration to avoid overhead
+        if (iteration % 2 == 0) progressDialog->updateProgress();
+
+        ++iteration;
         delete pdfDoc;
     }
+    progressDialog->updateProgress(); // Final update to ensure it doesn't get stuck on 99%
 }
-
 
 void CExportCSV::reOrderFiles(size_t fileToMoveIndex, size_t targetPositionIndex) {
     if (fileToMoveIndex >= m_pdfFilePaths.size() || targetPositionIndex >= m_pdfFilePaths.size())

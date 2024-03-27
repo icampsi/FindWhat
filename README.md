@@ -67,16 +67,14 @@ Note: Because of that, serialization temporaly doesen't work properly.
 - Fixed some minor bugs.
 - Cleaned code.
 
-# Future updates
+# Planned future updates
 - A feature to Relocate or copy parsed PDF files to another folder.
-- Functionality to specify a destination location for extracted CSV files.
 - Add a check to see if a file you want to load is corrupted so the program doesen't crash if you do so.
 - Functionality to ensure that no two formulas or static data have the same name (right now it's a mess if you do that).
 - Additional functions to enhance capabilities related to extracting variables from the pdf.
 - Implementation of a verification mechanism to ensure the accuracy of extracted variables, with user notification for possible discrepancies.
 - Improvement of the CSV structure definition method to mitigate user errors.
 - Integration of tooltips, text placeholders, and other user-friendly navigation aids.
-- Continued code refinement, reorganization, and documentation for enhanced clarity and maintainability.
 - Visual enchancing
 
 # Licencing

@@ -113,12 +113,12 @@ void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
         return;
     }
 
+    // FILE BROWSE DIALOG FOR NAMING EXPORTED FILE
     // Open a file dialog for saving exported csv file
     QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Coma separated values (*.csv)");
-
     // Return if canceled
     if (saveCSVFileName.isEmpty()) { return; }
-
+    ///////////////////////////////////////////////
 
     ui->pushButton_ExportCSV->setEnabled(false);
     std::vector<std::vector<QString>> xsvStructure;

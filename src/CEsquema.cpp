@@ -11,11 +11,11 @@
 
 CEsquema::CEsquema(const QString &nameEsquema, const std::vector<CFormula*>& tExtractDataFormula, const std::vector<CData *> &valorsEstatics)
     : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula), m_staticData(valorsEstatics),
-    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2() {}
 
 CEsquema::CEsquema(const QString &nameEsquema, const std::vector<CFormula*> &tExtractDataFormula)
     : m_nameEsquema(nameEsquema), m_extractDataFormula(tExtractDataFormula),
-    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2(), m_outputDirectori() {}
+    m_csvFormatFormulaStructure(), m_XSVStringStructureResult(), m_dataForCheck1(), m_dataForCheck2() {}
 
 CEsquema::~CEsquema() {
     // Delete dynamically allocated CData objects in m_valorsEstatics vector
@@ -202,8 +202,6 @@ void CEsquema::serialize(std::ofstream& out) const {
      * std::vector<unsigned int>        m_dataForCheck1
      * size_t                           size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * size_t                           size of m_outputDirectori
-     * QString                          m_outputDirectori
      *
      * - NO NEED -
      * m_XSVStringStructureResult
@@ -218,7 +216,6 @@ void CEsquema::serialize(std::ofstream& out) const {
 
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::writePrimitiveContainer(out, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::writeQString(out, m_outputDirectori);            // m_outputDirectori
 }
 
 void CEsquema::deserliazile(std::ifstream& in) {
@@ -233,8 +230,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
      * std::vector<unsigned int>        m_dataForCheck1
      * size_t                           size of m_dataForCheck2
      * std::vector<unsigned int>        m_dataForCheck2
-     * size_t                           size of m_outputDirectori
-     * QString                          m_outputDirectori
      *
      * - RECONSTRUCTION -
      * m_csvFormatFormula       - RECONSTRUCTED ON DESERIALIZATION from m_fileNameFormula
@@ -261,7 +256,6 @@ void CEsquema::deserliazile(std::ifstream& in) {
     // SerializationUtils::readCustomContainer(in, m_valorsEstatics, this);     // m_valorsEstatics
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck1);   // m_dataForCheck1
     SerializationUtils::readPrimitiveContainer(in, m_dataForCheck2);   // m_dataForCheck2
-    SerializationUtils::readQString(in, m_outputDirectori);            // m_outputDirectori
 }
 
 

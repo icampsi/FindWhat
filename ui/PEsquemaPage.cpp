@@ -161,16 +161,19 @@ void PEsquemaPage::updateFunctionProcess() {
         ui->plainTextEdit_resultToSelectedFunction->setPlainText(result.result);
 
         {
-            size_t initialIndex = result.indexPosition.initial;
-            size_t finalIndex   = result.indexPosition.final;
-            emit functionUpdated(CFormula::IndexPosition{ initialIndex, finalIndex },  result.result); // BOOKMARK - Could change emit siognature to get onli CFormulaResult
+            size_t initialIndex = halfResult.indexPosition.initial;
+            size_t finalIndex   = halfResult.indexPosition.final;
+            emit functionUpdated(CFormula::IndexPosition{ initialIndex, finalIndex },  halfResult.result); // BOOKMARK - Could change emit siognature to get onli CFormulaResult
         }
 
         CFunction* function = m_itemFunctionMap[item];
         if(function && function->getFunctionType() == CFunction::Action::ExtractData) {
             ui->textEdit_extractedData->setText(halfResult.result);
-            ui->textEdit_finalResult->setText(result.result);
         }
+
+        // Update result and half result boxes
+        ui->plainTextEdit_resultToSelectedFunction->setPlainText(halfResult.result);
+        ui->textEdit_finalResult->setText(result.result);
     }
 }
 

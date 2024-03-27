@@ -67,6 +67,8 @@ void PFormExpToolBoxPage::updateFields() {
     ui->lineEdit_formatString->setText(m_exportCSV->getCSVFormat());
     // Rename Checkbox
     ui->checkBox_renameDocs->setChecked(m_exportCSV->getRenameParsedPDFFlag());
+    // Act only if textBox
+    ui->lineEdit_actOnlyIf->setText(m_exportCSV->getIdText());
     // Rename text formula
     ui->lineEdit_renameDocs->setText(m_exportCSV->getFileNamePlaceholder());
 }
@@ -91,5 +93,4 @@ void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
         ui->lineEdit_renameDocs->setEnabled(false);
     }
 }
-
 

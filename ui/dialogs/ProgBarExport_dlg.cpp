@@ -20,6 +20,6 @@ ProgBarExport_dlg::~ProgBarExport_dlg() {
 }
 
 void ProgBarExport_dlg::updateProgress() {
-    ui->progressBar->setValue(ui->progressBar->value() + 1);
+    ui->progressBar->setValue(ui->progressBar->value() + 2);
 }
 

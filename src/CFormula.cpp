@@ -149,8 +149,9 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
             extractData(pPdfDoc, pExctractingFunction);
             break;
         }
+        // Check if we reached "to" and update halfwayResult if so.
         if(halfWayResult) {
-            if(static_cast<int>(m_formulaPath.size() - 1) == to) *halfWayResult =  m_result;
+            if(static_cast<int>(i) == to) *halfWayResult =  m_result;
         }
     }
     //thisContainer	= nullptr;
@@ -232,7 +233,7 @@ void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
-    int linesToMove = pFunctionToApply->getNum(); // utilitzem un número intern per evitar que canviï el valor dins CFormula, ja que formula ha de ser reutilitzable
+    int linesToMove = pFunctionToApply->getNum();
     // Case when we go back X linesToMove
     if (linesToMove < 0) {
         while (m_result.indexPosition.initial != 0) {
@@ -291,7 +292,6 @@ void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of curre
     while (m_result.indexPosition.initial < static_cast<size_t>(text.size())) {
         m_result.indexPosition.initial++;
         if (text[m_result.indexPosition.initial] == '\n') {
-            m_result.indexPosition.initial--;
             break;
         }
     }
