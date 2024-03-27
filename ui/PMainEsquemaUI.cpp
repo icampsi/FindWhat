@@ -11,6 +11,7 @@
 
 #include <QToolBox>
 #include <QtPreprocessorSupport>
+#include <QFileDialog>
 
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
@@ -106,14 +107,23 @@ void PMainEsquemaUI::on_DeleteEsquema_clicked() {
 }
 
 void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
-    if (CMDoc::getMDoc().getLoadedEsquemaDocs()->size() == 0) {
+    CMDoc& cmdoc = CMDoc::getMDoc();
+    if (cmdoc.getLoadedEsquemaDocs()->size() == 0) {
         QMessageBox::information(this, "Empty esquema", "You need to define at least one esquema to extract data from PDF files");
         return;
     }
+
+    // Open a file dialog for saving exported csv file
+    QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Coma separated values (*.csv)");
+
+    // Return if canceled
+    if (saveCSVFileName.isEmpty()) { return; }
+
+
     ui->pushButton_ExportCSV->setEnabled(false);
     std::vector<std::vector<QString>> xsvStructure;
     // Get all the loaded exportCSV as a vector
-    std::vector<CExportCSV*> exportCSVs = CMDoc::getMDoc().getExportPathDoc().getExportCSVs();
+    std::vector<CExportCSV*> exportCSVs = cmdoc.getExportPathDoc().getExportCSVs();
 
     // Checks the ammount of work that will be needed to set up the progress bar dialog (and to check if actually anything is needed)
     size_t fileCount = 0;
@@ -137,7 +147,7 @@ void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
             xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
         }
         // Create .csv File from the structure
-        CMDoc::getMDoc().getExportPathDoc().xsvm_stringStructureToFile("extractedText.csv", xsvStructure, ',');
+        cmdoc.getExportPathDoc().xsvm_stringStructureToFile(saveCSVFileName, xsvStructure, ',');
         // Delete progress dialog for closing
         delete progressDlg;
         progressDlg = nullptr;
