@@ -25,7 +25,7 @@ QString parseToText(const QString& text);
 
 // CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
 PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
-    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc} {
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc}, m_blockFunUpdate{false} {
     ui->setupUi(this);
 
     model_esquema = new QStandardItemModel();
@@ -45,7 +45,7 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {nullptr} {
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {nullptr}, m_blockFunUpdate{false} {
     ui->setupUi(this);
     ui->frame_esquema->setEnabled(false);
     ui->stackedWidget_general->setCurrentIndex(0);
@@ -102,6 +102,7 @@ void PEsquemaPage::loadFunction() {
     ui->stacked_editFunction->setCurrentIndex(static_cast<int>(function->getFunctionType()) + 1);
 
     updateFunctionProcess();
+    m_blockFunUpdate = true;
 
     CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
@@ -138,10 +139,17 @@ void PEsquemaPage::loadFunction() {
     QString functionName = item->text();
     functionName.replace(function->getFunctionTypeName() + ": ", "");
     ui->lineEdit_functionName->setText(functionName);
+
+    m_blockFunUpdate = false;
 }
 
 void PEsquemaPage::updateFunctionProcess() {
-    if (!m_loadedFormula | !m_activeFunction) return; // We won't be doing any function update if there is no function
+    if (m_blockFunUpdate | !m_loadedFormula | !m_activeFunction) {
+        qDebug() << "update blocked";
+
+        return; // We won't be doing any function update if there is no function
+    }
+    qDebug() << "update Started";
     QListWidgetItem *item = ui->listWidget_formula->currentItem();
 
     // Applay formula up to this selected function

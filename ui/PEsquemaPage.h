@@ -47,6 +47,7 @@ protected:
 
     QStandardItemModel *model_esquema; // Pretty sure this should be deleted in the destructor but program crashes when I try it, even with a check for double deletition. I'll check latter
 
+    bool m_blockFunUpdate;
     void newStaticData();
     void loadEsquema();
 

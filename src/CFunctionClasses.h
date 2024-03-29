@@ -63,10 +63,10 @@ public:
     void setNum(const int num) { m_num = num;  }
 
     bool getOption() const      { return m_option;   }
-    void setOption(bool option) { m_option = option; }
+    void setOption(const bool option) { m_option = option; }
 
     bool getStartFromBeggining() const      { return m_startFromBeggining;   }
-    void setStartFromBeggining(bool option) { m_startFromBeggining = option; }
+    void setStartFromBeggining(const bool option) { m_startFromBeggining = option; }
 
     // SERIALIZATION
     void serialize(std::ofstream& out) const override;
@@ -111,38 +111,38 @@ public:
     virtual ~CExtractingFunction() {}
 
     // GETTERS&SETTERS
-    inline int  getCharsToGet() const         { return m_charsToGet; }
-    inline void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
+    int  getCharsToGet() const         { return m_charsToGet; }
+    void setCharsToGet(int charsToGet) { m_charsToGet = charsToGet; }
 
-    inline int  getCharsToRead() const          { return m_charsToRead; }
-    inline void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
+    int  getCharsToRead() const          { return m_charsToRead; }
+    void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
 
-    inline const std::vector<QString>& getEndingStringBlock() const { return m_endingStr; }
-    inline void addEndingStringBlock(const QString& endingString) { m_endingStr.push_back(std::move(endingString)); }
-    inline void deleteEndingStringBlockMember(size_t index) {
+    const std::vector<QString>& getEndingStringBlock() const { return m_endingStr; }
+    void addEndingStringBlock(const QString& endingString) { m_endingStr.push_back(std::move(endingString)); }
+    void deleteEndingStringBlockMember(size_t index) {
         if (index < m_endingStr.size()) {
             m_endingStr.erase(m_endingStr.begin() + index);
         }
     }
-    inline void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }
+    void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }
 
-    inline bool isInverted() const                          { return m_invertDirection; }
-    inline void setIsInverted(const bool invertedDirection) { m_invertDirection = invertedDirection; }
+    bool isInverted() const                          { return m_invertDirection; }
+    void setIsInverted(const bool invertedDirection) { m_invertDirection = invertedDirection; }
 
-    inline CharTypeToGet getCharTypeToGet() const             { return m_charTypeToGet; }
-    inline void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
+    CharTypeToGet getCharTypeToGet() const             { return m_charTypeToGet; }
+    void setCharTypeToGet(CharTypeToGet charTypeToGet) { m_charTypeToGet = charTypeToGet; }
 
-    inline const QString& getToAllow() const { return m_toAllow; }
-    inline void setToAllow(QString toAllow)  { m_toAllow = toAllow; }
+    const QString& getToAllow() const { return m_toAllow; }
+    void setToAllow(const QString& toAllow)  { m_toAllow = toAllow; }
 
-    inline const QString& getToAvoid() const       { return m_toAvoid; }
-    inline void setToAvoid(const QString& toAvoid) { m_toAvoid = toAvoid; }
+    const QString& getToAvoid() const       { return m_toAvoid; }
+    void setToAvoid(const QString& toAvoid) { m_toAvoid = toAvoid; }
 
-    inline const QString& getToReplace() const         { return m_toReplace; }
-    inline void setToReplace(const QString& toReplace) { m_toReplace = toReplace; }
+    const QString& getToReplace() const         { return m_toReplace; }
+    void setToReplace(const QString& toReplace) { m_toReplace = toReplace; }
 
-    inline const QString& getReplaceFor() const          { return m_replaceFor; }
-    inline void setReplaceFor(const QString& replaceFor) { m_replaceFor = replaceFor; }
+    const QString& getReplaceFor() const          { return m_replaceFor; }
+    void setReplaceFor(const QString& replaceFor) { m_replaceFor = replaceFor; }
 
     // SERIALIZATION
     void serialize(std::ofstream& out)  const override;

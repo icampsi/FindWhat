@@ -31,7 +31,7 @@ void PEndingStringBlock::setupUi() {
     addNewLabel(false);
 }
 
-void PEndingStringBlock::addNewLabel(bool attachRemoveBtn) {
+void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttaching remove button to first lable*/) {
     QHBoxLayout *labelLayout = new QHBoxLayout;
     QTextEdit *textEdit = new QTextEdit(this);
 

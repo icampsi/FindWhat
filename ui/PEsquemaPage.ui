@@ -109,6 +109,9 @@
                 <height>71</height>
                </rect>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Whatever you write here will be a fixed value for this static data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </widget>
             </widget>
             <widget class="QWidget" name="Formula">
@@ -204,7 +207,7 @@
                     <enum>QFrame::Plain</enum>
                    </property>
                    <property name="currentIndex">
-                    <number>5</number>
+                    <number>2</number>
                    </property>
                    <widget class="QWidget" name="NewFunction">
                     <layout class="QGridLayout" name="gridLayout_8"/>
@@ -215,6 +218,9 @@
                       <widget class="QSpinBox" name="spinBox_lookOnlyAtPage">
                        <property name="enabled">
                         <bool>false</bool>
+                       </property>
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Look only at a specific page&lt;/span&gt;. If the document doesen't have so many pages, the full document will be search.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
                        <property name="minimum">
                         <number>1</number>
@@ -297,17 +303,23 @@
                      </item>
                      <item row="4" column="1" colspan="2">
                       <widget class="QComboBox" name="comboBox_setIndexAt">
+                       <property name="minimumSize">
+                        <size>
+                         <width>155</width>
+                         <height>0</height>
+                        </size>
+                       </property>
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify if, when found, you want the index placed before or after the found text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
                        <item>
                         <property name="text">
-                         <string>End String</string>
+                         <string>End of text found</string>
                         </property>
                        </item>
                        <item>
                         <property name="text">
-                         <string>Begin String</string>
+                         <string>Begin of text found</string>
                         </property>
                        </item>
                       </widget>
@@ -331,7 +343,7 @@
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify whether you want to start from wherever the index is after the previous functions or if you want to start from the beginning of the text. If 'Look only at page X' is enabled, this will start looking at the beginning of the page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Current index: &lt;/span&gt;Will look for the desired text from wherever we are after previous functions moved the index around.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Begin text: &lt;/span&gt;Starts looking from the desired text from the begining. If 'Look only at page X' is enabled, this will start looking at the beginning of the desired page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
                        <item>
                         <property name="text">
@@ -347,6 +359,9 @@
                      </item>
                      <item row="2" column="0" colspan="4">
                       <widget class="QLineEdit" name="lineEdit_textToFind">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a text to be found in the PDF in order to move the index there.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
                        <property name="clearButtonEnabled">
                         <bool>true</bool>
                        </property>
@@ -400,6 +415,9 @@
                      </item>
                      <item row="2" column="1">
                       <widget class="QSpinBox" name="spinBox_moveIndex">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Move the current index an specified ammount of characters. Use negative to move backwards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
                        <property name="minimum">
                         <number>-9999</number>
                        </property>
@@ -467,6 +485,9 @@
                      </item>
                      <item row="1" column="1">
                       <widget class="QSpinBox" name="spinBox_moveLinesNum">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Move the current index an specified ammount of lines. Use negative to move backwards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
                        <property name="minimum">
                         <number>-1000</number>
                        </property>
@@ -477,6 +498,9 @@
                      </item>
                      <item row="2" column="1">
                       <widget class="QComboBox" name="comboBox_placeInLine">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Place the index at the begining or ending of the line. You can use that even if you didn't use this function to move any line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
                        <item>
                         <property name="text">
                          <string>Beninging of line</string>
@@ -551,7 +575,11 @@
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QLineEdit" name="lineEdit_stringToAppend"/>
+                      <widget class="QLineEdit" name="lineEdit_stringToAppend">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a string to be appended/prepended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                      </widget>
                      </item>
                      <item row="1" column="2">
                       <spacer name="horizontalSpacer_2">
@@ -612,6 +640,9 @@
                          <width>16777215</width>
                          <height>16777215</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the data extracted only by the current function.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
                        <property name="readOnly">
                         <bool>true</bool>
@@ -718,7 +749,11 @@
                        </property>
                        <layout class="QGridLayout" name="gridLayout_11">
                         <item row="1" column="1">
-                         <widget class="QLineEdit" name="lineEdit_charsToAllow"/>
+                         <widget class="QLineEdit" name="lineEdit_charsToAllow">
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow whatever characters you write even if they are not allowed by the &amp;quot;Get Only&amp;quot; filter. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Important: &lt;/span&gt;This works on individual characters. Writing &amp;quot;,.€&amp;quot; will allow every ',', every '.' and every '€' found.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                         </widget>
                         </item>
                         <item row="1" column="0">
                          <widget class="QLabel" name="label_allow">
@@ -735,7 +770,11 @@
                          </widget>
                         </item>
                         <item row="2" column="1">
-                         <widget class="QLineEdit" name="lineEdit_charsToAvoid"/>
+                         <widget class="QLineEdit" name="lineEdit_charsToAvoid">
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Blocks whatever characters you write even if they are allowed by the &amp;quot;Get Only&amp;quot; filter or the 'Allow' box..&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Important: &lt;/span&gt;This works on individual characters. Writing &amp;quot;,.€&amp;quot; will block every ',', every '.' and every '€' found.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                         </widget>
                         </item>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_getOnly">
@@ -746,6 +785,9 @@
                         </item>
                         <item row="0" column="1">
                          <widget class="QComboBox" name="comboBox_typeOfData">
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;What kind of characters to be extracted. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;    - All: &lt;/span&gt;Will allow everything.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;    - Numbers: &lt;/span&gt;Will allow only digits.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;    - Letters: &lt;/span&gt;Will allow everything but digits (symbols as well).&lt;/p&gt;&lt;p&gt;You can further define your filters using the Allow and Avoid boxes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
                           <item>
                            <property name="text">
                             <string>All</string>
@@ -783,7 +825,11 @@
                          </widget>
                         </item>
                         <item row="0" column="1">
-                         <widget class="QLineEdit" name="lineEdit_toReplace"/>
+                         <widget class="QLineEdit" name="lineEdit_toReplace">
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a character or a full string to be replaced for another.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                         </widget>
                         </item>
                         <item row="1" column="0">
                          <widget class="QLabel" name="label_replaceFor">
@@ -793,7 +839,11 @@
                          </widget>
                         </item>
                         <item row="1" column="1">
-                         <widget class="QLineEdit" name="lineEdit_replaceFor"/>
+                         <widget class="QLineEdit" name="lineEdit_replaceFor">
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a character or a full string to be replaced for another.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                         </widget>
                         </item>
                        </layout>
                       </widget>
@@ -813,6 +863,9 @@
                      </item>
                      <item row="1" column="1">
                       <widget class="QComboBox" name="comboBox_readDirection">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extract data forwards or backwards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
                        <item>
                         <property name="text">
                          <string>Forward</string>
@@ -837,6 +890,9 @@
                      <height>100</height>
                     </size>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting value up to the currently selected function.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="readOnly">
                     <bool>true</bool>
                    </property>
@@ -849,6 +905,9 @@
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maxLength">
                     <number>20</number>
@@ -882,6 +941,9 @@
                      <width>16777215</width>
                      <height>100</height>
                     </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting after going through the full stack of functions for this formula.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="readOnly">
                     <bool>true</bool>
