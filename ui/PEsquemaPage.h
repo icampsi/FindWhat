@@ -61,7 +61,7 @@ public slots:
     void handleFunctionUpdated();
 
 private slots:
-    // VIEWS
+    // VIEWS ==============================================================
     void on_listWidget_formula_itemSelectionChanged() { loadFunction();  }
     void on_pushButton_addFormula_clicked()           { newFormula();    }
     void on_pushButton_addStaticData_clicked()        { newStaticData(); }
@@ -70,12 +70,12 @@ private slots:
     void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
     void handleItemEditFinish(const QModelIndex &index, const QString &text);
 
-    // MANAGE FUNCTIONS
+    // MANAGE FUNCTIONS ====================================================
     void on_btn_newFunction_clicked();
     void on_lineEdit_functionName_textChanged(const QString &arg1);
     void on_pushButton_deleteFunctin_clicked();
 
-    // STACKED BOX UI
+    // STACKED BOX UI =====================================================
     // Static data
     void on_plainTextEdit_staticDataString_textChanged();
 
@@ -83,11 +83,16 @@ private slots:
     void on_lineEdit_textToFind_textChanged(const QString &arg1);
     void on_comboBox_setIndexAt_currentIndexChanged(int index);
     void on_comboBox_startFrom_currentIndexChanged(int index);
+    void on_checkBox_lookOnlyAtPage_stateChanged(int arg1);
+    void on_spinBox_lookOnlyAtPage_valueChanged(int arg1);
 
-    // Extractinf function UI
+    // Extracting function UI
     void on_comboBox_readDirection_currentIndexChanged(int index);
     void on_lineEdit_charsToAllow_textEdited(const QString &arg1);
     void on_lineEdit_charsToAvoid_textEdited(const QString &arg1);
+    void on_spinBox_extractAmmount_valueChanged(int arg1);
+    void on_lineEdit_toReplace_textChanged(const QString &arg1);
+    void on_lineEdit_replaceFor_textChanged(const QString &arg1);
 
     // Move lines UI
     void on_spinBox_moveLinesNum_valueChanged(int arg1);
@@ -104,12 +109,7 @@ private slots:
 
     // Menú actions for the "New Function" push button
     void handle_newFunActions(CFunction::Action functionType);
-    void on_checkBox_lookOnlyAtPage_stateChanged(int arg1);
-    void on_spinBox_lookOnlyAtPage_valueChanged(int arg1);
-    void on_lineEdit_toReplace_textChanged(const QString &arg1);
-    void on_lineEdit_replaceFor_textChanged(const QString &arg1);
 
-    void on_spinBox_extractAmmount_valueChanged(int arg1);
 
 signals:
     void functionUpdated(CFormula::IndexPosition index, const QString& result);

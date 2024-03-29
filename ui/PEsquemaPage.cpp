@@ -23,7 +23,7 @@
 QString parseFromText(const QString& text);
 QString parseToText(const QString& text);
 
-// CONSTRUCTORS AND DESTRUCTORS ----------------------------------------
+// CONSTRUCTORS AND DESTRUCTORS ====================================================
 PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc}, m_blockFunUpdate{false} {
     ui->setupUi(this);
@@ -53,7 +53,7 @@ PEsquemaPage::PEsquemaPage(QWidget *parent)
 
 PEsquemaPage::~PEsquemaPage() { delete ui; }
 
-// PUBLIC FUNCTIONS ----------------------------------------------------
+// PUBLIC FUNCTIONS ====================================================
 void PEsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex) {
     QStandardItemModel *itemModel = dynamic_cast<QStandardItemModel*>(ui->treeView_Esquema->model());
     QStandardItem *item = nullptr;
@@ -238,8 +238,8 @@ void PEsquemaPage::newStaticData() {
     model_esquema->item(0, 0)->appendRow(staticDataItem);
 }
 
-// SLOTS ---------------------------------------------------------------
-// VIEWS
+// SLOTS
+// VIEWS ==============================================================
 void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
     if (!index.isValid() || !index.parent().isValid()) return;
 
@@ -309,7 +309,7 @@ void PEsquemaPage::handleItemEditFinish(const QModelIndex &index, const QString 
         ui->label_dataName->setText(m_loadedFormula->getDataName());
     }
 }
-// MANAGE FUNCTIONS
+// MANAGE FUNCTIONS ====================================================
 void PEsquemaPage::on_btn_newFunction_clicked() {
     // Create a menu
     QMenu   *menu                = new QMenu(this);
@@ -411,6 +411,25 @@ void PEsquemaPage::on_comboBox_startFrom_currentIndexChanged(int index) {
     updateFunctionProcess();
 }
 
+void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    if(arg1) {
+        ui->spinBox_lookOnlyAtPage->setEnabled(true);
+        function->setNum(ui->spinBox_lookOnlyAtPage->value());
+    }
+    else {
+        ui->spinBox_lookOnlyAtPage->setEnabled(false);
+        function->setNum(0);
+    }
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_spinBox_lookOnlyAtPage_valueChanged(int arg1) {
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setNum(arg1);
+    updateFunctionProcess();
+}
+
 // EXTRACTING FUNCTION UI
 void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
     QListWidgetItem *item = ui->listWidget_formula->currentItem();
@@ -439,6 +458,24 @@ void PEsquemaPage::on_lineEdit_charsToAllow_textEdited(const QString &arg1) {
 void PEsquemaPage::on_lineEdit_charsToAvoid_textEdited(const QString &arg1) {
     CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
     function->setToAvoid(parseFromText(arg1));
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_spinBox_extractAmmount_valueChanged(int arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setCharsToGet(arg1);
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_lineEdit_toReplace_textChanged(const QString &arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setToReplace(arg1);
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setReplaceFor(arg1);
     updateFunctionProcess();
 }
 
@@ -490,46 +527,5 @@ void PEsquemaPage::on_comboBox_typeOfData_currentIndexChanged(int index) {
 void PEsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
     QString text = ui->plainTextEdit_staticDataString->toPlainText();
     m_loadedStaticData->setDataString(text);
-}
-
-void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
-    if(arg1) {
-        ui->spinBox_lookOnlyAtPage->setEnabled(true);
-        function->setNum(ui->spinBox_lookOnlyAtPage->value());
-    }
-    else {
-        ui->spinBox_lookOnlyAtPage->setEnabled(false);
-        function->setNum(0);
-    }
-    updateFunctionProcess();
-}
-
-
-void PEsquemaPage::on_spinBox_lookOnlyAtPage_valueChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
-    function->setNum(arg1);
-    updateFunctionProcess();
-}
-
-
-void PEsquemaPage::on_lineEdit_toReplace_textChanged(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
-    function->setToReplace(arg1);
-    updateFunctionProcess();
-}
-
-
-void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
-    function->setReplaceFor(arg1);
-    updateFunctionProcess();
-}
-
-
-void PEsquemaPage::on_spinBox_extractAmmount_valueChanged(int arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
-    function->setCharsToGet(arg1);
-    updateFunctionProcess();
 }
 

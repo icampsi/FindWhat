@@ -174,7 +174,7 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
         relativeIndexFinal   = 0;
     }
 
-    int pageToLook = pFunctionToApply->getNum();
+    int pageToLook = pFunctionToApply->getNum() - 1;
     if(pageToLook >= static_cast<int>(pPdfDoc->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
 
     if(pageToLook < 0) { // whereas if negative, looks the entire document
