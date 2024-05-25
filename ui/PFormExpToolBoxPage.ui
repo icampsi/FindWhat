@@ -116,6 +116,9 @@
      <property name="placeholderText">
       <string extracomment="use '&lt;dataName&gt;' as placeholders "/>
      </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">
@@ -148,6 +151,9 @@
     <widget class="QLineEdit" name="lineEdit_actOnlyIf">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only documents that contain the text on this box will be parsed. Leave blank to act on every PDF file added on the Drag&amp;amp;Drop list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

@@ -39,6 +39,7 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttach
     QTextOption option;
     option.setFlags(QTextOption::ShowTabsAndSpaces | QTextOption::ShowLineAndParagraphSeparators);
     textEdit->document()->setDefaultTextOption(option);
+    textEdit->setMinimumHeight(400);
 
     textEdit->setFixedHeight(28);
     labelLayout->addWidget(textEdit);

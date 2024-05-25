@@ -207,7 +207,7 @@
                     <enum>QFrame::Plain</enum>
                    </property>
                    <property name="currentIndex">
-                    <number>1</number>
+                    <number>5</number>
                    </property>
                    <widget class="QWidget" name="NewFunction">
                     <layout class="QGridLayout" name="gridLayout_8"/>
@@ -579,6 +579,9 @@
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a string to be appended/prepended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
+                       <property name="clearButtonEnabled">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item row="1" column="2">
@@ -753,6 +756,9 @@
                           <property name="toolTip">
                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow whatever characters you write even if they are not allowed by the &amp;quot;Get Only&amp;quot; filter. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Important: &lt;/span&gt;This works on individual characters. Writing &amp;quot;,.€&amp;quot; will allow every ',', every '.' and every '€' found.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                           </property>
+                          <property name="clearButtonEnabled">
+                           <bool>true</bool>
+                          </property>
                          </widget>
                         </item>
                         <item row="1" column="0">
@@ -773,6 +779,9 @@
                          <widget class="QLineEdit" name="lineEdit_charsToAvoid">
                           <property name="toolTip">
                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Blocks whatever characters you write even if they are allowed by the &amp;quot;Get Only&amp;quot; filter or the 'Allow' box..&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Important: &lt;/span&gt;This works on individual characters. Writing &amp;quot;,.€&amp;quot; will block every ',', every '.' and every '€' found.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                          <property name="clearButtonEnabled">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
@@ -829,6 +838,9 @@
                           <property name="toolTip">
                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a character or a full string to be replaced for another.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                           </property>
+                          <property name="clearButtonEnabled">
+                           <bool>true</bool>
+                          </property>
                          </widget>
                         </item>
                         <item row="1" column="0">
@@ -842,6 +854,9 @@
                          <widget class="QLineEdit" name="lineEdit_replaceFor">
                           <property name="toolTip">
                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a character or a full string to be replaced for another.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                          <property name="clearButtonEnabled">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
@@ -911,6 +926,9 @@
                    </property>
                    <property name="maxLength">
                     <number>20</number>
+                   </property>
+                   <property name="clearButtonEnabled">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
