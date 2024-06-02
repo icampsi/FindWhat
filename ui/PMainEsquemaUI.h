@@ -30,12 +30,14 @@ public:
     void newEsquema(CEsquemaDoc* esquemaDoc);
     void changeCurrentPage(PEsquemaPage* page) { ui->stackedWidget_esquemaPage->setCurrentWidget(page); }
     void addExportCSV(CExportCSV *exportCSV);
+    void deletePage(int index); // Deletes a page from the toobox
+    void clearPages(); // Clears all pages (calls deletePage one by one)
 
 private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
     void on_pushButton_addPage_clicked();
-    void on_DeleteEsquema_clicked();
-    void on_pushButton_ExportCSV_clicked();
+    void on_DeletePage_clicked() { deletePage(ui->toolBox_formatEsquema->currentIndex()); }
+    void on_pushButton_parse_clicked();
 
 public slots:
     void handleDeleteEsquema(const size_t index);

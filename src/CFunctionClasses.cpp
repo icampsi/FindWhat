@@ -177,3 +177,6 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
     SerializationUtils::readQString(in, m_toReplace);                          // m_toReplace
     SerializationUtils::readQString(in, m_replaceFor);                         // m_replaceFor
 }
+
+// MODFUNCTION
+

@@ -13,6 +13,7 @@ class ProgBarExport_dlg;
 class CEsquemaDoc;
 
 class CExportCSV {
+
 public:
     // CONSTRUCTORS AND DESTRUCTORS
     CExportCSV() : m_pdfFilePaths(), m_associatedEsquemaDoc(nullptr), m_csvFormat(), m_exportFileRename(), m_renameParsedPDFFlag(false), m_fileNamePlaceholder(), m_idText("") {}

@@ -12,7 +12,7 @@ class CFormula;
 
 class CFunction {
 public:
-    enum class Action { Find, MoveIndex, MoveLine, AppendString, ExtractData };
+    enum class Action { Find, MoveIndex, MoveLine, AppendString, ExtractData, ModifyResult };
 
 protected:
     // MEMBERS
@@ -147,6 +147,23 @@ public:
     // SERIALIZATION
     void serialize(std::ofstream& out)  const override;
     void deserialize(std::ifstream& in) override;
+};
+
+class CModFunction : public CFunction {
+    // CONSTRUCTORS&DESTRUCTORS
+public:
+    explicit CModFunction(Action name) : CFunction(name){}
+    ~CModFunction(){}
+
+private:
+    // MEMBERS
+    QString m_toReplace;
+    QString m_replaceFor;
+
+public:
+    // GETTERS & SETTERS
+    void setToReplace(const QString &toReplace){ m_toReplace = toReplace; }
+    const QString& getToReplace() const { return m_toReplace; }
 };
 
 #endif // CFUNCTIONCLASSES_H

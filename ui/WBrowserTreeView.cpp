@@ -28,18 +28,19 @@ WBrowserTreeView::WBrowserTreeView(QWidget *parent) : QTreeView(parent) {
 
 void WBrowserTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)  {
     QTreeView::selectionChanged(selected, deselected);
-    QModelIndexList indexes = selected.indexes();
-    if (!indexes.isEmpty()) {
-        QModelIndex index = indexes.first();
-        QFileSystemModel *model = qobject_cast<QFileSystemModel*>(this->model());
-        if (model) {
-            QString filePath = model->filePath(index);
-            QFileInfo fileInfo(filePath);
-            if (fileInfo.suffix().toLower() == "pdf") {
-                emit filePathChanged(filePath);
-            }
+    if(selected.isEmpty()) return;
+
+    // Emits the filePath of the first selected item
+    const QModelIndexList indexes = selected.indexes();
+    const QFileSystemModel *model = qobject_cast<QFileSystemModel*>(this->model());
+    if (model) {
+        const QString filePath = model->filePath(indexes.first());
+        const QFileInfo fileInfo(filePath);
+        if (fileInfo.suffix().toLower() == "pdf") {
+            emit filePathChanged(filePath);
         }
     }
+
 }
 
 void WBrowserTreeView::dragEnterEvent(QDragEnterEvent *event)  {
@@ -58,15 +59,3 @@ void WBrowserTreeView::dragMoveEvent(QDragMoveEvent *event) {
         event->ignore();
     }
 }
-
-// void WBrowserTreeView::dropEvent(QDropEvent *event)  {
-//     if (event->mimeData()->hasUrls()) {
-//         QList<QUrl> urls = event->mimeData()->urls();
-//         for (const QUrl &url : urls) {
-//             addDroppedItem(url);
-//         }
-//         event->accept();
-//     } else {
-//         event->ignore();
-//     }
-// }

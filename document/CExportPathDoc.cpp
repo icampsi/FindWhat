@@ -19,7 +19,7 @@ CExportPathDoc::~CExportPathDoc() {
     }
 }
 
-CExportCSV* CExportPathDoc::getExportCSVByIndex(size_t index) {
+CExportCSV* CExportPathDoc::getExportCSVByIndex(size_t index) const {
     if (index >= m_exportCSVs.size()) {
         return nullptr; // Index out of range
     }
@@ -37,6 +37,15 @@ void CExportPathDoc::deleteExportCSV(size_t index) {
     delete m_exportCSVs[index];
     m_exportCSVs.erase(m_exportCSVs.begin() + index);
 }
+
+size_t CExportPathDoc::getFileCount() {
+    size_t fileCount = 0;
+    for (CExportCSV* it : m_exportCSVs) {
+        fileCount += it->getFilePaths().size();
+    }
+    return fileCount;
+}
+
 
 void CExportPathDoc::xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator) {
     QFile file(fileName);

@@ -106,7 +106,7 @@ void PEsquemaPage::loadFunction() {
 
     CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
-    // CMathFunction       *mathFunction       = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
+    // CMathFunction       *mathFunction    = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     QString parsedText;
     switch (function->getFunctionType()) {
     case CFunction::Action::Find:
@@ -132,7 +132,6 @@ void PEsquemaPage::loadFunction() {
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
         ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
-
         break;
     }
 
@@ -145,11 +144,8 @@ void PEsquemaPage::loadFunction() {
 
 void PEsquemaPage::updateFunctionProcess() {
     if (m_blockFunUpdate | !m_loadedFormula | !m_activeFunction) {
-        qDebug() << "update blocked";
-
         return; // We won't be doing any function update if there is no function
     }
-    qDebug() << "update Started";
     QListWidgetItem *item = ui->listWidget_formula->currentItem();
 
     // Applay formula up to this selected function

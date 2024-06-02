@@ -80,6 +80,7 @@ void MainWindow::action_newEsquema() {
 }
 
 void MainWindow::action_loadSession() {
+    // File Dialog
     QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "FindWhat Session Files (*.fw)");
     if (fileName.isEmpty()) return;
 
@@ -89,10 +90,15 @@ void MainWindow::action_loadSession() {
                                   QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::No) return;
 
-    for (size_t i{0}; i < m_cmdoc.getLoadedEsquemaDocs()->size(); i++) {
+    // Delete loaded exportCSV pages
+    ui->mainEsquemaUI->clearPages();
+
+    //Delete esquemas
+    for (size_t i = m_cmdoc.getLoadedEsquemaDocs()->size(); i-- > 0; ) {
         ui->mainEsquemaUI->handleDeleteEsquema(i);
     }
 
+    // Deserialize file
     std::ifstream file(fileName.toStdString(), std::ios::binary);
     if (file.is_open()) {
         std::vector<CEsquemaDoc*> loadedEsquemaDocs;
@@ -107,6 +113,7 @@ void MainWindow::action_loadSession() {
         QMessageBox::critical(this, "Error", errorString);
     }
 
+    //Creates the exportCSV pages
     for(size_t i{ 0 }; i < m_cmdoc.getExportPathDoc().getExportCSVs().size(); i++) {
         CExportCSV* exportCSV = m_cmdoc.getExportPathDoc().getExportCSVByIndex(i);
         ui->mainEsquemaUI->addExportCSV(exportCSV);

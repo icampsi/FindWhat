@@ -46,15 +46,18 @@ void CMDoc::onDocumentDestroyed(CDocument *pDoc) {
 }
 
 void CMDoc::deleteEsquema(const size_t index) {
+    // Range Check
     if (index >= m_loadedEsquemaDocs.size()) {
         qDebug() << "Esquema out of range for deletition";
         return;
     }
+    // Delete esquema
+    qDebug() << "Deleting esquema: " << m_loadedEsquemaDocs[index]->getEsquema()->getName();
     delete m_loadedEsquemaDocs[index];
     m_loadedEsquemaDocs.erase(m_loadedEsquemaDocs.begin() + index);
+    // Emit update esquema list
     esquemaListUpdated();
 }
-
 
 // SERIALIZATOIN
 void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {

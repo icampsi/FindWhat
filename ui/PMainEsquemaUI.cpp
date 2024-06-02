@@ -6,6 +6,7 @@
 #include "PMainEsquemaUI.h"
 
 #include "MainWindow.h"
+#include "ui/dialogs/DDisplayParsedInfo.h"
 #include "ui/dialogs/ProgBarExport_dlg.h"
 #include "ui_PMainEsquemaUI.h"
 
@@ -40,8 +41,8 @@ PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
 
     // Disable "export CSV" and "delete esquema" buttons if no toolbox pages are loaded
     if(ui->toolBox_formatEsquema->count() == 0) {
-        ui->pushButton_ExportCSV->setEnabled(false);
-        ui->DeleteEsquema->setEnabled(false);
+        ui->pushButton_parse->setEnabled(false);
+        ui->DeletePage->setEnabled(false);
     }
 }
 
@@ -65,17 +66,18 @@ void PMainEsquemaUI::addExportCSV(CExportCSV *exportCSV) {
     // Enable export esquema button if any page is loaded
     switch (ui->toolBox_formatEsquema->count()) {
     case 0:
-        ui->pushButton_ExportCSV->setEnabled(false);
+        ui->pushButton_parse->setEnabled(false);
         break;
     case 1:
-        ui->pushButton_ExportCSV->setEnabled(true);
-        ui->DeleteEsquema->setEnabled(true);
+        ui->pushButton_parse->setEnabled(true);
+        ui->DeletePage->setEnabled(true);
         break;
     }
 }
 
 void PMainEsquemaUI::on_pushButton_addPage_clicked() {
-    // Disable the button until actions are finished so there are no conflicts witht he document types we acces on the toolboxpage constructor
+    // Disable the button until actions are finished so there are
+    // no conflicts with he document types we acces on the toolboxpage constructor
     ui->pushButton_addPage->setEnabled(false);
 
     addExportCSV(nullptr);
@@ -83,10 +85,10 @@ void PMainEsquemaUI::on_pushButton_addPage_clicked() {
     ui->pushButton_addPage->setEnabled(true);
 }
 
-void PMainEsquemaUI::on_DeleteEsquema_clicked() {
-    int index = ui->toolBox_formatEsquema->currentIndex();
-    // Remove the asociated document
+void PMainEsquemaUI::deletePage(int index) {
+    // Remove the associated document
     CMDoc::getMDoc().getExportPathDoc().deleteExportCSV(index);
+
     // Remove the page from the toolBox
     ui->toolBox_formatEsquema->removeItem(index);
 
@@ -97,64 +99,68 @@ void PMainEsquemaUI::on_DeleteEsquema_clicked() {
     // Disable export esquema button if no pages are loaded
     switch (count) {
     case 0:
-        ui->pushButton_ExportCSV->setEnabled(false);
-        ui->DeleteEsquema->setEnabled(false);
+        ui->pushButton_parse->setEnabled(false);
+        ui->DeletePage->setEnabled(false);
         break;
     case 1:
-        ui->pushButton_ExportCSV->setEnabled(true);
+        ui->pushButton_parse->setEnabled(true);
         break;
     }
 }
 
-void PMainEsquemaUI::on_pushButton_ExportCSV_clicked() {
+void PMainEsquemaUI::clearPages() {
+    int pages = ui->toolBox_formatEsquema->count();
+    for(int i{pages - 1}; i >= 0; i--) {
+        deletePage(i);
+    }
+}
+
+void PMainEsquemaUI::on_pushButton_parse_clicked() {
     CMDoc& cmdoc = CMDoc::getMDoc();
     if (cmdoc.getLoadedEsquemaDocs()->size() == 0) {
-        QMessageBox::information(this, "Empty esquema", "You need to define at least one esquema to extract data from PDF files");
+        QMessageBox::information(this, "Empty esquema list", "You need to define at least one esquema to extract data from PDF files");
         return;
     }
 
-    // FILE BROWSE DIALOG FOR NAMING EXPORTED FILE
-    // Open a file dialog for saving exported csv file
-    QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Coma separated values (*.csv)");
-    // Return if canceled
-    if (saveCSVFileName.isEmpty()) { return; }
-    ///////////////////////////////////////////////
+    ui->pushButton_parse->setEnabled(false); // Disable button to avoid conflicts while parsing
 
-    ui->pushButton_ExportCSV->setEnabled(false);
-    std::vector<std::vector<QString>> xsvStructure;
+    std::vector<std::vector<QString>> xsvStructure; // Data Structure that will hold the whole parsed info
+
+    CExportPathDoc& exportPathDoc = cmdoc.getExportPathDoc();
     // Get all the loaded exportCSV as a vector
-    std::vector<CExportCSV*> exportCSVs = cmdoc.getExportPathDoc().getExportCSVs();
+    const std::vector<CExportCSV*>& exportCSVs = exportPathDoc.getExportCSVs();
 
-    // Checks the ammount of work that will be needed to set up the progress bar dialog (and to check if actually anything is needed)
-    size_t fileCount = 0;
-    for (CExportCSV* it : exportCSVs) {
-        fileCount += it->getFilePaths().size();
-    }
+    // Checks the ammount of work that will be needed (if any) to set up the progress bar dialog
+    const size_t fileCount = exportPathDoc.getFileCount();
+
     // Creates a progressBar dialog and sets its progress bar range to match fileCount
     if(fileCount > 0) {
         ProgBarExport_dlg *progressDlg = new ProgBarExport_dlg(fileCount, this);
         progressDlg->show();
-        // Process pending events to update the UI
+        // Process pending events to update the progress bar
         QCoreApplication::processEvents();
 
         std::vector<std::vector<QString>> newData;
         for (CExportCSV* it : exportCSVs) {
-            // Pass the string taken from the textedit in the WFormExpToolBoxPage to the selected esquema
+            newData.clear();
+            // Pass the string taken from the textEdit in the WFormExpToolBoxPage to the selected esquema
             it->getAsocEsquemaDoc()->getEsquema()->constructCsvFormatFormulaStructure(it->getCSVFormat(), '\"',',');
-            // Build the structure
+            // DOING THE ACTUAL WORK: Build the structure
             it->buildXSVStructure(&newData, progressDlg);
             // Append it to the global xsvm structure
             xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
         }
-        // Create .csv File from the structure
-        cmdoc.getExportPathDoc().xsvm_stringStructureToFile(saveCSVFileName, xsvStructure, ',');
+        // Display Table DIalog
+        DDisplayParsedInfo *piDialog = new DDisplayParsedInfo(xsvStructure, this);
+        piDialog->exec();
+
         // Delete progress dialog for closing
         delete progressDlg;
         progressDlg = nullptr;
     }
-
-    ui->pushButton_ExportCSV->setEnabled(true);
+    ui->pushButton_parse->setEnabled(true);
 }
+
 void PMainEsquemaUI::handleFilePathChanged(const QString &filePath) {
     Q_UNUSED(filePath);
 

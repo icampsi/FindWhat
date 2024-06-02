@@ -577,7 +577,6 @@ void CFormula::serialize(std::ofstream& out) const {
 }
 
 void CFormula::deserialize(std::ifstream& in) {
-    qDebug() << "deserialize";
     /*  - DESERIALIZATION ORDER -
      *
      *  CData    	  m_data

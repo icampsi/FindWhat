@@ -14,11 +14,12 @@
 // Document to hold all the information for the export path to follow
 class CExportPathDoc {
 public:
-    //Constructors and destructors
+    //CONSTRUCTORS & DESTRUCTORS
     CExportPathDoc() : m_exportCSVs(){}
     ~CExportPathDoc();
 
-private:
+protected:
+    // MEMBERS
     std::vector<CExportCSV*> m_exportCSVs;
 
 public:
@@ -33,9 +34,12 @@ public:
     size_t getExportCSVCount() const { return m_exportCSVs.size(); }
 
     // Get a pointer to a specific CExportCSV object by index
-    CExportCSV* getExportCSVByIndex(size_t index);
-    const std::vector<CExportCSV*>& getExportCSVs() { return m_exportCSVs; }
+    CExportCSV* getExportCSVByIndex(size_t index) const;
+    const std::vector<CExportCSV*>& getExportCSVs() const { return m_exportCSVs; }
     void deleteExportCSV(size_t index);
+
+    // Returns the colective size of the stored exportCSV filePaths
+    size_t getFileCount();
 
     // Creates a .csv File from a xsvStringStructure
     void xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator);

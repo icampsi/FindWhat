@@ -123,7 +123,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="DeleteEsquema">
+              <widget class="QPushButton" name="DeletePage">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -149,9 +149,9 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_ExportCSV">
+              <widget class="QPushButton" name="pushButton_parse">
                <property name="text">
-                <string>Export CSV</string>
+                <string>Parse</string>
                </property>
               </widget>
              </item>

@@ -50,6 +50,7 @@ set(MAIN_FILES
     ui/MainWindow.cpp         ui/MainWindow.h           ui/MainWindow.ui
     ui/QCItemDelegateFormulaTreeView.cpp
 
+
     ui/PDockPreview.cpp        ui/PDockPreview.h        ui/PDockPreview.ui
     ui/PEsquemaPage.cpp        ui/PEsquemaPage.h        ui/PEsquemaPage.ui
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
@@ -70,6 +71,7 @@ set(MAIN_FILES
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui
     ui/dialogs/ProgBarExport_dlg.cpp    ui/dialogs/ProgBarExport_dlg.h   ui/dialogs/ProgBarExport_dlg.ui
     ui/dialogs/InvalidFileName_dlg.cpp  ui/dialogs/InvalidFileName_dlg.h ui/dialogs/InvalidFileName_dlg.ui
+    ui/dialogs/DDisplayParsedInfo.cpp   ui/dialogs/DDisplayParsedInfo.h  ui/dialogs/DDisplayParsedInfo.ui
 
     # RESOURCE
     res/icons.qrc
@@ -135,6 +137,10 @@ set_target_properties(FindWhat PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS FindWhat
