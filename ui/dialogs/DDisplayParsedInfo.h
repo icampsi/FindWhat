@@ -14,10 +14,10 @@ public:
     ~DDisplayParsedInfo();
     // Populates the table with the recived xsvStucture
     void populateTable(std::vector<std::vector<QString>>& xsvStruct);
-
-private slots:
     // Exports the struct to a .csv
     bool exportToCSV();
+
+private slots:
     void on_pushButton_save_clicked() { if(exportToCSV()) { accept(); } }
     // Updates the xsvStructure on table edition
     void on_tableWidget_cellChanged(int row, int column) { m_xsvStruct[row][column] = ui->tableWidget->item(row, column)->text(); }

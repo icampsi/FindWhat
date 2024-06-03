@@ -118,6 +118,7 @@ void MainWindow::action_loadSession() {
         CExportCSV* exportCSV = m_cmdoc.getExportPathDoc().getExportCSVByIndex(i);
         ui->mainEsquemaUI->addExportCSV(exportCSV);
     }
+    qDebug() << "try";
 
 }
 

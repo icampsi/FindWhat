@@ -22,7 +22,7 @@ public:
         IndexPosition indexPosition;
         QString result{""};
     };
-    enum class FunctionType : int { Indexing, Extracting, Math };  // Used only for serialization purposes
+    enum class FunctionType : int { Indexing, Extracting, Math, Mod };  // Used only for serialization purposes
 
 protected:
     Result m_result;
@@ -66,6 +66,9 @@ public:
     bool MathData(CMathFunction* pMathFunctionToApply);
 
     void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
+
+    // Replaces text in the result
+    void replaceString(CModFunction *pFunctionToApply){ m_result.result.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor()); }
 
     // m_formulaPath INTERFACE
     void addFunction(CFunction* function);

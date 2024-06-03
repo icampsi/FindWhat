@@ -179,4 +179,25 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
 }
 
 // MODFUNCTION
+void CModFunction::serialize(std::ofstream& out) const {
+    CFunction::serialize(out);
+    /* - SERIALIZATION ORDER -
+     *
+     * QString       m_toReplace
+     * QString       m_replaceFor
+     */
 
+    SerializationUtils::writeQString(out, m_toReplace);  // m_toReplace
+    SerializationUtils::writeQString(out, m_replaceFor); // m_replaceFor
+}
+
+void CModFunction::deserialize(std::ifstream& in) {
+    /* - DESERIALIZATION ORDER -
+     *
+     * QString       m_toReplace
+     * QString       m_replaceFor
+     */
+
+    SerializationUtils::readQString(in, m_toReplace);  // m_toReplace
+    SerializationUtils::readQString(in, m_replaceFor); // m_replaceFor
+}

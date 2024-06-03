@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QKeyEvent>
 
+// ListWidget view for loaded esquemes. Supports esquema deletition
 class WEsquemaListView : public QListWidget {
     Q_OBJECT
 public:

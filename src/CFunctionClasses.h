@@ -151,8 +151,11 @@ public:
 
 class CModFunction : public CFunction {
     // CONSTRUCTORS&DESTRUCTORS
-public:
-    explicit CModFunction(Action name) : CFunction(name){}
+public:   
+    explicit CModFunction(Action name) : CFunction(name), m_toReplace(), m_replaceFor(){}
+    CModFunction(std::ifstream& in, CFormula* parent = nullptr)
+        : CFunction(in, parent) { CModFunction::deserialize(in); } // Serialization constructor
+
     ~CModFunction(){}
 
 private:
@@ -164,6 +167,13 @@ public:
     // GETTERS & SETTERS
     void setToReplace(const QString &toReplace){ m_toReplace = toReplace; }
     const QString& getToReplace() const { return m_toReplace; }
+
+    void setReplaceFor(const QString &replaceFor) { m_replaceFor = replaceFor; }
+    const QString& getReplaceFor() const { return m_replaceFor; }
+
+    // SERIALIZATION
+    void serialize(std::ofstream& out)  const override;
+    void deserialize(std::ifstream& in) override;
 };
 
 #endif // CFUNCTIONCLASSES_H

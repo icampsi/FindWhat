@@ -114,6 +114,7 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
 
         CIndexingFunction* pIndexingFunction = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
         // CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
+        CModFunction *pModFunction = dynamic_cast<CModFunction*>(m_formulaPath[i]);
 
         switch (m_formulaPath[i]->getFunctionType()) {
         case CFunction::Action::Find:
@@ -143,6 +144,10 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         // case FunctionType::MathData:
         //     //MathData(pMathFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
         //     break;
+
+        case CFunction::Action::ModifyResult:
+            if(pModFunction) replaceString(pModFunction);
+            break;
 
         case CFunction::Action::ExtractData:
             CExtractingFunction* pExctractingFunction = static_cast<CExtractingFunction*>(m_formulaPath[i]);
@@ -380,6 +385,7 @@ bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     return true;
 }
 
+
 void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
     QString text = pPdfDoc->getFullText();
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
@@ -569,6 +575,10 @@ void CFormula::serialize(std::ofstream& out) const {
             type = FunctionType::Math;
             out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
             mathFunction->serialize(out);
+        } else if (CModFunction* modFunction = dynamic_cast<CModFunction*>(function)) {
+            type = FunctionType::Mod;
+            out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
+            modFunction->serialize(out);
         } else {
             qDebug() << "Function pointer not valid";
             continue;
@@ -608,6 +618,11 @@ void CFormula::deserialize(std::ifstream& in) {
             case FunctionType::Math: {
                 // CMathFunction *mathFunction = new CMathFunction(in, this); // Not used yet
                 // addFunction(mathFunction);
+                break;
+            }
+            case FunctionType::Mod: {
+                CModFunction *modFunction = new CModFunction(in, this);
+                addFunction(modFunction);
                 break;
             }
             default: {

@@ -107,6 +107,7 @@ void PEsquemaPage::loadFunction() {
     CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
     // CMathFunction       *mathFunction    = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
+    CModFunction        *modFunction        = dynamic_cast<CModFunction*>(function);
     QString parsedText;
     switch (function->getFunctionType()) {
     case CFunction::Action::Find:
@@ -132,6 +133,10 @@ void PEsquemaPage::loadFunction() {
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
         ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
+        break;
+    case CFunction::Action::ModifyResult:
+        ui->lineEdit_globalReplaceFor->setText(modFunction->getReplaceFor());
+        ui->lineEdit_globalToReplace->setText(modFunction->getToReplace());
         break;
     }
 
@@ -305,23 +310,25 @@ void PEsquemaPage::handleItemEditFinish(const QModelIndex &index, const QString 
         ui->label_dataName->setText(m_loadedFormula->getDataName());
     }
 }
+
 // MANAGE FUNCTIONS ====================================================
 void PEsquemaPage::on_btn_newFunction_clicked() {
     // Create a menu
-    QMenu   *menu                = new QMenu(this);
-    QAction *action_Find         = menu->addAction("Find");
-    QAction *action_MoveIndex    = menu->addAction("Move Index");
-    QAction *action_MoveLine     = menu->addAction("Move Line");
-    QAction *action_appendString = menu->addAction("Append String");
-    QAction *action_extractData  = menu->addAction("Extract Data");
+    QMenu   *menu                 = new QMenu(this);
+    QAction *action_Find          = menu->addAction("Find");
+    QAction *action_MoveIndex     = menu->addAction("Move Index");
+    QAction *action_MoveLine      = menu->addAction("Move Line");
+    QAction *action_appendString  = menu->addAction("Append String");
+    QAction *action_extractData   = menu->addAction("Extract Data");
+    QAction *action_replaceString = menu->addAction("Replace String");
 
     // Connect actions' triggered signal to slots
-    connect(action_Find        , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::Find); });
-    connect(action_MoveIndex   , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveIndex); });
-    connect(action_MoveLine    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveLine); });
-    connect(action_appendString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::AppendString); });
-    connect(action_extractData , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ExtractData); });
-
+    connect(action_Find         , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::Find); });
+    connect(action_MoveIndex    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveIndex); });
+    connect(action_MoveLine     , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveLine); });
+    connect(action_appendString , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::AppendString); });
+    connect(action_extractData  , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ExtractData); });
+    connect(action_replaceString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ModifyResult); });
     menu->exec(ui->btn_newFunction->mapToGlobal(QPoint(0, ui->btn_newFunction->height())));
 }
 
@@ -340,6 +347,9 @@ void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
             newFunction = new CExtractingFunction(functionType);
             ui->endingStringBlock->setParentFunction(static_cast<CExtractingFunction*>(newFunction)); // Pass the new function to PEndingStringBlock
             connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
+            break;
+        case CFunction::Action::ModifyResult:
+            newFunction = new CModFunction(functionType);
             break;
         }
 
@@ -523,5 +533,18 @@ void PEsquemaPage::on_comboBox_typeOfData_currentIndexChanged(int index) {
 void PEsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
     QString text = ui->plainTextEdit_staticDataString->toPlainText();
     m_loadedStaticData->setDataString(text);
+}
+
+// REPLACE STRING
+void PEsquemaPage::on_lineEdit_globalToReplace_textChanged(const QString &arg1) {
+    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setToReplace(arg1);
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1) {
+    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    function->setReplaceFor(arg1);
+    updateFunctionProcess();
 }
 

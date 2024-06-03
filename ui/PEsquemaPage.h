@@ -107,9 +107,12 @@ private slots:
     void on_spinBox_moveIndex_valueChanged(int arg1);
     void on_comboBox_typeOfData_currentIndexChanged(int index);
 
+    // Replace String
+    void on_lineEdit_globalToReplace_textChanged(const QString &arg1);
+    void on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1);
+
     // Menú actions for the "New Function" push button
     void handle_newFunActions(CFunction::Action functionType);
-
 
 signals:
     void functionUpdated(CFormula::IndexPosition index, const QString& result);

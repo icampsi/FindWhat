@@ -35,9 +35,7 @@ DDisplayParsedInfo::DDisplayParsedInfo(std::vector<std::vector<QString>> &xsvStr
     this->layout()->setMenuBar(menuBar);
 }
 
-DDisplayParsedInfo::~DDisplayParsedInfo() {
-    delete ui;
-}
+DDisplayParsedInfo::~DDisplayParsedInfo() { delete ui; }
 
 
 void DDisplayParsedInfo::populateTable(std::vector<std::vector<QString>>& xsvStruct) {
@@ -56,16 +54,16 @@ void DDisplayParsedInfo::populateTable(std::vector<std::vector<QString>>& xsvStr
     }
 }
 
-// PRIVATE SLOTS
 bool DDisplayParsedInfo::exportToCSV() {
     // Create .csv File from the structure
     // FILE BROWSE DIALOG FOR NAMING EXPORTED FILE
     // Open a file dialog for saving exported csv file
     QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Coma separated values (*.csv)");
-
+    qDebug() << saveCSVFileName;
     if (saveCSVFileName.isEmpty()) { return false; } // Return if canceled
     ///////////////////////////////////////////////
     CMDoc& cmdoc = CMDoc::getMDoc();
     cmdoc.getExportPathDoc().xsvm_stringStructureToFile(saveCSVFileName, m_xsvStruct, ',');
+    qDebug() << "exported";
     return true;
 }

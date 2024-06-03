@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QStandardItemModel>
 
+// TreeView for diplaying the formulas created inside the selected esquema
 class WEsquemaTreeView : public QTreeView {
     Q_OBJECT
 public:
