@@ -1,4 +1,4 @@
-#include "WEsqList.h"
+#include "WFuncList.h"
 #include "ui/PMainEsquemaUI.h"
 
 #include "document/CMDoc.h"
@@ -9,13 +9,13 @@
 #include <QEvent>
 #include <QMenu>
 
-WEsqList::WEsqList(QWidget *parent) : QListWidget{parent} {
-    connect(this, &WEsqList::deleteEsquema, static_cast<PMainEsquemaUI*>(parent), &PMainEsquemaUI::handleDeleteEsquema);
-    connect(this, &QListWidget::itemSelectionChanged, this, &WEsqList::handleItemSelectionChanged);
-    connect(this, &QListWidget::itemChanged, this, &WEsqList::handleItemChanged);
+WFuncList::WFuncList(QWidget *parent) : QListWidget{parent} {
+    connect(this, &WFuncList::deleteEsquema, static_cast<PMainEsquemaUI*>(parent), &PMainEsquemaUI::handleDeleteEsquema);
+    connect(this, &QListWidget::itemSelectionChanged, this, &WFuncList::handleItemSelectionChanged);
+    connect(this, &QListWidget::itemChanged, this, &WFuncList::handleItemChanged);
 }
 
-void WEsqList::keyPressEvent(QKeyEvent *event) {
+void WFuncList::keyPressEvent(QKeyEvent *event) {
     //REMOVE ITEMS
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
         QModelIndex selectedIndex = currentIndex();
@@ -41,7 +41,7 @@ void WEsqList::keyPressEvent(QKeyEvent *event) {
     else QListView::keyPressEvent(event);
 }
 
-void WEsqList::newEsquema(PEsquemaPage *page, CEsquema *esquema) {
+void WFuncList::newEsquema(PEsquemaPage *page, CEsquema *esquema) {
     QListWidgetItem *esquemaItem = new QListWidgetItem(static_cast<QListWidget*>(this));
     esquemaItem->setFlags(esquemaItem->flags() | Qt::ItemIsEditable);
     esquemaItem->setText(esquema->getName());
@@ -52,7 +52,7 @@ void WEsqList::newEsquema(PEsquemaPage *page, CEsquema *esquema) {
     setCurrentItem(esquemaItem);
 }
 
-void WEsqList::mousePressEvent(QMouseEvent *event) {
+void WFuncList::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::RightButton) {
         QListWidgetItem *item = itemAt(event->pos());
         QModelIndex index = indexAt(event->pos()); // Get the index of the clicked item
@@ -76,14 +76,14 @@ void WEsqList::mousePressEvent(QMouseEvent *event) {
 }
 
 // SLOTS
-void WEsqList::handleItemChanged(QListWidgetItem *item) {
+void WFuncList::handleItemChanged(QListWidgetItem *item) {
     int index = indexFromItem(item).row();
     QString newName = item->text();
     if(!newName.isEmpty()) // BOOKMARK - Quick fix to avoid getting an empty name when a new esquema is created, since itemChange signal is emmiten even when the item is first created
         CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema()->setName(newName);
 }
 
-void WEsqList::handleItemSelectionChanged() {
+void WFuncList::handleItemSelectionChanged() {
     PMainEsquemaUI *parent = dynamic_cast<PMainEsquemaUI*>(parentWidget());
     // Check if any esquema is loaded in the ui
     if(!selectedItems().isEmpty()) {

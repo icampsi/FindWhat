@@ -3,23 +3,23 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#include "WEsquemaTreeView.h"
+#include "WFormulaTreeView.h"
 
 #include "QCItemDelegateFormulaTreeView.h"
 
 #include <QMenu>
 #include <QMessageBox>
 
-WEsquemaTreeView::WEsquemaTreeView(QWidget *parent) : QTreeView(parent) {
+WFormulaTreeView::WFormulaTreeView(QWidget *parent) : QTreeView(parent) {
     setStyleSheet("QTreeView::branch {background-color: #A9A9A9;}");
     QCItemDelegateFormulaTreeView *delegate = new QCItemDelegateFormulaTreeView(this);
     setItemDelegate(delegate);
 
-    connect(this, &QTreeView::doubleClicked, this, &WEsquemaTreeView::handleDoubleClick);
-    connect(delegate, &QCItemDelegateFormulaTreeView::editingFinished, this, &WEsquemaTreeView::handleEditingFinished);
+    connect(this, &QTreeView::doubleClicked, this, &WFormulaTreeView::handleDoubleClick);
+    connect(delegate, &QCItemDelegateFormulaTreeView::editingFinished, this, &WFormulaTreeView::handleEditingFinished);
 }
 
-void WEsquemaTreeView::keyPressEvent(QKeyEvent *event) {
+void WFormulaTreeView::keyPressEvent(QKeyEvent *event) {
     //REMOVE ITEMS
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
         QModelIndex selectedIndex = currentIndex();

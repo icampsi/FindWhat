@@ -3,8 +3,8 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#ifndef WESQUEMATREEVIEW_H
-#define WESQUEMATREEVIEW_H
+#ifndef WFORMULATREEVIEW_H
+#define WFORMULATREEVIEW_H
 
 #include <QTreeView>
 #include <QApplication>
@@ -14,10 +14,10 @@
 #include <QStandardItemModel>
 
 // TreeView for diplaying the formulas created inside the selected esquema
-class WEsquemaTreeView : public QTreeView {
+class WFormulaTreeView : public QTreeView {
     Q_OBJECT
 public:
-    explicit WEsquemaTreeView(QWidget *parent = nullptr);
+    explicit WFormulaTreeView(QWidget *parent = nullptr);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting child elements
@@ -36,6 +36,6 @@ private slots:
     void handleEditingFinished(const QModelIndex &index, const QString &text) { emit itemEditingFinished(index, text); }
 };
 
-#endif // WESQUEMATREEVIEW_H
+#endif // WFORMULATREEVIEW_H
 
 

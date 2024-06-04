@@ -1,16 +1,16 @@
-#ifndef WESQLIST_H
-#define WESQLIST_H
+#ifndef WFUNCLIST_H
+#define WFUNCLIST_H
 
 #include "ui/PEsquemaPage.h"
 
 #include <QObject>
 #include <QListWidget>
 
-class WEsqList : public QListWidget {
+class WFuncList : public QListWidget {
     Q_OBJECT
 public:
-    explicit WEsqList(QWidget *parent = nullptr);
-    ~WEsqList() {}
+    explicit WFuncList(QWidget *parent = nullptr);
+    ~WFuncList() {}
 
     void keyPressEvent(QKeyEvent *event) override; // Support "del" key for deleting elements
 
@@ -36,4 +36,4 @@ private:
     QMap<QListWidgetItem*, PEsquemaPage*> m_itemPageMap;
 };
 
-#endif // WESQLIST_H
+#endif // WFUNCLIST_H

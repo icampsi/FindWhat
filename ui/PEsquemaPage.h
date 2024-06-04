@@ -62,11 +62,11 @@ public slots:
 
 private slots:
     // VIEWS ==============================================================
-    void on_listWidget_formula_itemSelectionChanged() { loadFunction();  }
+    void on_listWidget_function_itemSelectionChanged() { loadFunction();  }
     void on_pushButton_addFormula_clicked()           { newFormula();    }
     void on_pushButton_addStaticData_clicked()        { newStaticData(); }
 
-    void on_treeView_Esquema_clicked(const QModelIndex &index);
+    void on_treeView_formula_clicked(const QModelIndex &index); // Loads selected formula
     void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
     void handleItemEditFinish(const QModelIndex &index, const QString &text);
 

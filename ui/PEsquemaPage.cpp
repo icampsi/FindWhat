@@ -32,15 +32,15 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     ui->stacked_editFunction->setCurrentIndex(0);
     ui->stackedWidget_general->setCurrentIndex(0);
 
-    ui->treeView_Esquema->setModel(model_esquema);
-    connect(ui->treeView_Esquema, &WEsquemaTreeView::itemEditingFinished, this, &PEsquemaPage::handleItemEditFinish);
+    ui->treeView_formula->setModel(model_esquema);
+    connect(ui->treeView_formula, &WFormulaTreeView::itemEditingFinished, this, &PEsquemaPage::handleItemEditFinish);
 
     loadEsquema();
-    ui->treeView_Esquema->expandAll();
-
-    connect(ui->treeView_Esquema, &WEsquemaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
+    ui->treeView_formula->expandAll();
+    
+    connect(ui->treeView_formula, &WFormulaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
     connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
-    connect(ui->listWidget_formula->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
+    connect(ui->listWidget_function->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
     connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
 }
 
@@ -55,27 +55,27 @@ PEsquemaPage::~PEsquemaPage() { delete ui; }
 
 // PUBLIC FUNCTIONS ====================================================
 void PEsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &parentIndex) {
-    QStandardItemModel *itemModel = dynamic_cast<QStandardItemModel*>(ui->treeView_Esquema->model());
+    QStandardItemModel *itemModel = dynamic_cast<QStandardItemModel*>(ui->treeView_formula->model());
     QStandardItem *item = nullptr;
 
     if(itemModel) {
-        item = itemModel->itemFromIndex(ui->treeView_Esquema->model()->index(index, 0, parentIndex));
+        item = itemModel->itemFromIndex(ui->treeView_formula->model()->index(index, 0, parentIndex));
 
-        // HANDLE REMOVE STATICDATA
+        // HANDLE REMOVE STATIC DATA
         if(parentIndex.row() == 0) {
             m_itemDataMap.remove(item);
             m_esquemaDoc->getEsquema()->deleteStaticData(index);
-            ui->treeView_Esquema->model()->removeRow(index, parentIndex);
+            ui->treeView_formula->model()->removeRow(index, parentIndex);
         }
 
         // HANDLE REMOVE FORMULA
         if(parentIndex.row() == 1) {
             m_itemFormulaMap.remove(item);
             m_esquemaDoc->getEsquema()->deleteFormula(index);
-            ui->treeView_Esquema->model()->removeRow(index, parentIndex);
+            ui->treeView_formula->model()->removeRow(index, parentIndex);
         }
 
-        ui->treeView_Esquema->clearSelection();
+        ui->treeView_formula->clearSelection();
         ui->stackedWidget_general->setCurrentIndex(0);
     }
 }
@@ -86,7 +86,7 @@ void PEsquemaPage::handleFunctionUpdated() {
 
 void PEsquemaPage::loadFunction() {
     // Retrieve the selected item
-    QListWidgetItem *item = ui->listWidget_formula->currentItem();
+    QListWidgetItem *item = ui->listWidget_function->currentItem();
     if(!item) {
         ui->stacked_editFunction->setCurrentIndex(0);
         return;
@@ -151,12 +151,12 @@ void PEsquemaPage::updateFunctionProcess() {
     if (m_blockFunUpdate | !m_loadedFormula | !m_activeFunction) {
         return; // We won't be doing any function update if there is no function
     }
-    QListWidgetItem *item = ui->listWidget_formula->currentItem();
+    QListWidgetItem *item = ui->listWidget_function->currentItem();
 
     // Applay formula up to this selected function
     int functionIndex;
     if(item) {
-        functionIndex = ui->listWidget_formula->indexFromItem(item).row(); // Get function index
+        functionIndex = ui->listWidget_function->indexFromItem(item).row(); // Get function index
     }
     else functionIndex = -1; // if no item is provided the formula will go up to the end of the function path
 
@@ -241,14 +241,14 @@ void PEsquemaPage::newStaticData() {
 
 // SLOTS
 // VIEWS ==============================================================
-void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
+void PEsquemaPage::on_treeView_formula_clicked(const QModelIndex &index) {
     if (!index.isValid() || !index.parent().isValid()) return;
 
-    ui->listWidget_formula->clear();
+    ui->listWidget_function->clear();
     m_loadedFormula = nullptr; // Just in case, so can't try to acces the previous loaded formula if there where any.
     ui->stackedWidget_general->setCurrentIndex(1);
 
-    // STATIC DATA
+    // STATIC DATA - item clicked
     if(index.parent().row() == 0) {       
         QStandardItem *retrievedDataItem = model_esquema->itemFromIndex(index);
         // Load data member
@@ -261,7 +261,7 @@ void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
         ui->stackedWidget_dataOrFormula->setCurrentIndex(0);
     }
 
-    // FORMULA
+    // FORMULA - item clicked
     if(index.parent().row() == 1) {
         QStandardItem *retrievedFormulaItem = model_esquema->itemFromIndex(index);
         // Load formula member
@@ -270,17 +270,18 @@ void PEsquemaPage::on_treeView_Esquema_clicked(const QModelIndex &index) {
         ui->label_dataName->setText(m_loadedFormula->getDataName());
 
         QString functionName;
-        // Add function items to listWidget_formula
+        // Add function items to listWidget_function
         for(size_t i{0}; i < m_loadedFormula->getPathSize(); i++) {
             CFunction* function = m_loadedFormula->getFunction(static_cast<int>(i));
             functionName = function->getFunctionTypeName() + ": ";
             QListWidgetItem * functionItem = new QListWidgetItem(functionName);
             m_itemFunctionMap[functionItem] = function;
-            ui->listWidget_formula->addItem(functionItem);
+            ui->listWidget_function->addItem(functionItem);
         }
-        // If any function is loaded, show the first one, else, empty stacked edit function page by showing the empty page on index 0
-        if(ui->listWidget_formula->count() > 0) {
-            ui->listWidget_formula->setCurrentRow(0);
+        // Select last function if any, else show empty page
+        int funCount = ui->listWidget_function->count();
+        if(funCount > 0) {
+            ui->listWidget_function->setCurrentRow(funCount - 1);
         }
         else {
             ui->stacked_editFunction->setCurrentIndex(0);
@@ -356,14 +357,14 @@ void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
         item = new QListWidgetItem(newFunction->getFunctionTypeName());
         m_loadedFormula->addFunction(newFunction);
         m_itemFunctionMap[item] = newFunction;
-        ui->listWidget_formula->addItem(item);
+        ui->listWidget_function->addItem(item);
     }
     else { qDebug() << "No formula is been loaded yet"; }
 
-    if (ui->listWidget_formula != nullptr && ui->listWidget_formula->count() > 0) {
-        int lastIndex = ui->listWidget_formula->count() - 1;
+    if (ui->listWidget_function != nullptr && ui->listWidget_function->count() > 0) {
+        int lastIndex = ui->listWidget_function->count() - 1;
 
-        ui->listWidget_formula->setCurrentRow(lastIndex);
+        ui->listWidget_function->setCurrentRow(lastIndex);
     } else {
         QMessageBox* messageBox = new QMessageBox(QMessageBox::Warning, "Formula required", "You need to select a formula first", QMessageBox::Ok);
         messageBox->exec();
@@ -372,14 +373,14 @@ void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
 }
 
 void PEsquemaPage::on_lineEdit_functionName_textChanged(const QString &arg1) {
-    QListWidgetItem* item = ui->listWidget_formula->currentItem();
+    QListWidgetItem* item = ui->listWidget_function->currentItem();
     CFunction* function = m_itemFunctionMap[item];
     QString newName = function->getFunctionTypeName() + ": " + arg1;
     item->setText(newName);
 }
 
 void PEsquemaPage::on_pushButton_deleteFunctin_clicked() {
-    QListWidget *listWidget = ui->listWidget_formula;
+    QListWidget *listWidget = ui->listWidget_function;
     if(listWidget->count() == 0) return; // if there are no functions, return
     int rowToDelete = listWidget->currentRow(); // Get the index of the current row
 
@@ -411,14 +412,14 @@ void PEsquemaPage::on_comboBox_setIndexAt_currentIndexChanged(int index) {
 }
 
 void PEsquemaPage::on_comboBox_startFrom_currentIndexChanged(int index) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     if(!index) function->setStartFromBeggining(false);
     else       function->setStartFromBeggining(true);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     if(arg1) {
         ui->spinBox_lookOnlyAtPage->setEnabled(true);
         function->setNum(ui->spinBox_lookOnlyAtPage->value());
@@ -431,14 +432,14 @@ void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
 }
 
 void PEsquemaPage::on_spinBox_lookOnlyAtPage_valueChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setNum(arg1);
     updateFunctionProcess();
 }
 
 // EXTRACTING FUNCTION UI
 void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
-    QListWidgetItem *item = ui->listWidget_formula->currentItem();
+    QListWidgetItem *item = ui->listWidget_function->currentItem();
     if(!item) {
         qDebug() << "No items selected";
         return;
@@ -456,76 +457,76 @@ void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
 }
 
 void PEsquemaPage::on_lineEdit_charsToAllow_textEdited(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setToAllow(parseFromText(arg1));
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_lineEdit_charsToAvoid_textEdited(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setToAvoid(parseFromText(arg1));
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_spinBox_extractAmmount_valueChanged(int arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setCharsToGet(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_lineEdit_toReplace_textChanged(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setToReplace(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setReplaceFor(arg1);
     updateFunctionProcess();
 }
 
 // MOVE LINES UI
 void PEsquemaPage::on_spinBox_moveLinesNum_valueChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setNum(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_comboBox_placeInLine_activated(int index) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setOption(index);
     updateFunctionProcess();
 }
 
 // APPEND STRING UI
 void PEsquemaPage::on_lineEdit_stringToAppend_textChanged(const QString &arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setText(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_radioButton_preppend_clicked() {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setOption(true);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_radioButton_append_clicked() {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setOption(false);
     updateFunctionProcess();
 }
 
 // MOVE INDEX UI
 void PEsquemaPage::on_spinBox_moveIndex_valueChanged(int arg1) {
-    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setNum(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_comboBox_typeOfData_currentIndexChanged(int index) {
-    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setCharTypeToGet(static_cast<CExtractingFunction::CharTypeToGet>(index));
     updateFunctionProcess();
 }
@@ -537,14 +538,13 @@ void PEsquemaPage::on_plainTextEdit_staticDataString_textChanged() {
 
 // REPLACE STRING
 void PEsquemaPage::on_lineEdit_globalToReplace_textChanged(const QString &arg1) {
-    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setToReplace(arg1);
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1) {
-    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_formula->currentItem()]);
+    CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setReplaceFor(arg1);
     updateFunctionProcess();
 }
-

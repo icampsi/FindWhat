@@ -24,7 +24,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0" columnstretch="0,0">
    <item row="1" column="0" rowspan="3">
-    <widget class="WEsqList" name="esqList">
+    <widget class="WFuncList" name="esqList">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -256,9 +256,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>WEsqList</class>
+   <class>WFuncList</class>
    <extends>QListWidget</extends>
-   <header>WEsqList.h</header>
+   <header>WFuncList.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

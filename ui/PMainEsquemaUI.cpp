@@ -16,7 +16,7 @@
 
 #include "PEsquemaPage.h"
 #include "PFormExpToolBoxPage.h"
-#include "WEsqList.h"
+#include "WFuncList.h"
 
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"

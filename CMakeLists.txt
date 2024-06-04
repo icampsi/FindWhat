@@ -60,12 +60,12 @@ set(MAIN_FILES
 
     ui/WBrowserTreeView.cpp     ui/WBrowserTreeView.h
     ui/WEsquemaListView.cpp     ui/WEsquemaListView.h
-    ui/WEsquemaTreeView.cpp     ui/WEsquemaTreeView.h
+    ui/WFormulaTreeView.cpp     ui/WFormulaTreeView.h
 
     ui/WLoadedFilesTreeView.cpp ui/WLoadedFilesTreeView.h
     ui/WToolBarPreview.cpp      ui/WToolBarPreview.h
     ui/WToolBarEsquema.cpp      ui/WToolBarEsquema.h
-    ui/WEsqList.cpp             ui/WEsqList.h
+    ui/WFuncList.cpp             ui/WFuncList.h
 
     ui/dialogs/NewEsquema_dlg.cpp       ui/dialogs/NewEsquema_dlg.h      ui/dialogs/NewEsquema_dlg.ui
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui
