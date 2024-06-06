@@ -112,7 +112,15 @@ private slots:
     void on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1);
 
     // Menú actions for the "New Function" push button
-    void handle_newFunActions(CFunction::Action functionType);
+    void handle_newFunActions(CFunction::Function functionType);
+
+    void on_comboBox_operator_currentIndexChanged(int index);
+
+    void on_spinBox_ammountToJump_valueChanged(int arg1);
+
+    void on_comboBox_action_currentIndexChanged(int index);
+
+    void on_lineEdit_compare_textChanged(const QString &arg1);
 
 signals:
     void functionUpdated(CFormula::IndexPosition index, const QString& result);

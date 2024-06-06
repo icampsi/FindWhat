@@ -12,22 +12,29 @@ class CFormula;
 
 class CFunction {
 public:
-    enum class Action { Find, MoveIndex, MoveLine, AppendString, ExtractData, ModifyResult };
+    enum class Function { Find,
+                        MoveIndex,
+                        MoveLine,
+                        AppendString,
+                        ExtractData,
+                        ModifyResult,
+                        Condition
+    };
 
 protected:
     // MEMBERS
-    Action       m_action;
+    Function     m_action;
     QString      m_functionTypeName;
     CFormula*    m_parent = nullptr;
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    explicit CFunction(Action functionType, CFormula* parent = nullptr);
+    explicit CFunction(Function functionType, CFormula* parent = nullptr);
     explicit CFunction(std::ifstream& in,   CFormula* parent = nullptr) : m_parent{parent} { CFunction::deserialize(in); } // Serialization constructor
     virtual ~CFunction() {} // Virtual destructor
 
     //SETTERS&GETTERS
-    virtual Action getFunctionType() const { return m_action; }
+    virtual Function getFunctionType() const { return m_action; }
     const QString& getFunctionTypeName() const { return m_functionTypeName;  }
 
     CFormula* getParent() const          {return m_parent;}
@@ -48,7 +55,7 @@ protected:
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    explicit CIndexingFunction(Action name);
+    explicit CIndexingFunction(Function name);
     CIndexingFunction(const CIndexingFunction &other);
     CIndexingFunction(std::ifstream& in, CFormula* parent = nullptr)
         : CFunction(in, parent) { CIndexingFunction::deserialize(in); } // Serialization constructor
@@ -81,7 +88,7 @@ public:
     QString   m_val2{ "" };
     Operation m_operation{ Operation::add };
 
-    explicit CMathFunction(Action name);
+    explicit CMathFunction(Function name);
     explicit CMathFunction(const CMathFunction &other);
     virtual ~CMathFunction() {} // Virtual destructor
 };
@@ -104,7 +111,7 @@ protected:
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
-    explicit CExtractingFunction(Action name);
+    explicit CExtractingFunction(Function name);
     explicit CExtractingFunction(const CExtractingFunction &other);
     explicit CExtractingFunction(std::ifstream& in, CFormula* parent = nullptr)
         : CFunction(in, parent) { CExtractingFunction::deserialize(in); } // Serialization constructor
@@ -151,8 +158,8 @@ public:
 
 class CModFunction : public CFunction {
     // CONSTRUCTORS&DESTRUCTORS
-public:   
-    explicit CModFunction(Action name) : CFunction(name), m_toReplace(), m_replaceFor(){}
+public:
+    explicit CModFunction(Function name) : CFunction(name), m_toReplace(), m_replaceFor(){}
     CModFunction(std::ifstream& in, CFormula* parent = nullptr)
         : CFunction(in, parent) { CModFunction::deserialize(in); } // Serialization constructor
 
@@ -170,6 +177,48 @@ public:
 
     void setReplaceFor(const QString &replaceFor) { m_replaceFor = replaceFor; }
     const QString& getReplaceFor() const { return m_replaceFor; }
+
+    // SERIALIZATION
+    void serialize(std::ofstream& out)  const override;
+    void deserialize(std::ifstream& in) override;
+};
+
+class CConditionFunction : public CFunction {
+    // CONSTRUCTORS AND DESTRUCTORS
+public:
+    explicit CConditionFunction(Function name) : CFunction(name), m_compared() {}
+    CConditionFunction(std::ifstream& in, CFormula* parent = nullptr)
+        : CFunction(in, parent) { CConditionFunction::deserialize(in); } // Serialization constructor
+
+    //ENUMS
+    enum class Operator { Equal,
+                          NotEqual,
+                          Empty,
+                          NotEmpty
+    };
+
+    enum class Action { Jump, Stop, DoNothing };
+
+private:
+    //MEMBERS
+    Operator m_operator;    // Establishes the condition operator
+    QString  m_compared;    // String to be compared to
+    Action   m_action;      // Action to perform if condition is true
+    size_t   m_nJump;       // Ammount to jump (this will mark how many subseqüent functions to skip)
+
+public:
+    // GETTERS & SETTERS
+    const QString& getCompared() const        { return m_compared; }
+    void setCompared(const QString& compared) { m_compared = compared; }
+
+    Operator getOperator() const  { return m_operator; }
+    void setOperator(Operator op) { m_operator = op; }
+
+    Action getAction() const      { return m_action; }
+    void setAction(Action action) { m_action = action; }
+
+    size_t getNJump() const  { return m_nJump; }
+    void setNJump(int nJump) { m_nJump = nJump; }
 
     // SERIALIZATION
     void serialize(std::ofstream& out)  const override;

@@ -108,25 +108,26 @@ void PEsquemaPage::loadFunction() {
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
     // CMathFunction       *mathFunction    = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     CModFunction        *modFunction        = dynamic_cast<CModFunction*>(function);
+    CConditionFunction  *condFunction       = dynamic_cast<CConditionFunction*>(function);
     QString parsedText;
     switch (function->getFunctionType()) {
-    case CFunction::Action::Find:
+    case CFunction::Function::Find:
         parsedText = parseToText(indexingFunction->getText());
         if(ui->lineEdit_textToFind->text() != parsedText) ui->lineEdit_textToFind->setText(parsedText);
         if(ui->comboBox_setIndexAt->currentIndex() != !indexingFunction->getOption())ui->comboBox_setIndexAt->setCurrentIndex(!indexingFunction->getOption());
         ui->comboBox_startFrom->setCurrentIndex(indexingFunction->getStartFromBeggining());
         break;
-    case CFunction::Action::MoveIndex:
+    case CFunction::Function::MoveIndex:
         break;
-    case CFunction::Action::MoveLine:
+    case CFunction::Function::MoveLine:
         break;
-    case CFunction::Action::AppendString:
+    case CFunction::Function::AppendString:
         parsedText = parseToText(indexingFunction->getText());
         ui->lineEdit_stringToAppend->setText(parsedText);
         if(!indexingFunction->getOption()) ui->radioButton_append->setChecked(true);
         if(indexingFunction->getOption()) ui->radioButton_preppend->setChecked(true);
         break;
-    case CFunction::Action::ExtractData:
+    case CFunction::Function::ExtractData:
         ui->comboBox_readDirection->setCurrentIndex(extractingFunction->isInverted());
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
@@ -134,9 +135,15 @@ void PEsquemaPage::loadFunction() {
         ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
         break;
-    case CFunction::Action::ModifyResult:
+    case CFunction::Function::ModifyResult:
         ui->lineEdit_globalReplaceFor->setText(modFunction->getReplaceFor());
         ui->lineEdit_globalToReplace->setText(modFunction->getToReplace());
+        break;
+    case CFunction::Function::Condition:
+        ui->spinBox_ammountToJump->setValue(static_cast<int>(condFunction->getNJump()));
+        ui->comboBox_operator->setCurrentIndex(static_cast<int>(condFunction->getOperator()));
+        ui->lineEdit_compare->setText(condFunction->getCompared());
+        ui->comboBox_action->setCurrentIndex(static_cast<int>(condFunction->getAction()));
         break;
     }
 
@@ -176,7 +183,7 @@ void PEsquemaPage::updateFunctionProcess() {
         }
 
         CFunction* function = m_itemFunctionMap[item];
-        if(function && function->getFunctionType() == CFunction::Action::ExtractData) {
+        if(function && function->getFunctionType() == CFunction::Function::ExtractData) {
             ui->textEdit_extractedData->setText(halfResult.result);
         }
 
@@ -322,35 +329,40 @@ void PEsquemaPage::on_btn_newFunction_clicked() {
     QAction *action_appendString  = menu->addAction("Append String");
     QAction *action_extractData   = menu->addAction("Extract Data");
     QAction *action_replaceString = menu->addAction("Replace String");
+    QAction *action_condition     = menu->addAction("Condition");
 
     // Connect actions' triggered signal to slots
-    connect(action_Find         , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::Find); });
-    connect(action_MoveIndex    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveIndex); });
-    connect(action_MoveLine     , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::MoveLine); });
-    connect(action_appendString , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::AppendString); });
-    connect(action_extractData  , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ExtractData); });
-    connect(action_replaceString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Action::ModifyResult); });
+    connect(action_Find         , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::Find); });
+    connect(action_MoveIndex    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::MoveIndex); });
+    connect(action_MoveLine     , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::MoveLine); });
+    connect(action_appendString , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::AppendString); });
+    connect(action_extractData  , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::ExtractData); });
+    connect(action_replaceString, &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::ModifyResult); });
+    connect(action_condition    , &QAction::triggered, this, [=]() { handle_newFunActions(CFunction::Function::Condition); });
     menu->exec(ui->btn_newFunction->mapToGlobal(QPoint(0, ui->btn_newFunction->height())));
 }
 
-void PEsquemaPage::handle_newFunActions(CFunction::Action functionType) {
+void PEsquemaPage::handle_newFunActions(CFunction::Function functionType) {
     CFunction* newFunction = nullptr;
     QListWidgetItem* item  = nullptr;
     if(m_loadedFormula) {
         switch (functionType) {
-        case (CFunction::Action::Find):
-        case CFunction::Action::MoveIndex:
-        case CFunction::Action::MoveLine:
-        case CFunction::Action::AppendString:
+        case (CFunction::Function::Find):
+        case CFunction::Function::MoveIndex:
+        case CFunction::Function::MoveLine:
+        case CFunction::Function::AppendString:
             newFunction = new CIndexingFunction(functionType);
             break;
-        case CFunction::Action::ExtractData:
+        case CFunction::Function::ExtractData:
             newFunction = new CExtractingFunction(functionType);
             ui->endingStringBlock->setParentFunction(static_cast<CExtractingFunction*>(newFunction)); // Pass the new function to PEndingStringBlock
             connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
             break;
-        case CFunction::Action::ModifyResult:
+        case CFunction::Function::ModifyResult:
             newFunction = new CModFunction(functionType);
+            break;
+        case CFunction::Function::Condition:
+            newFunction = new CConditionFunction(functionType);
             break;
         }
 
@@ -548,3 +560,39 @@ void PEsquemaPage::on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1)
     function->setReplaceFor(arg1);
     updateFunctionProcess();
 }
+
+// CONDITION
+void PEsquemaPage::on_comboBox_operator_currentIndexChanged(int index) {
+    CConditionFunction* function = static_cast<CConditionFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
+    using Operator = CConditionFunction::Operator;
+    Operator op = static_cast<Operator>(index);
+    function->setOperator(op);
+    if(op == Operator::Equal || op == Operator::NotEqual) ui->lineEdit_compare->setEnabled(true);
+    else                                                  ui->lineEdit_compare->setEnabled(false);
+    updateFunctionProcess();
+}
+
+
+void PEsquemaPage::on_spinBox_ammountToJump_valueChanged(int arg1) {
+    CConditionFunction* function = static_cast<CConditionFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
+    function->setNJump(arg1);
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_comboBox_action_currentIndexChanged(int index) {
+    CConditionFunction* function = static_cast<CConditionFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
+    using Action = CConditionFunction::Action;
+    Action action = static_cast<CConditionFunction::Action>(index);
+    function->setAction(action);
+
+    if(action == Action::Jump)  ui->spinBox_ammountToJump->setEnabled(true);
+    else                        ui->spinBox_ammountToJump->setEnabled(false);
+    updateFunctionProcess();
+}
+
+void PEsquemaPage::on_lineEdit_compare_textChanged(const QString &arg1) {
+    CConditionFunction* function = static_cast<CConditionFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
+    function->setCompared(arg1);
+    updateFunctionProcess();
+}
+

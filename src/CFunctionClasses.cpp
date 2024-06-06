@@ -10,25 +10,29 @@
 #include "utils/GeneralFunctions.h"
 #include "CFormula.h"
 
-CFunction::CFunction(Action functionType, CFormula *parent) : m_action{ functionType }, m_parent{parent} {
+CFunction::CFunction(Function functionType, CFormula *parent) : m_action{ functionType }, m_parent{parent} {
     switch(m_action) {
-    case Action::Find:
+    case Function::Find:
         m_functionTypeName = "Find";
         break;
-    case Action::MoveIndex:
+    case Function::MoveIndex:
         m_functionTypeName = "Move Index";
         break;
-    case Action::MoveLine:
+    case Function::MoveLine:
         m_functionTypeName = "Move Line";
         break;
-    case Action::AppendString:
+    case Function::AppendString:
         m_functionTypeName = "Append String";
         break;
-    case Action::ExtractData:
+    case Function::ExtractData:
         m_functionTypeName = "Extract Data";
         break;
-    default:
-        m_functionTypeName = "";
+    case Function::ModifyResult:
+        m_functionTypeName = "Modify Result";
+        break;
+    case Function::Condition:
+        m_functionTypeName = "Condition";
+        break;
     }
 }
 
@@ -39,8 +43,8 @@ void CFunction::serialize(std::ofstream& out) const {
      * size of      m_functionTypeName
      * QString      m_functionTypeName
     */
-
-    out.write(reinterpret_cast<const char*>(&m_action), sizeof(Action)); // m_action
+    
+    out.write(reinterpret_cast<const char*>(&m_action), sizeof(Function)); // m_action
     SerializationUtils::writeQString(out, m_functionTypeName);           // m_functionTypeName
 }
 
@@ -52,19 +56,19 @@ void CFunction::deserialize(std::ifstream& in) {
      * size of      m_functionTypeName
      * QString      m_functionTypeName
     */
-
-    in.read(reinterpret_cast<char*>(&m_action), sizeof(Action)); // m_action
+    
+    in.read(reinterpret_cast<char*>(&m_action), sizeof(Function)); // m_action
     SerializationUtils::readQString(in, m_functionTypeName);     // m_functionTypeName
 }
 
-CMathFunction::CMathFunction(Action name) : CFunction(name) {}
+CMathFunction::CMathFunction(Function name) : CFunction(name) {}
 CMathFunction::CMathFunction(const CMathFunction &other)
     : CFunction(other.m_action), m_val1{other.m_val1}, m_val2{other.m_val2} {}
 
 
 
-CIndexingFunction::CIndexingFunction(Action name) : CFunction(name) {
-    if (name == Action::Find) m_num = -1; // Set m_num to negative if it is a Find function so by default the full document is looked at instead of page 0;
+CIndexingFunction::CIndexingFunction(Function name) : CFunction(name) {
+    if (name == Function::Find) m_num = -1; // Set m_num to negative if it is a Find function so by default the full document is looked at instead of page 0;
 }
 CIndexingFunction::CIndexingFunction(const CIndexingFunction &other)
     : CFunction(other.m_action), m_text{other.m_text}, m_num{other.m_num}, m_option{other.m_option} {}
@@ -102,7 +106,7 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
 }
 
-CExtractingFunction::CExtractingFunction(Action name) : CFunction(name), m_endingStr{ "\n" } {}
+CExtractingFunction::CExtractingFunction(Function name) : CFunction(name), m_endingStr{ "\n" } {}
 
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
     : CFunction(other.m_action),
@@ -201,3 +205,37 @@ void CModFunction::deserialize(std::ifstream& in) {
     SerializationUtils::readQString(in, m_toReplace);  // m_toReplace
     SerializationUtils::readQString(in, m_replaceFor); // m_replaceFor
 }
+
+// ConditionFunction
+
+void CConditionFunction::serialize(std::ofstream& out) const {
+    CFunction::serialize(out);
+    /* - SERIALIZATION ORDER -
+     *
+     * Operator         m_operator;
+     * QString          m_compared;
+     * Action           m_action;
+     * size_t           m_nJump;
+     */
+
+    out.write(reinterpret_cast<const char*>(&m_operator), sizeof(Operator));    // m_compared
+    SerializationUtils::writeQString(out, m_compared);                          // m_operator
+    out.write(reinterpret_cast<const char*>(&m_action), sizeof(Action));        // m_compared
+    out.write(reinterpret_cast<const char*>(&m_nJump), sizeof(size_t));         // m_nJump
+}
+
+void CConditionFunction::deserialize(std::ifstream& in) {
+    /* - DESERIALIZATION ORDER -
+     *
+     * Operator         m_operator;
+     * QString          m_compared;
+     * Action           m_action;
+     * unsigned short   m_nJump;
+     */
+
+    in.read(reinterpret_cast<char*>(&m_operator), sizeof(Operator));    // m_operator
+    SerializationUtils::readQString(in, m_compared);                    // m_compared
+    in.read(reinterpret_cast<char*>(&m_action), sizeof(Action));        // m_operator
+    in.read(reinterpret_cast<char*>(&m_nJump), sizeof(size_t));         // m_operator
+}
+

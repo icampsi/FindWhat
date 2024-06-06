@@ -1,8 +1,6 @@
 #include "WFuncList.h"
+#include "src/CEsquema.h"
 #include "ui/PMainEsquemaUI.h"
-
-#include "document/CMDoc.h"
-#include "document/CEsquemaDoc.h"
 
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -77,10 +75,12 @@ void WFuncList::mousePressEvent(QMouseEvent *event) {
 
 // SLOTS
 void WFuncList::handleItemChanged(QListWidgetItem *item) {
-    int index = indexFromItem(item).row();
-    QString newName = item->text();
-    if(!newName.isEmpty()) // BOOKMARK - Quick fix to avoid getting an empty name when a new esquema is created, since itemChange signal is emmiten even when the item is first created
-        CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema()->setName(newName);
+    Q_UNUSED(item);
+    // int index = indexFromItem(item).row();
+    // QString newName = item->text();
+
+    // if(!newName.isEmpty())
+    //    CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema()->setName(newName); // BOOKMARK - this line is completly wrong and the full code for renaming functions is broken
 }
 
 void WFuncList::handleItemSelectionChanged() {

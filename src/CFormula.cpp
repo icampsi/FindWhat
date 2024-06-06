@@ -106,27 +106,30 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         m_result.result = "ERROR EXTRACTING VALUES";
         return m_result;
     }
-
-    for (size_t i = from ; i < m_formulaPath.size(); i++) {
+    size_t formulaPathSz = m_formulaPath.size();
+    bool shouldBreak = false;
+    for (size_t i = from ; i < formulaPathSz; i++) {
         if(i == from) {
             m_result.indexPosition = {0, 0};
         }
 
-        CIndexingFunction* pIndexingFunction = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
+        CIndexingFunction* pIndexFun = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
         // CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
-        CModFunction *pModFunction = dynamic_cast<CModFunction*>(m_formulaPath[i]);
-
+        CModFunction *pModFun = dynamic_cast<CModFunction*>(m_formulaPath[i]);
+        CConditionFunction *pCondFun = dynamic_cast<CConditionFunction*>(m_formulaPath[i]);
         switch (m_formulaPath[i]->getFunctionType()) {
-        case CFunction::Action::Find:
-            if (pIndexingFunction) {
-                if (findText(pPdfDoc, pIndexingFunction) == -1) return m_result;
+        case CFunction::Function::Find:
+            if (pIndexFun) {
+                if (findText(pPdfDoc, pIndexFun) == -1) return m_result;
             }
             break;
-        case CFunction::Action::MoveIndex:
-            if (pIndexingFunction) { moveIndex(pPdfDoc, pIndexingFunction); }
+
+        case CFunction::Function::MoveIndex:
+            if (pIndexFun) { moveIndex(pPdfDoc, pIndexFun); }
             break;
-        case CFunction::Action::MoveLine:
-            if (pIndexingFunction) { moveLine(pPdfDoc, pIndexingFunction); }
+
+        case CFunction::Function::MoveLine:
+            if (pIndexFun) { moveLine(pPdfDoc, pIndexFun); }
             break;
         // case FunctionType::BeginLine:
         //     BeginLine(pPdfDoc);
@@ -134,8 +137,8 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         // case FunctionType::EndLine:
         //     EndLine(pPdfDoc);
         //     break;
-        case CFunction::Action::AppendString:
-            appendString(pIndexingFunction); // I DONT LIKE IT BEING INDEXING FUNCTION. CREATE A SUBCLASS FOR APPENDING/SUBSTRACTING STRINGS?
+        case CFunction::Function::AppendString:
+            appendString(pIndexFun); // I DONT LIKE IT BEING INDEXING FUNCTION. CREATE A SUBCLASS FOR APPENDING/SUBSTRACTING STRINGS?
             break;
         // case FunctionType::AppendData:
         //     //AppendData(pIndexingFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
@@ -144,20 +147,42 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         // case FunctionType::MathData:
         //     //MathData(pMathFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
         //     break;
-
-        case CFunction::Action::ModifyResult:
-            if(pModFunction) replaceString(pModFunction);
+            
+        case CFunction::Function::ModifyResult:
+            if(pModFun) replaceString(pModFun);
+            break;
+            
+        case CFunction::Function::Condition:
+            if(pCondFun) {
+                switch (doCondition(pCondFun)) {
+                    using Act = CConditionFunction::Action;
+                case Act::DoNothing:
+                    break;
+                case Act::Jump:
+                    if(i + pCondFun->getNJump() < formulaPathSz) {
+                        i += pCondFun->getNJump();
+                    }
+                    else shouldBreak = true; // If we want to jump farther away than possible, we simply stop.
+                    break;
+                case Act::Stop:
+                    shouldBreak = true;
+                    break;
+                }
+            }
             break;
 
-        case CFunction::Action::ExtractData:
-            CExtractingFunction* pExctractingFunction = static_cast<CExtractingFunction*>(m_formulaPath[i]);
-            extractData(pPdfDoc, pExctractingFunction);
+        case CFunction::Function::ExtractData:
+            CExtractingFunction* pExctracFun = static_cast<CExtractingFunction*>(m_formulaPath[i]);
+            extractData(pPdfDoc, pExctracFun);
             break;
+
         }
+
         // Check if we reached "to" and update halfwayResult if so.
         if(halfWayResult) {
             if(static_cast<int>(i) == to) *halfWayResult =  m_result;
         }
+        if(shouldBreak) break;
     }
     //thisContainer	= nullptr;
     m_data.setDataString(m_result.result);
@@ -385,6 +410,28 @@ bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     return true;
 }
 
+CConditionFunction::Action CFormula::doCondition(CConditionFunction *pFunctionToApply) {
+    bool flag = false;
+    QString &result = m_result.result;
+    switch(pFunctionToApply->getOperator()) {
+        using Op = CConditionFunction::Operator;
+    case Op::Empty:
+        flag = result.isEmpty();
+        break;
+    case Op::NotEmpty:
+        flag = !result.isEmpty();
+        break;
+    case Op::Equal:
+        flag = (result == pFunctionToApply->getCompared());
+        break;
+    case Op::NotEqual:
+        flag = (result != pFunctionToApply->getCompared());
+        break;
+    }
+
+    if(flag) return pFunctionToApply->getAction();
+    else     return CConditionFunction::Action::DoNothing;
+}
 
 void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
     QString text = pPdfDoc->getFullText();
@@ -579,6 +626,10 @@ void CFormula::serialize(std::ofstream& out) const {
             type = FunctionType::Mod;
             out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
             modFunction->serialize(out);
+        } else if (CConditionFunction *condFunction = dynamic_cast<CConditionFunction*>(function)) {
+            type = FunctionType::Condition;
+            out.write(reinterpret_cast<const char*>(&type), sizeof(FunctionType));
+            condFunction->serialize(out);
         } else {
             qDebug() << "Function pointer not valid";
             continue;
@@ -598,9 +649,9 @@ void CFormula::deserialize(std::ifstream& in) {
 
     m_formulaPath.clear();
 
-    size_t formulaPathSize;                                                     // Size of m_formulaPath
-    in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(size_t));
-    for (size_t i{0}; i < formulaPathSize; i++) {                               // m_formulaPath
+    size_t formulaPathSize;
+    in.read(reinterpret_cast<char*>(&formulaPathSize), sizeof(size_t)); // Size of m_formulaPath
+    for (size_t i{0}; i < formulaPathSize; i++) {                       // m_formulaPath
         FunctionType type;
         in.read(reinterpret_cast<char*>(&type), sizeof(FunctionType));
 
@@ -625,6 +676,11 @@ void CFormula::deserialize(std::ifstream& in) {
                 addFunction(modFunction);
                 break;
             }
+            case FunctionType::Condition: {
+                CConditionFunction *conditionFunction = new CConditionFunction(in, this);
+                addFunction(conditionFunction);
+                break;
+            }
             default: {
                 qDebug() << "Unknown function type during deserialization";
                 break;
@@ -632,4 +688,3 @@ void CFormula::deserialize(std::ifstream& in) {
         }
     }
 }
-

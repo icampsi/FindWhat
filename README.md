@@ -37,7 +37,8 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 # Latest updates
 NEW
-- Added a dialog with a spreadSheet to show the result of parsed files and allows edition before exporting them to csv.
+- Added a dialog with a spreadSheet to show the result of parsed files and allows edition before exporting them to csv. Needs more work
+- Added new function type: condition. Used for stoping the straction or jump forward in the formula path if some conditions are met. 
 - Fixed a Bug where files where being parsed more than once in some cases.
 - Fixed a bug that corrupted memory after parsing a document, crashing if tried to parse again during the same session.
 

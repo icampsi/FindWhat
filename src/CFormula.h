@@ -22,7 +22,7 @@ public:
         IndexPosition indexPosition;
         QString result{""};
     };
-    enum class FunctionType : int { Indexing, Extracting, Math, Mod };  // Used only for serialization purposes
+    enum class FunctionType : int { Indexing, Extracting, Math, Mod, Condition };  // Used only for serialization purposes
 
 protected:
     Result m_result;
@@ -65,10 +65,12 @@ public:
     void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     bool MathData(CMathFunction* pMathFunctionToApply);
 
-    void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
-
     // Replaces text in the result
     void replaceString(CModFunction *pFunctionToApply){ m_result.result.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor()); }
+    // Activates a condition
+    CConditionFunction::Action doCondition(CConditionFunction *pFunctionToApply);
+
+    void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
 
     // m_formulaPath INTERFACE
     void addFunction(CFunction* function);
