@@ -114,7 +114,6 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         }
 
         CIndexingFunction* pIndexFun = dynamic_cast<CIndexingFunction*>(m_formulaPath[i]);
-        // CMathFunction* pMathFunction = dynamic_cast<CMathFunction*>(m_formulaPath[i]);
         CModFunction *pModFun = dynamic_cast<CModFunction*>(m_formulaPath[i]);
         CConditionFunction *pCondFun = dynamic_cast<CConditionFunction*>(m_formulaPath[i]);
         switch (m_formulaPath[i]->getFunctionType()) {
@@ -131,38 +130,28 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         case CFunction::Function::MoveLine:
             if (pIndexFun) { moveLine(pPdfDoc, pIndexFun); }
             break;
-        // case FunctionType::BeginLine:
-        //     BeginLine(pPdfDoc);
-        //     break;
-        // case FunctionType::EndLine:
-        //     EndLine(pPdfDoc);
-        //     break;
+
         case CFunction::Function::AppendString:
             appendString(pIndexFun); // I DONT LIKE IT BEING INDEXING FUNCTION. CREATE A SUBCLASS FOR APPENDING/SUBSTRACTING STRINGS?
             break;
-        // case FunctionType::AppendData:
-        //     //AppendData(pIndexingFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
-        //     break;
 
-        // case FunctionType::MathData:
-        //     //MathData(pMathFunction, thisContainer); // std::vector<CData>* thisContainer as an argument for funciton call
-        //     break;
-            
         case CFunction::Function::ModifyResult:
             if(pModFun) replaceString(pModFun);
             break;
             
         case CFunction::Function::Condition:
             if(pCondFun) {
-                switch (doCondition(pCondFun)) {
+                switch (doCondition(pPdfDoc, pCondFun)) {
                     using Act = CConditionFunction::Action;
                 case Act::DoNothing:
                     break;
                 case Act::Jump:
-                    if(i + pCondFun->getNJump() < formulaPathSz) {
-                        i += pCondFun->getNJump();
+                    if(i + pCondFun->getNJump() < formulaPathSz && pCondFun->getNJump() > 1) {
+                        i += pCondFun->getNJump() - 1;
                     }
-                    else shouldBreak = true; // If we want to jump farther away than possible, we simply stop.
+                    else if (i != formulaPathSz - 1) {
+                        i = formulaPathSz - 2; // If we want to jump farther away than possible, we actually just jump to the last one.
+                    }
                     break;
                 case Act::Stop:
                     shouldBreak = true;
@@ -207,7 +196,7 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     int pageToLook = pFunctionToApply->getNum() - 1;
     if(pageToLook >= static_cast<int>(pPdfDoc->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
 
-    if(pageToLook < 0) { // whereas if negative, looks the entire document
+    if(pageToLook < 0) { // if negative looks the entire document
        text = pPdfDoc->getFullText();
     }
     else {
@@ -410,7 +399,7 @@ bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     return true;
 }
 
-CConditionFunction::Action CFormula::doCondition(CConditionFunction *pFunctionToApply) {
+CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFunction *pFunctionToApply) {
     bool flag = false;
     QString &result = m_result.result;
     switch(pFunctionToApply->getOperator()) {
@@ -426,6 +415,12 @@ CConditionFunction::Action CFormula::doCondition(CConditionFunction *pFunctionTo
         break;
     case Op::NotEqual:
         flag = (result != pFunctionToApply->getCompared());
+        break;
+    case CConditionFunction::Operator::Found:
+        flag = (pPdfDoc->getFullText().contains(pFunctionToApply->getCompared()));
+        break;
+    case CConditionFunction::Operator::NotFound:
+        flag = !(pPdfDoc->getFullText().contains(pFunctionToApply->getCompared()));
         break;
     }
 

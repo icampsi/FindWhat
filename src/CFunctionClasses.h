@@ -194,7 +194,9 @@ public:
     enum class Operator { Equal,
                           NotEqual,
                           Empty,
-                          NotEmpty
+                          NotEmpty,
+                          Found,
+                          NotFound
     };
 
     enum class Action { Jump, Stop, DoNothing };

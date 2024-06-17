@@ -8,6 +8,8 @@
 #include "CPdfDoc.h"
 #include "CEsquemaDoc.h"
 
+#include <fstream>
+
 CEsquemaDoc *CMDoc::newDoc(CEsquema *esquema) {
     CEsquemaDoc *pDoc = new CEsquemaDoc(esquema);
     m_loadedEsquemaDocs.push_back(pDoc);

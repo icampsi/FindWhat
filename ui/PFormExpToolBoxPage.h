@@ -24,20 +24,48 @@ public:
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
     void updateFields();
 
+    void getTableDataAsVector(/*std::vector<std::vector<QString>>& out*/) { // NEW BOOKMARK
+        // Get the number of rows and columns
+        // int rowCount = ui->tableWidget->rowCount();
+        // int columnCount = ui->tableWidget->columnCount();
+
+        // // Iterate over each cell in the table widget
+        // for (int row = 0; row < rowCount; ++row) {
+        //     for (int col = 0; col < columnCount; ++col) {
+        //         // Get the item at the current cell
+        //         QTableWidgetItem* item = ui->tableWidget->item(row, col);
+
+        //         // Check if the item exists
+        //         if (item) {
+        //             // Retrieve the text from the item and store it in the vector
+        //             out[row][col] = item->text();
+        //         } else {
+        //             // If the item is null, store an empty string
+        //             out[row][col] = QString();
+        //         }
+        //     }
+        // }
+    }
+
 public slots:
     void handlePathContentChanged(const std::vector<QString>& paths) { m_exportCSV->setPathFiles(paths); }
 
 private slots:
     void on_comboBox_esquemaName_currentIndexChanged(int index);
     void on_checkBox_renameDocs_stateChanged(int arg1);
-    void on_lineEdit_formatString_textChanged(const QString &arg1) { m_exportCSV->setCSVFormat(arg1); }
     void on_lineEdit_renameDocs_textChanged(const QString &arg1)   { m_exportCSV->setFileNamePlaceholder(arg1); }
     void on_lineEdit_actOnlyIf_textChanged(const QString &arg1)    { m_exportCSV->setIdText(arg1); }
+
+    void on_pushButton_addRow_clicked();
+    void on_pushButton_delRow_clicked();
+    void on_pushButton_addCol_clicked();
+    void on_pushButton_delCol_clicked();
 
 private:
     // MEMBERS
     Ui::PExpFormToolBoxPage *ui;
     CExportCSV *m_exportCSV;
+
 };
 
 #endif // PFORMEXPTOOLBOXPAGE_H

@@ -63,6 +63,22 @@ QWidget* getLastParent(QWidget* widget) {
     else                   return getLastParent(parent); // Recursively call the function with the parent widget
 }
 
+
+void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<QString(const QString&)> replacer) {
+    QRegularExpression regex(regexStr);
+    QRegularExpressionMatchIterator matches = regex.globalMatch(targetString);
+
+    while (matches.hasNext()) {
+        QRegularExpressionMatch match = matches.next();
+        QString capturedString = match.captured(1);
+
+        QString replacement = replacer(capturedString);
+
+        targetString.replace(match.capturedStart(0), match.capturedLength(0), replacement);
+        matches = regex.globalMatch(targetString); // Update matches
+    }
+}
+
 namespace SerializationUtils {
     void writeQString(std::ofstream& out, const QString& str) {
         // conversion so i can get size in bytes, not characters

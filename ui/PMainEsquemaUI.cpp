@@ -126,27 +126,30 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
 
     std::vector<std::vector<QString>> xsvStructure; // Data Structure that will hold the whole parsed info
 
-    CExportPathDoc& exportPathDoc = cmdoc.getExportPathDoc();
+    CExportPathDoc& exportPathDoc = CMDoc::getMDoc().getExportPathDoc();
     // Get all the loaded exportCSV as a vector
     const std::vector<CExportCSV*>& exportCSVs = exportPathDoc.getExportCSVs();
 
     // Checks the ammount of work that will be needed (if any) to set up the progress bar dialog
     const size_t fileCount = exportPathDoc.getFileCount();
 
-    // Creates a progressBar dialog and sets its progress bar range to match fileCount
+    // Creates progressBar dialog
     if(fileCount > 0) {
         ProgBarExport_dlg *progressDlg = new ProgBarExport_dlg(fileCount, this);
         progressDlg->show();
-        // Process pending events to update the progress bar
-        QCoreApplication::processEvents();
+        QCoreApplication::processEvents(); // Needed to display progress bar
 
+        size_t maxColumns{ 0 };
+        for (CExportCSV* it : exportCSVs) {
+            QStandardItemModel *model = it->getTableModel();
+            size_t columnCount = model->columnCount();
+            if(columnCount > maxColumns) maxColumns = columnCount;
+        }
         std::vector<std::vector<QString>> newData;
         for (CExportCSV* it : exportCSVs) {
             newData.clear();
-            // Pass the string taken from the textEdit in the WFormExpToolBoxPage to the selected esquema
-            it->getAsocEsquemaDoc()->getEsquema()->constructCsvFormatFormulaStructure(it->getCSVFormat(), '\"',',');
             // DOING THE ACTUAL WORK: Build the structure
-            it->buildXSVStructure(&newData, progressDlg);
+            it->buildStructure(&newData, progressDlg, maxColumns);
             // Append it to the global xsvm structure
             xsvStructure.insert(xsvStructure.end(), newData.begin(), newData.end());
         }

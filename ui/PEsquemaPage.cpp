@@ -24,12 +24,16 @@ QString parseFromText(const QString& text);
 QString parseToText(const QString& text);
 
 // CONSTRUCTORS AND DESTRUCTORS ====================================================
+void PEsquemaPage::sharedConstructorSetup() { // Shared constructor options for DRY code
+    ui->setupUi(this);
+    ui->stackedWidget_general->setCurrentIndex(0);
+    ui->endingStringBlock->setLableText("Ending String:");
+}
+
 PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc}, m_blockFunUpdate{false} {
-    ui->setupUi(this);
-
+    sharedConstructorSetup();
     model_esquema = new QStandardItemModel();
-    ui->stacked_editFunction->setCurrentIndex(0);
     ui->stackedWidget_general->setCurrentIndex(0);
 
     ui->treeView_formula->setModel(model_esquema);
@@ -46,9 +50,8 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {nullptr}, m_blockFunUpdate{false} {
-    ui->setupUi(this);
+    sharedConstructorSetup();
     ui->frame_esquema->setEnabled(false);
-    ui->stackedWidget_general->setCurrentIndex(0);
 }
 
 PEsquemaPage::~PEsquemaPage() { delete ui; }
@@ -555,7 +558,7 @@ void PEsquemaPage::on_lineEdit_globalToReplace_textChanged(const QString &arg1) 
     updateFunctionProcess();
 }
 
-void PEsquemaPage::on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1) {
+void PEsquemaPage::on_lineEdit_globalReplaceFor_textChanged(const QString &arg1) {
     CModFunction* function = static_cast<CModFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setReplaceFor(arg1);
     updateFunctionProcess();
@@ -567,11 +570,10 @@ void PEsquemaPage::on_comboBox_operator_currentIndexChanged(int index) {
     using Operator = CConditionFunction::Operator;
     Operator op = static_cast<Operator>(index);
     function->setOperator(op);
-    if(op == Operator::Equal || op == Operator::NotEqual) ui->lineEdit_compare->setEnabled(true);
-    else                                                  ui->lineEdit_compare->setEnabled(false);
+    if(op == Operator::Empty || op == Operator::NotEmpty) ui->lineEdit_compare->setEnabled(false);
+    else                                                  ui->lineEdit_compare->setEnabled(true);
     updateFunctionProcess();
 }
-
 
 void PEsquemaPage::on_spinBox_ammountToJump_valueChanged(int arg1) {
     CConditionFunction* function = static_cast<CConditionFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);

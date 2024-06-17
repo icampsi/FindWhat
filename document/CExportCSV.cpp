@@ -17,38 +17,82 @@
 #include "ui/dialogs/ProgBarExport_dlg.h"
 #include "ui/dialogs/InvalidFileName_dlg.h"
 
-void CExportCSV::buildXSVStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog) {
+
+std::vector<std::vector<QString>> CExportCSV::convertModelToVector(QStandardItemModel* model) {
+    int rowCount = model->rowCount();
+    int columnCount = model->columnCount();
+
+    std::vector<std::vector<QString>> tableData(rowCount, std::vector<QString>(columnCount));
+
+    for (int row = 0; row < rowCount; ++row) {
+        for (int col = 0; col < columnCount; ++col) {
+            QStandardItem* item = model->item(row, col);
+            if (item) {
+                tableData[row][col] = item->text();
+            } else {
+                tableData[row][col] = QString();
+            }
+        }
+    }
+
+    return tableData;
+}
+
+void CExportCSV::buildStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog, size_t maxColumns = 0) {
     CEsquema *esquema = m_associatedEsquemaDoc->getEsquema();
+    std::vector<std::vector<QString>> format(convertModelToVector(&m_tableModel));
+
+    // Ensure each row in format has at least maxColumns columns
+    if (!format.empty() && format[0].size() < maxColumns) {
+        for (std::vector<QString>& row : format) {
+            row.resize(maxColumns, "");  // Add empty QStrings to the row if necessary
+        }
+    }
 
     int iteration{ 0 };
     for (QString& filePath : m_pdfFilePaths) {
-        CPdfDoc* pdfDoc = nullptr; // Initialize pointer to nullptr
+        // Create the pdf document
+        CPdfDoc* pdfDoc = nullptr;
 
         try {
             pdfDoc = new CPdfDoc(filePath); // Attempt to create pdfDoc
         }
         catch (const std::exception& e) {
-            // Handle any exceptions that occurred during CPdfDoc construction
-            delete pdfDoc; // Clean up allocated memory
+            // If we fail to create document we simply go to the next one // BOOKMARK - Maybe come other mechanism would be better
+            delete pdfDoc;
             QMessageBox::warning(nullptr, "Error", QString("Failed to process file: %1\nError: %2").arg(filePath, e.what()));
-            continue; // Move to the next iteration
+            continue;
         }
 
-        // check if ID text is present, else break iteration
+        // Continue if ID text not present
         if (!m_idText.isEmpty() && std::find(pdfDoc->getFullText().begin(), pdfDoc->getFullText().end(), m_idText) != pdfDoc->getFullText().end()) {
             delete pdfDoc;
             continue;
         }
 
-        // Add extracted structure to the vector
-        esquema->generateXSVStringStructure(pdfDoc);
-        for (auto& j : esquema->getXSVStringStructureResult()) {
-            xsvStructure->push_back(j);
+        // Extract data
+        std::unordered_map<QString, QString> extractedData;
+        esquema->parseDoc(pdfDoc, &extractedData);
+
+        auto replacer = [&extractedData](const QString& capturedString) -> QString {
+            auto it = extractedData.find(capturedString);
+            if (it != extractedData.end()) {
+                return it->second;
+            } else {
+                return "ERROR_REPLACING_PLACEHOLDER";
+            }
+        };
+
+        for (std::vector<QString> row : format) {
+            for(QString& cell : row) {
+                replacePlaceholders(cell, "<(.*?)>", replacer);
+            }
+            xsvStructure->push_back(std::move(row));
         }
 
-        // Rename document if flag enabled
+        // Rename document
         if (m_renameParsedPDFFlag) renameFile(filePath);
-        // Update progress bar every other iteration to avoid overhead
+        // Update progress bar
         if (iteration % 2 == 0) progressDialog->updateProgress();
 
         ++iteration;
@@ -93,15 +137,30 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
 }
 
 // SERIALIZATION
+void serializeModel(std::ofstream &out, const QStandardItemModel* model) {
+    int rowCount = model->rowCount();
+    int columnCount = model->columnCount();
+
+    out.write(reinterpret_cast<const char*>(&rowCount), sizeof(int));
+    out.write(reinterpret_cast<const char*>(&columnCount), sizeof(int));
+
+    for (int row = 0; row < rowCount; ++row) {
+        for (int column = 0; column < columnCount; ++column) {
+            QStandardItem* item = model->item(row, column);
+            SerializationUtils::writeQString(out, item ? item->text() : QString());
+        }
+    }
+}
+
 void CExportCSV::serialize(std::ofstream &out) const {
     /* - SERIALIZATION ORDER -
      * std::vector<QString>    m_pdfFilePaths
-     * QString                 m_csvFormat;
      * QString                 m_exportFileRename
      * bool                    m_renameParsedPDFFlag
      * QString                 m_fileNamePlaceholder
      * size_t                  index of m_associatedEsquemaDoc
      * QString                 m_idText
+     * QStandardItemModel      m_tableModel
      *
      * - NO NEED -
      * m_invalidFileNameDlg
@@ -121,17 +180,38 @@ void CExportCSV::serialize(std::ofstream &out) const {
     size_t index = std::distance(esquemaDocs->begin(), it);
     out.write(reinterpret_cast<const char*>(&index), sizeof(size_t));  // m_associatedEsquemaDoc index
 
-    SerializationUtils::writeQString(out, m_csvFormat);                                 // m_csvFormat
     SerializationUtils::writeQString(out, m_exportFileRename);                          // m_exportFileRename
     out.write(reinterpret_cast<const char*>(&m_renameParsedPDFFlag), sizeof(bool));     // m_renameParsedPDFFlag
     SerializationUtils::writeQString(out, m_fileNamePlaceholder);                       // m_fileNamePlaceholder
     SerializationUtils::writeQString(out, m_idText);                                    // m_idText
+
+    // Serialize the QStandardItemModel
+    serializeModel(out, &m_tableModel);
+}
+
+void deserializeModel(std::ifstream &in, QStandardItemModel* model) {
+    int rowCount;
+    int columnCount;
+
+    in.read(reinterpret_cast<char*>(&rowCount), sizeof(int));
+    in.read(reinterpret_cast<char*>(&columnCount), sizeof(int));
+
+    model->setRowCount(rowCount);
+    model->setColumnCount(columnCount);
+
+    for (int row = 0; row < rowCount; ++row) {
+        for (int column = 0; column < columnCount; ++column) {
+            QString text;
+            SerializationUtils::readQString(in, text);
+            QStandardItem* item = new QStandardItem(text);
+            model->setItem(row, column, item);
+        }
+    }
 }
 
 void CExportCSV::deserialize(std::ifstream &in) {
     /* - SERIALIZATION ORDER -
      * std::vector<QString>    m_pdfFilePaths
-     * QString                 m_csvFormat;
      * QString                 m_exportFileRename
      * bool                    m_renameParsedPDFFlag
      * QString                 m_fileNamePlaceholder
@@ -147,10 +227,11 @@ void CExportCSV::deserialize(std::ifstream &in) {
     in.read(reinterpret_cast<char*>(&index), sizeof(size_t));
     m_associatedEsquemaDoc = CMDoc::getMDoc().getEsquemaFromIndex(index);
 
-    SerializationUtils::readQString(in, m_csvFormat);                        // m_csvFormat
     SerializationUtils::readQString(in, m_exportFileRename);                 // m_exportFileRename
     in.read(reinterpret_cast<char*>(&m_renameParsedPDFFlag), sizeof(bool));  // m_renameParsedPDFFlag
     SerializationUtils::readQString(in, m_fileNamePlaceholder);              // m_fileNamePlaceholder
     SerializationUtils::readQString(in, m_idText);                           // m_idText
-}
 
+    // Deserialize the QStandardItemModel
+    deserializeModel(in, &m_tableModel);
+}

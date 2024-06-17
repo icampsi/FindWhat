@@ -36,9 +36,11 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
-NEW
-- Added a dialog with a spreadSheet to show the result of parsed files and allows edition before exporting them to csv. Needs more work
+17/06/24
+- Added a dialog with a spreadSheet to show the result of parsed files and allowing edition before exporting them to csv.
 - Added new function type: condition. Used for stoping the straction or jump forward in the formula path if some conditions are met. 
+- Changed the way to decide how the extracted data will be structured: instead of a csv string an interface with a table has been added, which at the same time allows to spread the extracted data between multiple rows if needed.
+- Changed classes to better encapsulate each behaviour
 - Fixed a Bug where files where being parsed more than once in some cases.
 - Fixed a bug that corrupted memory after parsing a document, crashing if tried to parse again during the same session.
 

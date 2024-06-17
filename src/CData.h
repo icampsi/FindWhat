@@ -40,7 +40,7 @@ public:
     void deserialize(std::ifstream& in);
 
     // enum class DataType { integer, floating, string, empty };
-    // DataType m_dataType{ DataType::empty }; // Tipus de dada
+    // DataType m_dataType { DataType::empty }; // Tipus de dada
 
     // qint64 m_dataInt{ 0 };              // Dada
     // float m_dataFloat{ 0.0f };           // Dada

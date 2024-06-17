@@ -29,6 +29,8 @@ public:
     size_t removeLabel(QHBoxLayout *labelLayout);
     void clearBlock();
 
+    void setLableText(const QString& text) { m_lbl_addEndingStr.setText(text); }
+
 signals:
     void functionUpdated();
 
@@ -38,7 +40,7 @@ private:
     QVBoxLayout *mainLayout;
     QPushButton  m_Btn_addEndingStr;
     QLabel       m_lbl_addEndingStr;
-    bool m_blockUpdate = false; // Flag to avoid unnecessary updates
+    bool         m_blockUpdate = false; // Flag to avoid unnecessary updates
 
     std::vector<QTextEdit*>   m_endingStrTxtBlock{};
     std::vector<QHBoxLayout*> m_addedLabelLayouts;

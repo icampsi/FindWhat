@@ -4,26 +4,26 @@
 
 #include "utils/generalfunctions.h"
 
-PEndingStringBlock::PEndingStringBlock(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("Ending Strings:", this) {
+PEndingStringBlock::PEndingStringBlock(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("UNDEFINED TEXT", this) {
     setupUi();
 }
 
-PEndingStringBlock::~PEndingStringBlock() {
-    delete mainLayout;
-}
+PEndingStringBlock::~PEndingStringBlock() { delete mainLayout; }
 
 void PEndingStringBlock::setupUi() {
-
     mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
 
-    // Add a button to dynamically add more labels
+    // Button to dynamically add more labels
     QFontMetrics addButtonFontM(m_Btn_addEndingStr.font());
     int addButtonWidth = addButtonFontM.horizontalAdvance(m_Btn_addEndingStr.text()) + 15;
     m_Btn_addEndingStr.setFixedWidth(addButtonWidth);
 
+    // Add lable and button to the layout
     mainLayout->addWidget(&m_lbl_addEndingStr);
     mainLayout->addWidget(&m_Btn_addEndingStr);
+
+    // Connect button to addNewLabel function
     connect(&m_Btn_addEndingStr, &QPushButton::clicked, this, [=](){ addNewLabel(true); });
 
     // Add the initial label, text edit, and button

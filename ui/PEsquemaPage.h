@@ -24,6 +24,7 @@ class PEsquemaPage : public QWidget {
     Q_OBJECT
 
 public:
+    void sharedConstructorSetup(); // Shared constructor options for DRY code
     explicit PEsquemaPage(CEsquemaDoc *esquema, QWidget *parent = nullptr);
     explicit PEsquemaPage(QWidget *parent = nullptr);
 
@@ -45,7 +46,7 @@ protected:
     CFunction   *m_activeFunction   = nullptr;
     CEsquemaDoc *m_esquemaDoc;
 
-    QStandardItemModel *model_esquema; // Pretty sure this should be deleted in the destructor but program crashes when I try it, even with a check for double deletition. I'll check latter
+    QStandardItemModel *model_esquema; // BOOKMARK - Pretty sure this should be deleted in the destructor but program crashes when I try it, even with a check for double deletition. I'll check latter
 
     bool m_blockFunUpdate;
     void newStaticData();
@@ -109,17 +110,14 @@ private slots:
 
     // Replace String
     void on_lineEdit_globalToReplace_textChanged(const QString &arg1);
-    void on_lineEdit_GlobalReplaceFor_textChanged(const QString &arg1);
+    void on_lineEdit_globalReplaceFor_textChanged(const QString &arg1);
 
     // Menú actions for the "New Function" push button
     void handle_newFunActions(CFunction::Function functionType);
 
     void on_comboBox_operator_currentIndexChanged(int index);
-
     void on_spinBox_ammountToJump_valueChanged(int arg1);
-
     void on_comboBox_action_currentIndexChanged(int index);
-
     void on_lineEdit_compare_textChanged(const QString &arg1);
 
 signals:

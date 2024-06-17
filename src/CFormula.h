@@ -53,6 +53,7 @@ public:
     // FORMULA FUNCTIONS
     const Result& applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
 
+protected:
     int  findText (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
     void moveIndex(CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
     void moveLine (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
@@ -68,10 +69,11 @@ public:
     // Replaces text in the result
     void replaceString(CModFunction *pFunctionToApply){ m_result.result.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor()); }
     // Activates a condition
-    CConditionFunction::Action doCondition(CConditionFunction *pFunctionToApply);
+    CConditionFunction::Action doCondition(CPdfDoc *pPdfDoc, CConditionFunction *pFunctionToApply);
 
     void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
 
+public:
     // m_formulaPath INTERFACE
     void addFunction(CFunction* function);
     void deleteFunction(const size_t index);

@@ -48,6 +48,8 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     if (!esquemadocs->empty() && m_exportCSV->getAsocEsquemaDoc() == nullptr) {
         m_exportCSV->setAsocEsquemaDoc(esquemadocs->front());
     }
+    
+    ui->tableView->setModel(m_exportCSV->getTableModel());
 }
 
 void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updatedEsquemaDocList) {
@@ -63,8 +65,6 @@ void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updat
 void PFormExpToolBoxPage::updateFields() {
     // Esquema Name
     ui->comboBox_esquemaName->setCurrentText(m_exportCSV->getAsocEsquemaDoc()->getEsquema()->getName());
-    // Format String
-    ui->lineEdit_formatString->setText(m_exportCSV->getCSVFormat());
     // Rename Checkbox
     ui->checkBox_renameDocs->setChecked(m_exportCSV->getRenameParsedPDFFlag());
     // Act only if textBox
@@ -93,4 +93,77 @@ void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
         ui->lineEdit_renameDocs->setEnabled(false);
     }
 }
+void PFormExpToolBoxPage::on_pushButton_addRow_clicked() {
+    QAbstractItemModel* model = m_exportCSV->getTableModel();
+
+    if (!model) {
+        qWarning() << "Model is null";
+        return;
+    }
+
+    // Insert an empty row at the end of the table
+    int rowCount = model->rowCount();
+    model->insertRow(rowCount);
+
+    int sectionSize = ui->tableView->verticalHeader()->defaultSectionSize();
+    int rowHeight = sectionSize * 2;
+    if(rowCount > 0) rowHeight = sectionSize * (rowCount + 1);
+    ui->tableView->setMaximumHeight(rowHeight);
+}
+
+void PFormExpToolBoxPage::on_pushButton_delRow_clicked() {
+    QAbstractItemModel* model = m_exportCSV->getTableModel();
+
+    if (!model) {
+        qWarning() << "Model is null";
+        return;
+    }
+
+    // Get the last row index
+    int lastRow = model->rowCount() - 1;
+
+    if (lastRow >= 0) {
+        // Remove the last row
+        model->removeRow(lastRow);
+    }
+
+    int sectionSize = ui->tableView->verticalHeader()->defaultSectionSize();
+    int rowCount = model->rowCount();
+    int rowHeight = sectionSize * 2;
+    if(rowCount > 0) rowHeight = sectionSize * (rowCount + 1);
+    ui->tableView->setMaximumHeight(rowHeight);
+}
+
+
+
+void PFormExpToolBoxPage::on_pushButton_addCol_clicked() {
+    QAbstractItemModel* model = m_exportCSV->getTableModel();
+
+    if (!model) {
+        qWarning() << "Model is null";
+        return;
+    }
+
+    // Insert a new column at the end of the table
+    int columnCount = model->columnCount();
+    model->insertColumn(columnCount);
+}
+
+void PFormExpToolBoxPage::on_pushButton_delCol_clicked() {
+    QAbstractItemModel* model = m_exportCSV->getTableModel();
+
+    if (!model) {
+        qWarning() << "Model is null";
+        return;
+    }
+
+    // Get the last column index
+    int lastColumn = model->columnCount() - 1;
+
+    if (lastColumn >= 0) {
+        // Remove the last column
+        model->removeColumn(lastColumn);
+    }
+}
+
 
