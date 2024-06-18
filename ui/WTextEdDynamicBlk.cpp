@@ -1,16 +1,16 @@
-#include "PEndingStringBlock.h"
+#include "WTextEdDynamicBlk.h"
 
 #include <QLabel>
 
 #include "utils/generalfunctions.h"
 
-PEndingStringBlock::PEndingStringBlock(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("UNDEFINED TEXT", this) {
+WTextEdDynamicBlk::WTextEdDynamicBlk(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("UNDEFINED TEXT", this) {
     setupUi();
 }
 
-PEndingStringBlock::~PEndingStringBlock() { delete mainLayout; }
+WTextEdDynamicBlk::~WTextEdDynamicBlk() { delete mainLayout; }
 
-void PEndingStringBlock::setupUi() {
+void WTextEdDynamicBlk::setupUi() {
     mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
 
@@ -31,7 +31,7 @@ void PEndingStringBlock::setupUi() {
     addNewLabel(false);
 }
 
-void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttaching remove button to first lable*/) {
+void WTextEdDynamicBlk::addNewLabel(bool attachRemoveBtn/*flag to avoid atttaching remove button to first lable*/) {
     QHBoxLayout *labelLayout = new QHBoxLayout;
 
     // Create and style the textEdit
@@ -84,7 +84,7 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttach
     mainLayout->insertLayout(lastWidgetIndex, labelLayout);
 }
 
-size_t PEndingStringBlock::removeLabel(QHBoxLayout *labelLayout) {
+size_t WTextEdDynamicBlk::removeLabel(QHBoxLayout *labelLayout) {
     QLayoutItem *item;
     int index = -1; // If still negative when returned something went wrong
     while ((item = labelLayout->takeAt(0)) != nullptr) {
@@ -108,31 +108,14 @@ size_t PEndingStringBlock::removeLabel(QHBoxLayout *labelLayout) {
     return index;
 }
 
-void PEndingStringBlock::clearBlock() {
+void WTextEdDynamicBlk::clearBlock() {
     for (auto it = m_addedLabelLayouts.rbegin(); it != m_addedLabelLayouts.rend(); ++it) {
         removeLabel(*it);
     }
     m_addedLabelLayouts.clear();
 }
 
-// void PEndingStringBlock::updateBlock(CExtractingFunction *function) {
-//     m_blockUpdate = true; // Blocks unnecessary function updates until every block is clear
-//     clearBlock();
-//     m_function = function;
-//     for(size_t i{ 0 }; i < m_function->getEndingStringBlock().size(); i++) {
-//         const QString& text = m_function->getEndingStringBlock().at(i);
-//         if (i == 0) m_endingStrTxtBlock.at(0)->setText(text);
-//         else {
-//             addNewLabel(true);
-//             m_endingStrTxtBlock.at(i)->setText(text);
-//         }
-//     }
-//     m_blockUpdate = false;
-//     emit functionUpdated();
-// }
-
-// NEW BOOKMARK
-void PEndingStringBlock::updateBlock(const std::vector<QString>& content) {
+void WTextEdDynamicBlk::updateBlock(const std::vector<QString>& content) {
     m_blockUpdate = true; // Blocks unnecessary function updates until every block is clear
     clearBlock();
     for(size_t i{ 0 }; i < content.size(); i++) {

@@ -664,7 +664,7 @@
                           </widget>
                          </item>
                          <item row="2" column="0" colspan="3">
-                          <widget class="PEndingStringBlock" name="endingStringBlock" native="true"/>
+                          <widget class="WTextEdDynamicBlk" name="endingStringBlock" native="true"/>
                          </item>
                         </layout>
                        </widget>
@@ -1179,15 +1179,15 @@
    <header>WFormulaTreeView.h</header>
   </customwidget>
   <customwidget>
-   <class>PEndingStringBlock</class>
-   <extends>QWidget</extends>
-   <header>PEndingStringBlock.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>WFuncList</class>
    <extends>QListWidget</extends>
    <header>WFuncList.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WTextEdDynamicBlk</class>
+   <extends>QWidget</extends>
+   <header>WTextEdDynamicBlk.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

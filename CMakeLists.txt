@@ -56,7 +56,7 @@ set(MAIN_FILES
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
     ui/PMainEsquemaUI.cpp      ui/PMainEsquemaUI.h      ui/PMainEsquemaUI.ui
     ui/PTabTextPreview.cpp     ui/PTabTextPreview.h
-    ui/PEndingStringBlock.cpp  ui/PEndingStringBlock.h
+    ui/WTextEdDynamicBlk.cpp  ui/WTextEdDynamicBlk.h
 
     ui/WBrowserTreeView.cpp     ui/WBrowserTreeView.h
     ui/WEsquemaListView.cpp     ui/WEsquemaListView.h

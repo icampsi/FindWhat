@@ -24,29 +24,6 @@ public:
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
     void updateFields();
 
-    void getTableDataAsVector(/*std::vector<std::vector<QString>>& out*/) { // NEW BOOKMARK
-        // Get the number of rows and columns
-        // int rowCount = ui->tableWidget->rowCount();
-        // int columnCount = ui->tableWidget->columnCount();
-
-        // // Iterate over each cell in the table widget
-        // for (int row = 0; row < rowCount; ++row) {
-        //     for (int col = 0; col < columnCount; ++col) {
-        //         // Get the item at the current cell
-        //         QTableWidgetItem* item = ui->tableWidget->item(row, col);
-
-        //         // Check if the item exists
-        //         if (item) {
-        //             // Retrieve the text from the item and store it in the vector
-        //             out[row][col] = item->text();
-        //         } else {
-        //             // If the item is null, store an empty string
-        //             out[row][col] = QString();
-        //         }
-        //     }
-        // }
-    }
-
 public slots:
     void handlePathContentChanged(const std::vector<QString>& paths) { m_exportCSV->setPathFiles(paths); }
 

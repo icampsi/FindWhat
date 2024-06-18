@@ -1,5 +1,5 @@
-#ifndef PENDINGSTRINGBLOCK_H
-#define PENDINGSTRINGBLOCK_H
+#ifndef WTEXTEDDYNAMICBLK_H
+#define WTEXTEDDYNAMICBLK_H
 
 #include <QWidget>
 #include <QTextEdit>
@@ -12,12 +12,12 @@
 
 #include "src/CFunctionClasses.h"
 
-class PEndingStringBlock : public QWidget {
+class WTextEdDynamicBlk : public QWidget {
     Q_OBJECT
 
 public:
-    explicit PEndingStringBlock(QWidget *parent = nullptr);
-    ~PEndingStringBlock();
+    explicit WTextEdDynamicBlk(QWidget *parent = nullptr);
+    ~WTextEdDynamicBlk();
 
     void setupUi();
 
@@ -25,7 +25,6 @@ public:
 
     // Getters&Setters
     void setParentFunction(CExtractingFunction *pFunction) { m_function = pFunction; }
-    // void updateBlock(CExtractingFunction *function);
     void updateBlock(const std::vector<QString>& content);
     size_t removeLabel(QHBoxLayout *labelLayout);
     void clearBlock();
@@ -34,7 +33,6 @@ public:
 
 signals:
     void functionUpdated();
-    // NEW BOOKMARK
     void labelAdded(size_t newLabelCount);
     void labelDeleted(size_t i);
     void labelTextChanged(size_t i, const QString& str);
@@ -51,4 +49,4 @@ private:
     std::vector<QHBoxLayout*> m_addedLabelLayouts;
 };
 
-#endif // PENDINGSTRINGBLOCK_H
+#endif // WTEXTEDDYNAMICBLK_H

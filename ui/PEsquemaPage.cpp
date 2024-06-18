@@ -47,10 +47,10 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     connect(ui->listWidget_function->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
 
     // Connections with the dynamic ending strings widget
-    connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated , this, &PEsquemaPage::handleFunctionUpdated);
-    connect(ui->endingStringBlock, &PEndingStringBlock::labelAdded      , this, &PEsquemaPage::handleEndingStr_lblAdded);
-    connect(ui->endingStringBlock, &PEndingStringBlock::labelDeleted    , this, &PEsquemaPage::handleEndingStr_lblDeleted);
-    connect(ui->endingStringBlock, &PEndingStringBlock::labelTextChanged, this, &PEsquemaPage::handleEndingStr_textChanged);
+    connect(ui->endingStringBlock, &WTextEdDynamicBlk::functionUpdated , this, &PEsquemaPage::handleFunctionUpdated);
+    connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelAdded      , this, &PEsquemaPage::handleEndingStr_lblAdded);
+    connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelDeleted    , this, &PEsquemaPage::handleEndingStr_lblDeleted);
+    connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelTextChanged, this, &PEsquemaPage::handleEndingStr_textChanged);
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
@@ -140,7 +140,6 @@ void PEsquemaPage::loadFunction() {
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
-        // ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction)); // NEW BOOKMARK
         ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction)->getEndingStringBlock());
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
         break;
@@ -365,7 +364,7 @@ void PEsquemaPage::handle_newFunActions(CFunction::Function functionType) {
         case CFunction::Function::ExtractData:
             newFunction = new CExtractingFunction(functionType);
             ui->endingStringBlock->setParentFunction(static_cast<CExtractingFunction*>(newFunction)); // Pass the new function to PEndingStringBlock
-            connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
+            connect(ui->endingStringBlock, &WTextEdDynamicBlk::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
             break;
         case CFunction::Function::ModifyResult:
             newFunction = new CModFunction(functionType);
