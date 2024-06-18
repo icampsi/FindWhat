@@ -25,7 +25,8 @@ public:
 
     // Getters&Setters
     void setParentFunction(CExtractingFunction *pFunction) { m_function = pFunction; }
-    void updateBlock(CExtractingFunction *function);
+    // void updateBlock(CExtractingFunction *function);
+    void updateBlock(const std::vector<QString>& content);
     size_t removeLabel(QHBoxLayout *labelLayout);
     void clearBlock();
 
@@ -33,6 +34,10 @@ public:
 
 signals:
     void functionUpdated();
+    // NEW BOOKMARK
+    void labelAdded(size_t newLabelCount);
+    void labelDeleted(size_t i);
+    void labelTextChanged(size_t i, const QString& str);
 
 private:
     CExtractingFunction *m_function = nullptr;

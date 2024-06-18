@@ -36,6 +36,9 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
+NEW
+- Fixed a bug with the ending string block and cleaned code
+
 17/06/24
 - Added a dialog with a spreadSheet to show the result of parsed files and allowing edition before exporting them to csv.
 - Added new function type: condition. Used for stoping the straction or jump forward in the formula path if some conditions are met. 

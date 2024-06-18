@@ -429,43 +429,49 @@ CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFun
 }
 
 void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
-    QString text = pPdfDoc->getFullText();
+    QString text = pPdfDoc->getFullText(); // PDF in text format
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
+
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
     if(directionInverted && m_result.indexPosition.final > 0) {
         m_result.indexPosition.final--; // If direction is inverted we start from one char before.
         m_result.indexPosition.initial--;
     }
-    bool allowed{ false };      // flag to mark if the character is allowed m_toAllow;
-    bool avoided{ false };      // flag to mark if the character is to avoid m_toAvoid;
-    int extractedAmount{ 0 };   // Counts how many characters we have extracted already: m_charsToGet
+    bool allowed{ false };       // flag to mark if the character is allowed m_toAllow;
+    bool avoided{ false };       // flag to mark if the character is to avoid m_toAvoid;
+    int extractedAmount{ 0 };    // Counter for how many characters we have extracted already: m_charsToGet
     std::vector<QString> endingString = pFunctionToApply->getEndingStringBlock(); // Strings that marks the ending of the extraction
-    QString extractedText;      // Stores the stracted text before copying it to m_result
-    size_t endingStringIndex{0};
-    QString currentEndingString("");
+    QString extractedText;       // Temp storage for the extracted text
+    size_t endingStringIndex{0}; // Counter for the ending str block
+    QString currentEndingString(""); // Ending str in use
+
+    // Initialize currentEndingString
     if(!endingString.empty()) {
         currentEndingString = endingString.at(0);
     }
+
+    // EXTRACTION LOOP - limited by chars to read and to get and broken if last ending string reached
     while(pFunctionToApply->getCharsToRead() != 0 && pFunctionToApply->getCharsToGet()  != 0) {
+        // Check text bounds (current index +/- ending str length needs to be inside text bounds)
         int remainingText{ 0 };
         if(directionInverted) {
-            remainingText = static_cast<int>(m_result.indexPosition.final) - static_cast<int>(currentEndingString.length() + 1);
+            remainingText = static_cast<int>(m_result.indexPosition.final - currentEndingString.length() + 1);
         } else {
             remainingText = static_cast<int>(m_result.indexPosition.final + currentEndingString.length() - 1);
         }
 
         if(remainingText >= 0 && remainingText < text.length()) {
-            // Check if currentEndingString reached.
-            if((directionInverted &&
-                 text.mid(static_cast<size_t>(m_result.indexPosition.final), currentEndingString.length()) == currentEndingString) ||
-                (!directionInverted &&
-                 text.mid(m_result.indexPosition.final, currentEndingString.length()) == currentEndingString))
+            // Is currentEndingString reached.
+            const QString& nextText(text.mid(m_result.indexPosition.final, currentEndingString.length()));
+
+            if(( directionInverted && nextText == currentEndingString) ||
+               (!directionInverted && nextText == currentEndingString))
             {
-                // If currentEndingString reached check next one. If there are no more, break
+                // Check next one or break if there are no more
                 if(endingStringIndex < endingString.size() - 1) {
-                    currentEndingString = endingString.at(endingStringIndex);
                     ++endingStringIndex;
+                    currentEndingString = endingString.at(endingStringIndex);
                 }
                 else break;
             }
@@ -484,7 +490,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         }
         // CHECK IF IT'S ONE OF THE AVOIDED CHARACTERS: m_toAvoid
         QString toAvoid = pFunctionToApply->getToAvoid();
-        if (toAvoid.size() > 0) { // Si hem posat caracters a l'string fa el loop, sino ja no s'ho mira
+        if (toAvoid.size() > 0) {
             for (unsigned short i{ 0 }; i < toAvoid.size(); i++) {
                 if (text[m_result.indexPosition.final] == toAvoid[i]) {
                     avoided = true;
@@ -493,6 +499,7 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
             }
         }
 
+        // Actual extraction if all conditions are met
         switch (pFunctionToApply->getCharTypeToGet()) {
         case CExtractingFunction::CharTypeToGet::digit:
             if ((text[m_result.indexPosition.final].isDigit() && !avoided) || allowed) {
@@ -515,14 +522,17 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
                 extractedAmount++;
             }
         }
+        // Break if extracted ammount reached
         if (pFunctionToApply->getCharsToGet() == extractedAmount) {
             m_result.indexPosition.final++; // Place index after the extracted string
             break;
         }
 
+        // Reset flags
         allowed = false;
         avoided = false;
 
+        // Update index
         if(!directionInverted && static_cast<int>(m_result.indexPosition.final) < text.length() - 1) {
             m_result.indexPosition.final++;
         }
@@ -531,9 +541,12 @@ void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApp
         }
         else break;
     }
-    extractedText.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor());
-    m_result.result.append(std::move(extractedText));
 
+    // Relplace extracted text if needed
+    extractedText.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor());
+
+    // Update result and index
+    m_result.result.append(std::move(extractedText));
     if(directionInverted) {
         m_result.indexPosition.initial = m_result.indexPosition.final - 1;
         m_result.indexPosition.final =  m_result.indexPosition.initial;

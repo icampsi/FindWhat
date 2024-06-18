@@ -45,7 +45,12 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     connect(ui->treeView_formula, &WFormulaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
     connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
     connect(ui->listWidget_function->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
-    connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
+
+    // Connections with the dynamic ending strings widget
+    connect(ui->endingStringBlock, &PEndingStringBlock::functionUpdated , this, &PEsquemaPage::handleFunctionUpdated);
+    connect(ui->endingStringBlock, &PEndingStringBlock::labelAdded      , this, &PEsquemaPage::handleEndingStr_lblAdded);
+    connect(ui->endingStringBlock, &PEndingStringBlock::labelDeleted    , this, &PEsquemaPage::handleEndingStr_lblDeleted);
+    connect(ui->endingStringBlock, &PEndingStringBlock::labelTextChanged, this, &PEsquemaPage::handleEndingStr_textChanged);
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
@@ -135,7 +140,8 @@ void PEsquemaPage::loadFunction() {
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
-        ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction));
+        // ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction)); // NEW BOOKMARK
+        ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction)->getEndingStringBlock());
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
         break;
     case CFunction::Function::ModifyResult:
@@ -499,6 +505,15 @@ void PEsquemaPage::on_lineEdit_replaceFor_textChanged(const QString &arg1) {
     CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setReplaceFor(arg1);
     updateFunctionProcess();
+}
+
+void PEsquemaPage::handleEndingStr_lblAdded(size_t count) {
+    CExtractingFunction *function = dynamic_cast<CExtractingFunction*>(m_activeFunction);
+    if(function) {
+        for(size_t i = function->getEndingStringBlock().size(); i <= count; i++) {
+            function->addEndingStringBlock("");
+        }
+    }
 }
 
 // MOVE LINES UI

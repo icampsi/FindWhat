@@ -95,6 +95,10 @@ private slots:
     void on_lineEdit_toReplace_textChanged(const QString &arg1);
     void on_lineEdit_replaceFor_textChanged(const QString &arg1);
 
+    void handleEndingStr_lblAdded(size_t count);
+    void handleEndingStr_lblDeleted(size_t i) { static_cast<CExtractingFunction*>(m_activeFunction)->deleteEndingStringBlockMember(i); }
+    void handleEndingStr_textChanged(size_t i, const QString& str) { static_cast<CExtractingFunction*>(m_activeFunction)->modifyEndingStringBlock(i, str); }
+
     // Move lines UI
     void on_spinBox_moveLinesNum_valueChanged(int arg1);
     void on_comboBox_placeInLine_activated(int index);

@@ -33,25 +33,22 @@ void PEndingStringBlock::setupUi() {
 
 void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttaching remove button to first lable*/) {
     QHBoxLayout *labelLayout = new QHBoxLayout;
-    QTextEdit *textEdit = new QTextEdit(this);
 
-    // Display whitespace characters and newlines in QTextEdit
+    // Create and style the textEdit
+    QTextEdit   *textEdit = new QTextEdit(this);
     QTextOption option;
     option.setFlags(QTextOption::ShowTabsAndSpaces | QTextOption::ShowLineAndParagraphSeparators);
     textEdit->document()->setDefaultTextOption(option);
     textEdit->setMinimumHeight(400);
-
     textEdit->setFixedHeight(28);
+
+    // Add the textEdit
     labelLayout->addWidget(textEdit);
     m_endingStrTxtBlock.push_back(textEdit);
 
     if(attachRemoveBtn) m_addedLabelLayouts.push_back(labelLayout);
 
-    if(m_function) {
-        for(size_t i = m_function->getEndingStringBlock().size(); i <= m_addedLabelLayouts.size(); i++) {
-            m_function->addEndingStringBlock("");
-        }
-    }
+    emit labelAdded(m_addedLabelLayouts.size());
 
     connect(textEdit, &QTextEdit::textChanged, this, [=]() {
         auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEdit);
@@ -59,7 +56,7 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttach
             size_t i = std::distance(m_endingStrTxtBlock.begin(), it);
 
             QString parsedText = parseFromText(textEdit->toPlainText());
-            m_function->modifyEndingStringBlock(i, parsedText);
+            emit labelTextChanged(i, parsedText);
             if (!m_blockUpdate) emit functionUpdated();
         }
     });
@@ -75,7 +72,7 @@ void PEndingStringBlock::addNewLabel(bool attachRemoveBtn/*flag to avoid atttach
 
         connect(removeButton, &QPushButton::clicked, this, [=](){
             size_t index = removeLabel(labelLayout);
-            m_function->deleteEndingStringBlockMember(index);
+            emit labelDeleted(index);
             if (!m_blockUpdate) emit functionUpdated();
         });
 
@@ -118,12 +115,28 @@ void PEndingStringBlock::clearBlock() {
     m_addedLabelLayouts.clear();
 }
 
-void PEndingStringBlock::updateBlock(CExtractingFunction *function) {
+// void PEndingStringBlock::updateBlock(CExtractingFunction *function) {
+//     m_blockUpdate = true; // Blocks unnecessary function updates until every block is clear
+//     clearBlock();
+//     m_function = function;
+//     for(size_t i{ 0 }; i < m_function->getEndingStringBlock().size(); i++) {
+//         const QString& text = m_function->getEndingStringBlock().at(i);
+//         if (i == 0) m_endingStrTxtBlock.at(0)->setText(text);
+//         else {
+//             addNewLabel(true);
+//             m_endingStrTxtBlock.at(i)->setText(text);
+//         }
+//     }
+//     m_blockUpdate = false;
+//     emit functionUpdated();
+// }
+
+// NEW BOOKMARK
+void PEndingStringBlock::updateBlock(const std::vector<QString>& content) {
     m_blockUpdate = true; // Blocks unnecessary function updates until every block is clear
     clearBlock();
-    m_function = function;
-    for(size_t i{ 0 }; i < m_function->getEndingStringBlock().size(); i++) {
-        const QString& text = m_function->getEndingStringBlock().at(i);
+    for(size_t i{ 0 }; i < content.size(); i++) {
+        const QString& text = content.at(i);
         if (i == 0) m_endingStrTxtBlock.at(0)->setText(text);
         else {
             addNewLabel(true);
