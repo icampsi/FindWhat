@@ -48,7 +48,7 @@ public:
 class CIndexingFunction : public CFunction {
 protected:
     // MEMBERS
-    QString m_text{ "" };
+    std::vector<QString> m_text;
     int     m_num{ 0 };
     bool    m_option{ true };
     bool    m_startFromBeggining{ false };
@@ -63,20 +63,24 @@ public:
     virtual ~CIndexingFunction() {}
 
     // GETTERS&SETTERS
-    const QString& getText() const              { return m_text; }
-    void           setText(const QString& text) { m_text = text; }
+    const QString& getText(const size_t i = 0) const                { return m_text.at(i); }
+    void           setText(const QString& text, const size_t i = 0) { m_text.at(i) = text; }
+    void           modifyTextBlock(size_t i, const QString& str)    { m_text.at(i) = std::move(str); }
+    const          std::vector<QString>& getTextBlock()             { return m_text; }
+    void           pushText(const QString& text)                    { m_text.push_back(std::move(text)); }
+    void           deleteTextBlockMember(size_t index);
 
     int  getNum() const        { return m_num; }
     void setNum(const int num) { m_num = num;  }
 
-    bool getOption() const      { return m_option;   }
+    bool getOption() const            { return m_option;   }
     void setOption(const bool option) { m_option = option; }
 
-    bool getStartFromBeggining() const      { return m_startFromBeggining;   }
+    bool getStartFromBeggining() const            { return m_startFromBeggining;   }
     void setStartFromBeggining(const bool option) { m_startFromBeggining = option; }
 
     // SERIALIZATION
-    void serialize(std::ofstream& out) const override;
+    void serialize(std::ofstream& out)  const override;
     void deserialize(std::ifstream& in) override;
 };
 
@@ -125,12 +129,9 @@ public:
     void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
 
     const std::vector<QString>& getEndingStringBlock() const { return m_endingStr; }
-    void addEndingStringBlock(const QString& endingString) { m_endingStr.push_back(std::move(endingString)); }
-    void deleteEndingStringBlockMember(size_t index) {
-        if (index < m_endingStr.size()) {
-            m_endingStr.erase(m_endingStr.begin() + index);
-        }
-    }
+    void addEndingStringBlock(const QString& endingString)   { m_endingStr.push_back(std::move(endingString)); }
+    void deleteEndingStringBlockMember(size_t index);
+
     void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }
 
     bool isInverted() const                          { return m_invertDirection; }

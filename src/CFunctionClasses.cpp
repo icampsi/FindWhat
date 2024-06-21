@@ -67,11 +67,17 @@ CMathFunction::CMathFunction(const CMathFunction &other)
 
 
 
-CIndexingFunction::CIndexingFunction(Function name) : CFunction(name) {
+CIndexingFunction::CIndexingFunction(Function name) : CFunction(name), m_text() {
     if (name == Function::Find) m_num = -1; // Set m_num to negative if it is a Find function so by default the full document is looked at instead of page 0;
 }
 CIndexingFunction::CIndexingFunction(const CIndexingFunction &other)
     : CFunction(other.m_action), m_text{other.m_text}, m_num{other.m_num}, m_option{other.m_option} {}
+
+void CIndexingFunction::deleteTextBlockMember(size_t index) {
+    if (index < m_text.size()) {
+        m_text.erase(m_text.begin() + index);
+    }
+}
 
 void CIndexingFunction::serialize(std::ofstream& out) const {
     CFunction::serialize(out);
@@ -84,7 +90,7 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
      * bool     m_startFromBeggining
     */
 
-    SerializationUtils::writeQString(out, m_text);                                 // m_text
+    SerializationUtils::writeCustomQStringContainer(out, m_text);                  // m_text
     out.write(reinterpret_cast<const char*>(&m_num), sizeof(int));                 // m_num
     out.write(reinterpret_cast<const char*>(&m_option), sizeof(bool));             // m_option
     out.write(reinterpret_cast<const char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
@@ -100,13 +106,13 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
      * bool     m_startFromBeggining
     */
 
-    SerializationUtils::readQString(in, m_text);                           // m_text
+    SerializationUtils::readCustomQStringContainer(in, m_text);            // m_text
     in.read(reinterpret_cast<char*>(&m_num), sizeof(int));                 // m_num
     in.read(reinterpret_cast<char*>(&m_option), sizeof(bool));             // m_option
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
 }
 
-CExtractingFunction::CExtractingFunction(Function name) : CFunction(name), m_endingStr{ "\n" } {}
+CExtractingFunction::CExtractingFunction(Function name) : CFunction(name), m_endingStr() {}
 
 CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
     : CFunction(other.m_action),
@@ -117,6 +123,12 @@ CExtractingFunction::CExtractingFunction(const CExtractingFunction &other)
     m_charTypeToGet{other.m_charTypeToGet},
     m_toAllow{other.m_toAllow},
     m_toAvoid{other.m_toAvoid} {
+}
+
+void CExtractingFunction::deleteEndingStringBlockMember(size_t index) {
+    if (index < m_endingStr.size()) {
+        m_endingStr.erase(m_endingStr.begin() + index);
+    }
 }
 
 void CExtractingFunction::serialize(std::ofstream& out) const {

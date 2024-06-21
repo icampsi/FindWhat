@@ -193,6 +193,7 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
         relativeIndexFinal   = 0;
     }
 
+    // Set up what pages to look for the text
     int pageToLook = pFunctionToApply->getNum() - 1;
     if(pageToLook >= static_cast<int>(pPdfDoc->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
 
@@ -207,19 +208,33 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     }
 
     // TRUE = end text. FALSE = begin text
-    if (text.indexOf(pFunctionToApply->getText(), indexPos_initial) != -1) {
-        if (pFunctionToApply->getOption()) {
-            relativeIndexInitial = text.indexOf(pFunctionToApply->getText(), relativeIndexInitial) + pFunctionToApply->getText().length();
+    const std::vector<QString>& textBlock = pFunctionToApply->getTextBlock();
+    // Find text. It keeps iterating through the vector until one of the texts are found,
+    // thus, text strings will only be looked for if previous ones aren't there
+    for (auto iter = textBlock.begin(); iter != textBlock.end(); ++iter) {
+        const QString& textToFind = *iter;
+        if (textToFind.isEmpty()) continue;
+
+        if (text.indexOf(textToFind, indexPos_initial) != -1) {
+            relativeIndexInitial = text.indexOf(textToFind, relativeIndexInitial);
+
+            if (pFunctionToApply->getOption()) {
+                relativeIndexInitial += textToFind.length();
+            }
+
+            relativeIndexFinal = relativeIndexInitial;
+            break;
         }
         else {
-            relativeIndexInitial = text.indexOf(pFunctionToApply->getText(), relativeIndexInitial);
+            qDebug() << "Couldn't find string '" << textToFind << "' for: '" << m_data.getDataName() << "'";
+            // return negative if no strings where found in the text
+            if (iter == textBlock.end() - 1) {
+                qDebug() << "None of the supplyed strings where found for: '" << m_data.getDataName() << "'";
+                return -1;
+            }
         }
-        relativeIndexFinal = relativeIndexInitial;
     }
-    else {
-        qDebug() << "Couldn't find string '" << pFunctionToApply->getText() << "' for: '" << m_data.getDataName() << "'";
-        return -1;
-    }
+
     if(pageToLook >= 0) {
         relativeIndexInitial += pPdfDoc->getPage(pageToLook).pageCharRange.from;
         relativeIndexFinal   += pPdfDoc->getPage(pageToLook).pageCharRange.from;
@@ -316,6 +331,11 @@ void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of curre
     }
     // Since this is an indexing function, we don't want the final index to be different than the starting index
     m_result.indexPosition.final = m_result.indexPosition.initial;
+}
+
+void CFormula::appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends string to m_result
+    if(!pFunctionToApply->getOption()) m_result.result.append(pFunctionToApply->getText());
+    else                               m_result.result.prepend(pFunctionToApply->getText());
 }
 
 void CFormula::appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer) {

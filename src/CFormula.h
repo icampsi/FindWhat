@@ -59,10 +59,8 @@ protected:
     void moveLine (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
     void BeginLine(CPdfDoc *pPdfDoc); // Sets index at the begining of current line
     void EndLine  (CPdfDoc *pPdfDoc); // Sets index at the begining of current line
-    void appendString(CIndexingFunction* pFunctionToApply) { //Appends or prepends string to m_result
-        if(!pFunctionToApply->getOption()) m_result.result.append(pFunctionToApply->getText());
-        else                               m_result.result.prepend(pFunctionToApply->getText());
-    }
+    void appendString(CIndexingFunction* pFunctionToApply); //Appends or prepends string to m_result
+
     void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
     bool MathData(CMathFunction* pMathFunctionToApply);
 
