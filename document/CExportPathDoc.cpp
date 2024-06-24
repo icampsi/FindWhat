@@ -47,7 +47,7 @@ size_t CExportPathDoc::getFileCount() {
 }
 
 
-void CExportPathDoc::xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator) {
+void CExportPathDoc::modelToFile(const QString& fileName, QStandardItemModel *model) {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(nullptr, QStringLiteral("ERROR"), QStringLiteral("Couldn't create file"));
@@ -55,18 +55,27 @@ void CExportPathDoc::xsvm_stringStructureToFile(const QString& fileName, std::ve
     }
 
     QTextStream out(&file);
-    for (const auto& row : rXSVStructure) {
-        for (const auto &cell : row) {
-            out << '"';
-            for (const QChar& c : cell) {
-                if (c == '"')
-                    out << "\"\"";
-                else
-                    out << c;
+
+    const int rowCount = model->rowCount();
+    const int columnCount = model->columnCount();
+
+    // Iterate through rows and columns of the model
+    for (int row = 0; row < rowCount; ++row) {
+        QStringList rowData;
+        for (int col = 0; col < columnCount; ++col) {
+            // Get data from model
+            QModelIndex index = model->index(row, col);
+            QString data = model->data(index).toString();
+            // Replace any commas in the data to avoid CSV format issues
+            if(data.contains(',')) {
+                data.append("\"");
+                data.prepend("\"");
             }
-            out << '"' << separator;
+            // Append the data to the row list
+            rowData.append(data);
         }
-        out << '\n';
+        // Join the row data with commas and write to the file
+        out << rowData.join(",") << "\n";
     }
     QMessageBox::information(nullptr, "Succes!", ".csv file created succesfully");
 }

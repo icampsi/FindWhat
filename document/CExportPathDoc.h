@@ -20,7 +20,7 @@ public:
 
 protected:
     // MEMBERS
-    std::vector<CExportCSV*> m_exportCSVs;
+    std::vector<CExportCSV*> m_exportCSVs;    
 
 public:
     // INTERFACE FOR m_exportCSVs
@@ -41,8 +41,8 @@ public:
     // Returns the colective size of the stored exportCSV filePaths
     size_t getFileCount();
 
-    // Creates a .csv File from a xsvStringStructure
-    void xsvm_stringStructureToFile(const QString& fileName, std::vector<std::vector<QString>>& rXSVStructure, QChar separator);
+    // Creates a .csv File from a QStandardItemModel
+    void modelToFile(const QString& fileName, QStandardItemModel *model);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;

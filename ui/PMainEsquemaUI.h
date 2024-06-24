@@ -31,21 +31,26 @@ public:
     void changeCurrentPage(PEsquemaPage* page) { ui->stackedWidget_esquemaPage->setCurrentWidget(page); }
     void addExportCSV(CExportCSV *exportCSV);
     void deletePage(int index); // Deletes a page from the toobox
+    int  pageCount() { return ui->toolBox_formatEsquema->count(); }
     void clearPages(); // Clears all pages (calls deletePage one by one)
+    void deleteEsquema(const int index, const bool askConfirmation = false);
 
 private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
     void on_pushButton_addPage_clicked();
     void on_DeletePage_clicked() { deletePage(ui->toolBox_formatEsquema->currentIndex()); }
     void on_pushButton_parse_clicked();
+    void handleEsquemaSelectionChanged();
+    void handleEsqItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
 
 public slots:
-    void handleDeleteEsquema(const size_t index);
+    void handleDeleteEsquema(const int index);
     void handleFilePathChanged(const QString &filePath);
     void setCurrentPageToEmptyPage() { ui->stackedWidget_esquemaPage->setCurrentWidget(&m_emptyPage); } // Sets the current page to empty page in case no esquemas are loaded
 
 private:
     Ui::PMainEsquemaUI *ui;
     PEsquemaPage m_emptyPage; // empty page to load when no esquema is loaded
+    QMap<QListWidgetItem*, PEsquemaPage*> m_itemPageMap;
 };
 #endif // PMAINESQUEMAUI_H

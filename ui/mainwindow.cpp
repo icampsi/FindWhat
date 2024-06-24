@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/logo/mainLogo.ico")); // Loads the .ico logo for the application
 
-    m_cmdoc.addObserver([this](const std::vector<QString>&) { this->checkExortEsquemaActionEnable(); });
+    m_observerHandle.push_back(m_cmdoc.addObserver([this](const std::vector<QString>&) { this->checkExortEsquemaActionEnable(); }));
 
     // SetUp the Dock Prveiew Widget
     m_dockPreview = new PDockPreview(this);
@@ -65,6 +65,10 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
     delete ui;
     delete m_dockPreview;
+    // Remove observers
+    for(size_t& handle : m_observerHandle) {
+        m_cmdoc.removeObserver(handle);
+    }
 }
 
 // MENU ACTIONS --------------------------------------------------------
@@ -85,17 +89,19 @@ void MainWindow::action_loadSession() {
     if (fileName.isEmpty()) return;
 
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Unsaved Changes",
-                                  "Loading a new session will replace current one and discard unsaved changes. Continue?",
-                                  QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::No) return;
+    if(m_cmdoc.getLoadedEsquemaDocs()->size() > 0 || m_cmdoc.getExportPathDoc().getExportCSVs().size() > 0) {
+        reply = QMessageBox::question(this, "Unsaved Changes",
+                                      "Loading a new session will replace current one and discard unsaved changes. Continue?",
+                                      QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::No) return;
+    }
 
-    // Delete loaded exportCSV pages
+    // Delete loaded exportCSV and pages
     ui->mainEsquemaUI->clearPages();
 
     //Delete esquemas
     for (size_t i = m_cmdoc.getLoadedEsquemaDocs()->size(); i-- > 0; ) {
-        ui->mainEsquemaUI->handleDeleteEsquema(i);
+        ui->mainEsquemaUI->deleteEsquema(static_cast<int>(i), false);
     }
 
     // Deserialize file
@@ -118,8 +124,6 @@ void MainWindow::action_loadSession() {
         CExportCSV* exportCSV = m_cmdoc.getExportPathDoc().getExportCSVByIndex(i);
         ui->mainEsquemaUI->addExportCSV(exportCSV);
     }
-    qDebug() << "try";
-
 }
 
 void MainWindow::action_saveSession() {

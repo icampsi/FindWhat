@@ -5,10 +5,13 @@
 #include <QAction>
 #include <QFileDialog>
 #include "document/CMDoc.h"
+#include "ui/dialogs/ui_DDisplayParsedInfo.h"
 
-DDisplayParsedInfo::DDisplayParsedInfo(std::vector<std::vector<QString>> &xsvStruct, QWidget *parent)
-    : QDialog(parent), ui(new Ui::DDisplayParsedInfo), m_xsvStruct{xsvStruct}
+DDisplayParsedInfo::DDisplayParsedInfo(QStandardItemModel *combinedModel,  QWidget *parent)
+    : QDialog(parent), ui(new Ui::DDisplayParsedInfo), m_combinedModel{combinedModel}
 {
+    ui->setupUi(this);
+
     // Create a menu bar
     QMenuBar *menuBar = new QMenuBar(this);
 
@@ -22,9 +25,6 @@ DDisplayParsedInfo::DDisplayParsedInfo(std::vector<std::vector<QString>> &xsvStr
     QAction *exportDBAction = new QAction(tr("Export to Database"), this);
     fileMenu->addAction(exportDBAction);
 
-    ui->setupUi(this);
-    populateTable(xsvStruct);
-
     // Connect actions to slots
     connect(exportCSVAction, &QAction::triggered, this, &DDisplayParsedInfo::exportToCSV);
     connect(exportDBAction, &QAction::triggered, this, [this]() {
@@ -33,25 +33,12 @@ DDisplayParsedInfo::DDisplayParsedInfo(std::vector<std::vector<QString>> &xsvStr
 
     // Set up the layout
     this->layout()->setMenuBar(menuBar);
+    ui->spreadSheet->setModel(combinedModel);
 }
 
-DDisplayParsedInfo::~DDisplayParsedInfo() { delete ui; }
-
-
-void DDisplayParsedInfo::populateTable(std::vector<std::vector<QString>>& xsvStruct) {
-    int numRows = static_cast<int>(xsvStruct.size());
-    if (numRows == 0) return;
-
-    int numCols = static_cast<int>(xsvStruct[0].size());
-    ui->tableWidget->setRowCount(numRows);
-    ui->tableWidget->setColumnCount(numCols);
-
-    for (int row = 0; row < numRows; ++row) {
-        for (int col = 0; col < numCols; ++col) {
-            QTableWidgetItem* item = new QTableWidgetItem(xsvStruct[row][col]);
-            ui->tableWidget->setItem(row, col, item);
-        }
-    }
+DDisplayParsedInfo::~DDisplayParsedInfo() {
+    delete ui;
+    delete m_combinedModel;
 }
 
 bool DDisplayParsedInfo::exportToCSV() {
@@ -63,7 +50,7 @@ bool DDisplayParsedInfo::exportToCSV() {
     if (saveCSVFileName.isEmpty()) { return false; } // Return if canceled
     ///////////////////////////////////////////////
     CMDoc& cmdoc = CMDoc::getMDoc();
-    cmdoc.getExportPathDoc().xsvm_stringStructureToFile(saveCSVFileName, m_xsvStruct, ',');
+    cmdoc.getExportPathDoc().modelToFile(saveCSVFileName, m_combinedModel);
     qDebug() << "exported";
     return true;
 }

@@ -42,15 +42,26 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     loadEsquema();
     ui->treeView_formula->expandAll();
     
+    ui->dynamicBlck_textToFind->setLableText("Text to find");
+    ui->dynamicBlck_textToFind->setSecondaryLabelText("else");
+
     connect(ui->treeView_formula, &WFormulaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
     connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
     connect(ui->listWidget_function->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
 
-    // Connections with the dynamic ending strings widget
-    connect(ui->endingStringBlock, &WTextEdDynamicBlk::functionUpdated , this, &PEsquemaPage::handleFunctionUpdated);
+    // Connections with the dynamic block ending strings widget
+    connect(ui->endingStringBlock, &WTextEdDynamicBlk::blockUpdated    , this, &PEsquemaPage::handleFunctionUpdated);
     connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelAdded      , this, &PEsquemaPage::handleEndingStr_lblAdded);
     connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelDeleted    , this, &PEsquemaPage::handleEndingStr_lblDeleted);
     connect(ui->endingStringBlock, &WTextEdDynamicBlk::labelTextChanged, this, &PEsquemaPage::handleEndingStr_textChanged);
+
+    // Connections with the dynamic block Find Strings widget
+    connect(ui->dynamicBlck_textToFind, &WTextEdDynamicBlk::blockUpdated    , this, &PEsquemaPage::handleFunctionUpdated);
+    connect(ui->dynamicBlck_textToFind, &WTextEdDynamicBlk::labelAdded      , this, &PEsquemaPage::handleFindBlock_lblAdded);
+    connect(ui->dynamicBlck_textToFind, &WTextEdDynamicBlk::labelDeleted    , this, &PEsquemaPage::handleFindBlock_lblDeleted);
+    connect(ui->dynamicBlck_textToFind, &WTextEdDynamicBlk::labelTextChanged, this, &PEsquemaPage::handleFindBlock_textChanged);
+    
+    connect(ui->listWidget_function, &WExtendedListWidget::itemDeletitionRequested, this, &PEsquemaPage::handleFunctionDelete);
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
@@ -114,20 +125,30 @@ void PEsquemaPage::loadFunction() {
 
     CIndexingFunction   *indexingFunction   = dynamic_cast<CIndexingFunction*>(function);
     CExtractingFunction *extractingFunction = dynamic_cast<CExtractingFunction*>(function);
-    // CMathFunction       *mathFunction    = dynamic_cast<CMathFunction*>(function); // Still unused until futur updates
     CModFunction        *modFunction        = dynamic_cast<CModFunction*>(function);
     CConditionFunction  *condFunction       = dynamic_cast<CConditionFunction*>(function);
     QString parsedText;
+    int num{0};
     switch (function->getFunctionType()) {
     case CFunction::Function::Find:
-        parsedText = parseToText(indexingFunction->getText());
-        if(ui->lineEdit_textToFind->text() != parsedText) ui->lineEdit_textToFind->setText(parsedText);
+        ui->dynamicBlck_textToFind->updateBlock(indexingFunction->getTextBlock());
         if(ui->comboBox_setIndexAt->currentIndex() != !indexingFunction->getOption())ui->comboBox_setIndexAt->setCurrentIndex(!indexingFunction->getOption());
         ui->comboBox_startFrom->setCurrentIndex(indexingFunction->getStartFromBeggining());
+        num = indexingFunction->getNum();
+        if(num > 0) {
+            ui->checkBox_lookOnlyAtPage->setChecked(true);
+            ui->spinBox_lookOnlyAtPage->setValue(num);
+        } else {
+            ui->spinBox_lookOnlyAtPage->setValue(1);
+            ui->checkBox_lookOnlyAtPage->setChecked(false);
+        }
+        ui->checkBox_goBackwards->setChecked(indexingFunction->getGoBackwards());
         break;
     case CFunction::Function::MoveIndex:
+        ui->spinBox_moveIndex->setValue(indexingFunction->getNum());
         break;
     case CFunction::Function::MoveLine:
+        ui->comboBox_placeInLine->setCurrentIndex(indexingFunction->getOption());
         break;
     case CFunction::Function::AppendString:
         parsedText = parseToText(indexingFunction->getText());
@@ -140,7 +161,7 @@ void PEsquemaPage::loadFunction() {
         ui->comboBox_typeOfData->setCurrentIndex(static_cast<int>(extractingFunction->getCharTypeToGet()));
         ui->lineEdit_charsToAllow->setText(extractingFunction->getToAllow());
         ui->lineEdit_charsToAvoid->setText(extractingFunction->getToAvoid());
-        ui->endingStringBlock->updateBlock(static_cast<CExtractingFunction*>(m_activeFunction)->getEndingStringBlock());
+        ui->endingStringBlock->updateBlock(extractingFunction->getEndingStringBlock());
         ui->spinBox_extractAmmount->setValue(extractingFunction->getCharsToGet());
         break;
     case CFunction::Function::ModifyResult:
@@ -256,6 +277,30 @@ void PEsquemaPage::newStaticData() {
 
 // SLOTS
 // VIEWS ==============================================================
+void PEsquemaPage::handleFunctionDelete(int rowToDelete) {
+    // Show confirmation dialog
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm Deletion", "Are you sure you want to delete this item?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        QListWidget *listWidget = ui->listWidget_function;
+        if(listWidget->count() == 0) return; // if there are no functions, return
+
+        // Ensure a valid row is selected
+        if (rowToDelete != -1) {
+            // Remove the item from the list widget
+            QListWidgetItem *item = listWidget->takeItem(rowToDelete);
+            delete item; // Delete the item
+            m_loadedFormula->deleteFunction(rowToDelete);
+        } else {
+            // Handle case where no row is selected
+            QMessageBox::warning(this, "No Row Selected", "Please select a row to delete.");
+        }
+        if(listWidget->count() == 0) m_activeFunction = nullptr; // if last function is been deleted, point m_activeFunction to nullptr
+        updateFunctionProcess();
+    }
+}
+
 void PEsquemaPage::on_treeView_formula_clicked(const QModelIndex &index) {
     if (!index.isValid() || !index.parent().isValid()) return;
 
@@ -360,11 +405,13 @@ void PEsquemaPage::handle_newFunActions(CFunction::Function functionType) {
         case CFunction::Function::MoveLine:
         case CFunction::Function::AppendString:
             newFunction = new CIndexingFunction(functionType);
+            static_cast<CIndexingFunction*>(newFunction)->pushText("");
             break;
         case CFunction::Function::ExtractData:
             newFunction = new CExtractingFunction(functionType);
+            static_cast<CExtractingFunction*>(newFunction)->pushEndingString("");
             ui->endingStringBlock->setParentFunction(static_cast<CExtractingFunction*>(newFunction)); // Pass the new function to PEndingStringBlock
-            connect(ui->endingStringBlock, &WTextEdDynamicBlk::functionUpdated, this, &PEsquemaPage::handleFunctionUpdated);
+            connect(ui->endingStringBlock, &WTextEdDynamicBlk::blockUpdated, this, &PEsquemaPage::handleFunctionUpdated);
             break;
         case CFunction::Function::ModifyResult:
             newFunction = new CModFunction(functionType);
@@ -400,32 +447,12 @@ void PEsquemaPage::on_lineEdit_functionName_textChanged(const QString &arg1) {
 }
 
 void PEsquemaPage::on_pushButton_deleteFunctin_clicked() {
-    QListWidget *listWidget = ui->listWidget_function;
-    if(listWidget->count() == 0) return; // if there are no functions, return
-    int rowToDelete = listWidget->currentRow(); // Get the index of the current row
-
-    // Ensure a valid row is selected
-    if (rowToDelete != -1) {
-        // Remove the item from the list widget
-        QListWidgetItem *item = listWidget->takeItem(rowToDelete);
-        delete item; // Delete the item
-        m_loadedFormula->deleteFunction(rowToDelete);
-    } else {
-        // Handle case where no row is selected
-        QMessageBox::warning(this, "No Row Selected", "Please select a row to delete.");
-    }
-    if(listWidget->count() == 0) m_activeFunction = nullptr; // if last function is been deleted, point m_activeFunction to nullptr
-    updateFunctionProcess();
+    int rowToDelete = ui->listWidget_function->currentRow(); // Get the index of the current row
+    handleFunctionDelete(rowToDelete);
 }
 
 // STACKED BOX UI
 // FIND FUNCTION UI
-void PEsquemaPage::on_lineEdit_textToFind_textChanged(const QString &arg1) {
-    QString parsedText = parseFromText(arg1);
-    dynamic_cast<CIndexingFunction*>(m_activeFunction)->setText(parsedText);
-    updateFunctionProcess();
-}
-
 void PEsquemaPage::on_comboBox_setIndexAt_currentIndexChanged(int index) {
     dynamic_cast<CIndexingFunction*>(m_activeFunction)->setOption(!index);
     updateFunctionProcess();
@@ -445,6 +472,7 @@ void PEsquemaPage::on_checkBox_lookOnlyAtPage_stateChanged(int arg1) {
         function->setNum(ui->spinBox_lookOnlyAtPage->value());
     }
     else {
+        ui->spinBox_lookOnlyAtPage->setValue(1);
         ui->spinBox_lookOnlyAtPage->setEnabled(false);
         function->setNum(0);
     }
@@ -455,6 +483,20 @@ void PEsquemaPage::on_spinBox_lookOnlyAtPage_valueChanged(int arg1) {
     CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setNum(arg1);
     updateFunctionProcess();
+}
+
+void PEsquemaPage::handleFindBlock_lblAdded(size_t count) {
+    CIndexingFunction *function = dynamic_cast<CIndexingFunction*>(m_activeFunction);
+    if(function) {
+        for(size_t i = function->getTextBlock().size(); i <= count; i++) {
+            function->pushText("");
+        }
+    }
+}
+
+void PEsquemaPage::on_checkBox_goBackwards_stateChanged(int arg1) {
+    CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
+    function->setGoBackwards(arg1);
 }
 
 // EXTRACTING FUNCTION UI
@@ -510,7 +552,7 @@ void PEsquemaPage::handleEndingStr_lblAdded(size_t count) {
     CExtractingFunction *function = dynamic_cast<CExtractingFunction*>(m_activeFunction);
     if(function) {
         for(size_t i = function->getEndingStringBlock().size(); i <= count; i++) {
-            function->addEndingStringBlock("");
+            function->pushEndingString("");
         }
     }
 }
@@ -522,7 +564,7 @@ void PEsquemaPage::on_spinBox_moveLinesNum_valueChanged(int arg1) {
     updateFunctionProcess();
 }
 
-void PEsquemaPage::on_comboBox_placeInLine_activated(int index) {
+void PEsquemaPage::on_comboBox_placeInLine_currentIndexChanged(int index) {
     CIndexingFunction* function = static_cast<CIndexingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
     function->setOption(index);
     updateFunctionProcess();

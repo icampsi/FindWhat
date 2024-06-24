@@ -36,7 +36,6 @@ void PDockPreview::handleFilePathChanged(const QString &filePath) {
 }
 
 void PDockPreview::handleFunctionUpdated(CFormula::IndexPosition index, const QString& result) {
-    // BOOKMARK - Since last change in cformula after extracting data all indexing function stay red. Need to change result for function type
     if(result.isEmpty()) m_highlightBrush = Qt::green; // Green is indexing
     else                 m_highlightBrush = Qt::red;   // Red if exracting
     updateCursor(index);

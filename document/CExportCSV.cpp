@@ -59,13 +59,13 @@ void CExportCSV::buildStructure(std::vector<std::vector<QString>> *xsvStructure,
         }
         catch (const std::exception& e) {
             // If we fail to create document we simply go to the next one // BOOKMARK - Maybe come other mechanism would be better
-            delete pdfDoc;
+            if (pdfDoc != nullptr) delete pdfDoc;
             QMessageBox::warning(nullptr, "Error", QString("Failed to process file: %1\nError: %2").arg(filePath, e.what()));
             continue;
         }
 
         // Continue if ID text not present
-        if (!m_idText.isEmpty() && std::find(pdfDoc->getFullText().begin(), pdfDoc->getFullText().end(), m_idText) != pdfDoc->getFullText().end()) {
+        if (!m_idText.isEmpty() && !pdfDoc->getFullText().contains(m_idText)) {
             delete pdfDoc;
             continue;
         }
@@ -92,6 +92,72 @@ void CExportCSV::buildStructure(std::vector<std::vector<QString>> *xsvStructure,
 
         // Rename document
         if (m_renameParsedPDFFlag) renameFile(filePath);
+        // Update progress bar
+        if (iteration % 2 == 0) progressDialog->updateProgress();
+
+        ++iteration;
+        delete pdfDoc;
+    }
+    progressDialog->updateProgress(); // Final update to ensure it doesn't get stuck on 99%
+}
+
+void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns) {
+    CEsquema* esquema = m_associatedEsquemaDoc->getEsquema();
+    std::vector<std::vector<QString>> format = convertModelToVector(&m_tableModel);
+
+    // Ensure each row in format has at least maxColumns columns
+    if (!format.empty() && format[0].size() < maxColumns) {
+        for (std::vector<QString>& row : format) {
+            row.resize(maxColumns, "");  // Add empty QStrings to the row if necessary
+        }
+    }
+
+    int iteration = 0;
+    for (const QString& filePath : m_pdfFilePaths) {
+        // Create the pdf document
+        CPdfDoc* pdfDoc = nullptr;
+
+        try {
+            pdfDoc = new CPdfDoc(filePath); // Attempt to create pdfDoc
+        } catch (const std::exception& e) {
+            // Handle creation failure
+            if (pdfDoc != nullptr) delete pdfDoc;
+            QMessageBox::warning(nullptr, "Error", QString("Failed to process file: %1\nError: %2").arg(filePath, e.what()));
+            continue;
+        }
+
+        // Skip if ID text not present
+        if (!m_idText.isEmpty() && !pdfDoc->getFullText().contains(m_idText)) {
+            delete pdfDoc;
+            continue;
+        }
+
+        // Extract data
+        std::unordered_map<QString, QString> extractedData;
+        esquema->parseDoc(pdfDoc, &extractedData);
+
+        auto replacer = [&extractedData](const QString& capturedString) -> QString {
+            auto it = extractedData.find(capturedString);
+            if (it != extractedData.end()) {
+                return it->second;
+            } else {
+                return "ERROR_REPLACING_PLACEHOLDER";
+            }
+        };
+
+        // Add rows from the format to the combined model
+        for (const std::vector<QString>& row : format) {
+            QList<QStandardItem*> newRowItems;
+            for (QString cell : row) {
+                replacePlaceholders(cell, "<(.*?)>", replacer);
+                newRowItems.append(new QStandardItem(cell));
+            }
+            combinedModel->appendRow(newRowItems);
+        }
+
+        // Rename document
+        if (m_renameParsedPDFFlag) renameFile(filePath);
+
         // Update progress bar
         if (iteration % 2 == 0) progressDialog->updateProgress();
 
@@ -128,11 +194,14 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
 
     QString newFilePath = QDir::toNativeSeparators(fileInfo.path() + QDir::separator() + newFileName + '.' + fileInfo.suffix());
 
-    QFile file(oldFilePath);
-    if (file.rename(newFilePath)) {
-        qDebug() << "File: " + file.fileName() + " renamed successfully to: " + newFileName;
-    } else {
-        qDebug() << "Failed to rename file:" << file.errorString();
+    QFile oldFile(oldFilePath);
+    QFile newFile(newFilePath);
+    if(oldFile.fileName() != newFile.fileName() && oldFile.rename(newFilePath)) {
+        if (oldFile.rename(newFilePath)) {
+            qDebug() << "File: " + oldFile.fileName() + " renamed successfully to: " + newFile.fileName();
+        } else {
+            qDebug() << "Failed to rename file:" << oldFile.errorString();
+        }
     }
 }
 

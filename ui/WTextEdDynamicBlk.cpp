@@ -4,7 +4,7 @@
 
 #include "utils/generalfunctions.h"
 
-WTextEdDynamicBlk::WTextEdDynamicBlk(QWidget *parent) : QWidget(parent), m_Btn_addEndingStr("+", this), m_lbl_addEndingStr("UNDEFINED TEXT", this) {
+WTextEdDynamicBlk::WTextEdDynamicBlk(QWidget *parent) : QWidget(parent), m_Btn_addBlock("+", this), m_mainLbl("UNDEFINED TEXT", this), m_secondaryLblTxt("") {
     setupUi();
 }
 
@@ -15,23 +15,23 @@ void WTextEdDynamicBlk::setupUi() {
     setLayout(mainLayout);
 
     // Button to dynamically add more labels
-    QFontMetrics addButtonFontM(m_Btn_addEndingStr.font());
-    int addButtonWidth = addButtonFontM.horizontalAdvance(m_Btn_addEndingStr.text()) + 15;
-    m_Btn_addEndingStr.setFixedWidth(addButtonWidth);
+    QFontMetrics addButtonFontM(m_Btn_addBlock.font());
+    int addButtonWidth = addButtonFontM.horizontalAdvance(m_Btn_addBlock.text()) + 15;
+    m_Btn_addBlock.setFixedWidth(addButtonWidth);
 
     // Add lable and button to the layout
-    mainLayout->addWidget(&m_lbl_addEndingStr);
-    mainLayout->addWidget(&m_Btn_addEndingStr);
+    mainLayout->addWidget(&m_mainLbl);
+    mainLayout->addWidget(&m_Btn_addBlock);
 
     // Connect button to addNewLabel function
-    connect(&m_Btn_addEndingStr, &QPushButton::clicked, this, [=](){ addNewLabel(true); });
+    connect(&m_Btn_addBlock, &QPushButton::clicked, this, [=](){ addNewLabel(true); });
 
     // Add the initial label, text edit, and button
     mainLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
     addNewLabel(false);
 }
 
-void WTextEdDynamicBlk::addNewLabel(bool attachRemoveBtn/*flag to avoid atttaching remove button to first lable*/) {
+void WTextEdDynamicBlk::addNewLabel(bool isSecondary/*flag to avoid atttaching remove button to first lable*/) {
     QHBoxLayout *labelLayout = new QHBoxLayout;
 
     // Create and style the textEdit
@@ -42,26 +42,31 @@ void WTextEdDynamicBlk::addNewLabel(bool attachRemoveBtn/*flag to avoid atttachi
     textEdit->setMinimumHeight(400);
     textEdit->setFixedHeight(28);
 
+    // Attach remove button and labels if it's not the main label
+    if(isSecondary) {
+        QLabel      *secondaryLabel = new QLabel(m_secondaryLblTxt, this);
+        labelLayout->addWidget(secondaryLabel);
+        m_addedLabelLayouts.push_back(labelLayout);
+    }
+
     // Add the textEdit
     labelLayout->addWidget(textEdit);
-    m_endingStrTxtBlock.push_back(textEdit);
-
-    if(attachRemoveBtn) m_addedLabelLayouts.push_back(labelLayout);
+    m_textEdtBlock.push_back(textEdit);
 
     emit labelAdded(m_addedLabelLayouts.size());
 
     connect(textEdit, &QTextEdit::textChanged, this, [=]() {
-        auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEdit);
-        if (it != m_endingStrTxtBlock.end()) {
-            size_t i = std::distance(m_endingStrTxtBlock.begin(), it);
+        auto it = std::find(m_textEdtBlock.begin(), m_textEdtBlock.end(), textEdit);
+        if (it != m_textEdtBlock.end()) {
+            size_t i = std::distance(m_textEdtBlock.begin(), it);
 
             QString parsedText = parseFromText(textEdit->toPlainText());
             emit labelTextChanged(i, parsedText);
-            if (!m_blockUpdate) emit functionUpdated();
+            if (!m_blockUpdate) emit blockUpdated();
         }
     });
 
-    if (attachRemoveBtn) {
+    if (isSecondary) {
         QPushButton *removeButton = new QPushButton("-", this);
 
         // Calculate the width based on the button's text
@@ -73,7 +78,7 @@ void WTextEdDynamicBlk::addNewLabel(bool attachRemoveBtn/*flag to avoid atttachi
         connect(removeButton, &QPushButton::clicked, this, [=](){
             size_t index = removeLabel(labelLayout);
             emit labelDeleted(index);
-            if (!m_blockUpdate) emit functionUpdated();
+            if (!m_blockUpdate) emit blockUpdated();
         });
 
         labelLayout->addWidget(removeButton);
@@ -84,19 +89,19 @@ void WTextEdDynamicBlk::addNewLabel(bool attachRemoveBtn/*flag to avoid atttachi
     mainLayout->insertLayout(lastWidgetIndex, labelLayout);
 }
 
-size_t WTextEdDynamicBlk::removeLabel(QHBoxLayout *labelLayout) {
+int WTextEdDynamicBlk::removeLabel(QHBoxLayout *labelLayout) {
     QLayoutItem *item;
-    int index = -1; // If still negative when returned something went wrong
+    int index = -1; // If still negative when returned, something went wrong
     while ((item = labelLayout->takeAt(0)) != nullptr) {
         QWidget *widget = item->widget();
 
         // Remove widgets. If it is the text edit, also remove it from m_endingStrTxtBlock;
         QTextEdit* textEditW = qobject_cast<QTextEdit*>(widget);
         if(textEditW) {
-            auto it = std::find(m_endingStrTxtBlock.begin(), m_endingStrTxtBlock.end(), textEditW);
-            if (it != m_endingStrTxtBlock.end()) {
-                index = std::distance(m_endingStrTxtBlock.begin(), it); // Get the index of "it"
-                m_endingStrTxtBlock.erase(it);
+            auto it = std::find(m_textEdtBlock.begin(), m_textEdtBlock.end(), textEditW);
+            if (it != m_textEdtBlock.end()) {
+                index = std::distance(m_textEdtBlock.begin(), it); // Get the index of "it"
+                m_textEdtBlock.erase(it);
                 delete textEditW;
             }
         }
@@ -120,12 +125,12 @@ void WTextEdDynamicBlk::updateBlock(const std::vector<QString>& content) {
     clearBlock();
     for(size_t i{ 0 }; i < content.size(); i++) {
         const QString& text = content.at(i);
-        if (i == 0) m_endingStrTxtBlock.at(0)->setText(text);
+        if (i == 0) m_textEdtBlock.at(0)->setText(text);
         else {
             addNewLabel(true);
-            m_endingStrTxtBlock.at(i)->setText(text);
+            m_textEdtBlock.at(i)->setText(text);
         }
     }
     m_blockUpdate = false;
-    emit functionUpdated();
+    emit blockUpdated();
 }

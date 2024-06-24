@@ -128,10 +128,72 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_9">
-                 <item row="3" column="2">
-                  <widget class="QLabel" name="label_3">
-                   <property name="text">
-                    <string>Result up to selected function</string>
+                 <item row="4" column="2">
+                  <widget class="QPlainTextEdit" name="plainTextEdit_resultToSelectedFunction">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>100</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting value up to the currently selected function.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" rowspan="4" colspan="2">
+                  <widget class="WExtendedListWidget" name="listWidget_function">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>40</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::NoEditTriggers</set>
+                   </property>
+                   <property name="dragDropMode">
+                    <enum>QAbstractItemView::InternalMove</enum>
+                   </property>
+                   <property name="defaultDropAction">
+                    <enum>Qt::MoveAction</enum>
+                   </property>
+                   <property name="alternatingRowColors">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="8">
+                  <widget class="QLineEdit" name="lineEdit_functionName">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="maxLength">
+                    <number>20</number>
+                   </property>
+                   <property name="clearButtonEnabled">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -142,10 +204,53 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="3" column="3">
+                  <widget class="QLabel" name="label_finalResult">
+                   <property name="text">
+                    <string>Final result</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="0" column="0">
                   <widget class="QPushButton" name="btn_newFunction">
                    <property name="text">
                     <string>Add</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="7">
+                  <widget class="QLabel" name="label_functionName">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Function Name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="3" colspan="6">
+                  <widget class="QTextEdit" name="textEdit_finalResult">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>100</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting after going through the full stack of functions for this formula.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2">
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Result up to selected function</string>
                    </property>
                   </widget>
                  </item>
@@ -161,14 +266,46 @@
                     <enum>QFrame::Plain</enum>
                    </property>
                    <property name="currentIndex">
-                    <number>5</number>
+                    <number>1</number>
                    </property>
                    <widget class="QWidget" name="NewFunction">
                     <layout class="QGridLayout" name="gridLayout_8"/>
                    </widget>
                    <widget class="QWidget" name="Find">
                     <layout class="QGridLayout" name="gridLayout_7">
-                     <item row="7" column="1" colspan="2">
+                     <item row="0" column="0" colspan="5">
+                      <widget class="QLabel" name="label_FindString">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;FIND STRING&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="textFormat">
+                        <enum>Qt::AutoText</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="4">
+                      <widget class="QLabel" name="label_setIndexAt">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify if, when found, you want the index placed before or after the found text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="text">
+                        <string>Set index at</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="13" column="2" colspan="2">
                       <widget class="QSpinBox" name="spinBox_lookOnlyAtPage">
                        <property name="enabled">
                         <bool>false</bool>
@@ -190,72 +327,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_textToFind">
-                       <property name="text">
-                        <string>Text to Find</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="0">
-                      <widget class="QLabel" name="StartFrom">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify whether you want to start from wherever the index is after the previous functions or if you want to start from the beginning of the text. If 'Look only at page X' is enabled, this will start looking at the beginning of the page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="text">
-                        <string>Strat from</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="4" column="0">
-                      <widget class="QLabel" name="label_setIndexAt">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify if, when found, you want the index placed before or after the found text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="text">
-                        <string>Set index at</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="9" column="0">
-                      <spacer name="verticalSpacer_4">
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>20</width>
-                         <height>40</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item row="4" column="3">
-                      <spacer name="horizontalSpacer_4">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item row="4" column="1" colspan="2">
+                     <item row="2" column="4">
                       <widget class="QComboBox" name="comboBox_setIndexAt">
                        <property name="minimumSize">
                         <size>
@@ -278,17 +350,7 @@
                        </item>
                       </widget>
                      </item>
-                     <item row="7" column="0">
-                      <widget class="QCheckBox" name="checkBox_lookOnlyAtPage">
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Look only at a specific page&lt;/span&gt;. If the document doesen't have so many pages, the full document will be search.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="text">
-                        <string>Look only at page</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="1" colspan="2">
+                     <item row="5" column="4">
                       <widget class="QComboBox" name="comboBox_startFrom">
                        <property name="minimumSize">
                         <size>
@@ -311,29 +373,78 @@
                        </item>
                       </widget>
                      </item>
-                     <item row="2" column="0" colspan="4">
-                      <widget class="QLineEdit" name="lineEdit_textToFind">
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write a text to be found in the PDF in order to move the index there.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="clearButtonEnabled">
+                     <item row="1" column="0" rowspan="10" colspan="4">
+                      <widget class="QScrollArea" name="scrollArea_2">
+                       <property name="widgetResizable">
                         <bool>true</bool>
                        </property>
+                       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>0</y>
+                          <width>372</width>
+                          <height>299</height>
+                         </rect>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_4">
+                         <item>
+                          <widget class="WTextEdDynamicBlk" name="dynamicBlck_textToFind" native="true">
+                           <property name="toolTip">
+                            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This will look for whatever text and place the cursor there. &lt;span style=&quot; font-weight:700;&quot;&gt;If the text is not found&lt;/span&gt;, it will look for the next one. Whenever one of the options is found, it stops.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;A good scenario to use this feature is in esquemas targeting multilingual range of documents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
                       </widget>
                      </item>
-                     <item row="0" column="0" colspan="4">
-                      <widget class="QLabel" name="label_FindString">
+                     <item row="13" column="0">
+                      <spacer name="horizontalSpacer_4">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="4" column="4">
+                      <widget class="QLabel" name="StartFrom">
                        <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="text">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:700;&quot;&gt;FIND STRING&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify whether you want to start from wherever the index is after the previous functions or if you want to start from the beginning of the text. If 'Look only at page X' is enabled, this will start looking at the beginning of the page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
-                       <property name="textFormat">
-                        <enum>Qt::AutoText</enum>
+                       <property name="text">
+                        <string>Strat from</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="13" column="1">
+                      <widget class="QCheckBox" name="checkBox_lookOnlyAtPage">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Look only at a specific page&lt;/span&gt;. If the document doesen't have so many pages, the full document will be search.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="text">
+                        <string>Look only at page</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="4">
+                      <widget class="QCheckBox" name="checkBox_goBackwards">
+                       <property name="toolTip">
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled it will look backwards from the current index, instead of forward.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="text">
+                        <string>Go Backwards</string>
                        </property>
                       </widget>
                      </item>
@@ -1051,111 +1162,6 @@
                    </widget>
                   </widget>
                  </item>
-                 <item row="4" column="2">
-                  <widget class="QPlainTextEdit" name="plainTextEdit_resultToSelectedFunction">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>100</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting value up to the currently selected function.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="8">
-                  <widget class="QLineEdit" name="lineEdit_functionName">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="maxLength">
-                    <number>20</number>
-                   </property>
-                   <property name="clearButtonEnabled">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="7">
-                  <widget class="QLabel" name="label_functionName">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Function Name</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="3">
-                  <widget class="QLabel" name="label_finalResult">
-                   <property name="text">
-                    <string>Final result</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="3" colspan="6">
-                  <widget class="QTextEdit" name="textEdit_finalResult">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>100</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This shows the resulting after going through the full stack of functions for this formula.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*This is a preview and only works if a PDF document is selected from the browser window. You can see how this would behave on different documents by keep browsing through them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" rowspan="4" colspan="2">
-                  <widget class="WFuncList" name="listWidget_function">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>40</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="editTriggers">
-                    <set>QAbstractItemView::NoEditTriggers</set>
-                   </property>
-                   <property name="dragDropMode">
-                    <enum>QAbstractItemView::InternalMove</enum>
-                   </property>
-                   <property name="defaultDropAction">
-                    <enum>Qt::MoveAction</enum>
-                   </property>
-                   <property name="alternatingRowColors">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
                </widget>
               </item>
@@ -1179,15 +1185,15 @@
    <header>WFormulaTreeView.h</header>
   </customwidget>
   <customwidget>
-   <class>WFuncList</class>
-   <extends>QListWidget</extends>
-   <header>WFuncList.h</header>
-  </customwidget>
-  <customwidget>
    <class>WTextEdDynamicBlk</class>
    <extends>QWidget</extends>
    <header>WTextEdDynamicBlk.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WExtendedListWidget</class>
+   <extends>QListWidget</extends>
+   <header>WExtendedListWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

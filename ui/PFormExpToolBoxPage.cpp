@@ -39,9 +39,10 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
         }
     }
 
-    // Set up observer for changes in the esquema list,
-    // so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index
-    cmdoc.addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1));
+    /* Set up observer for changes in the esquema list,
+     * so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index */
+    m_observerHandle.push_back(cmdoc.addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1)));
+
     connect(ui->TreeList_files, &WLoadedFilesTreeView::contentChanged, this, &PFormExpToolBoxPage::handlePathContentChanged);
 
     // If there are loaded Esquema documents, associate the first one with the export CSV
@@ -49,7 +50,7 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
         m_exportCSV->setAsocEsquemaDoc(esquemadocs->front());
     }
     
-    ui->tableView->setModel(m_exportCSV->getTableModel());
+    ui->spreadSheet_formatTable->setModel(m_exportCSV->getTableModel());
 }
 
 void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updatedEsquemaDocList) {
@@ -76,8 +77,7 @@ void PFormExpToolBoxPage::updateFields() {
 void PFormExpToolBoxPage::on_comboBox_esquemaName_currentIndexChanged(int index) { // Sets the associated esquema to the one that has the same index in loadedEsquemaDocs
     if (index < 0 || static_cast<size_t>(index) > CMDoc::getMDoc().getLoadedEsquemaDocs()->size()) {
         m_exportCSV->setAsocEsquemaDoc(nullptr);
-    }
-    else {
+    } else {
         CEsquemaDoc *esquemaDoc = CMDoc::getMDoc().getLoadedEsquemaDocs()->at(index);
         m_exportCSV->setAsocEsquemaDoc(esquemaDoc);
     }
@@ -87,83 +87,8 @@ void PFormExpToolBoxPage::on_checkBox_renameDocs_stateChanged(int arg1) {
     if (arg1) {
         m_exportCSV->setRenameParsedPDFFlag(true); // Set flag for renaming
         ui->lineEdit_renameDocs->setEnabled(true);
-    }
-    else {
+    } else {
         m_exportCSV->setRenameParsedPDFFlag(false); // Set flag for renaming
         ui->lineEdit_renameDocs->setEnabled(false);
     }
 }
-void PFormExpToolBoxPage::on_pushButton_addRow_clicked() {
-    QAbstractItemModel* model = m_exportCSV->getTableModel();
-
-    if (!model) {
-        qWarning() << "Model is null";
-        return;
-    }
-
-    // Insert an empty row at the end of the table
-    int rowCount = model->rowCount();
-    model->insertRow(rowCount);
-
-    int sectionSize = ui->tableView->verticalHeader()->defaultSectionSize();
-    int rowHeight = sectionSize * 2;
-    if(rowCount > 0) rowHeight = sectionSize * (rowCount + 1);
-    ui->tableView->setMaximumHeight(rowHeight);
-}
-
-void PFormExpToolBoxPage::on_pushButton_delRow_clicked() {
-    QAbstractItemModel* model = m_exportCSV->getTableModel();
-
-    if (!model) {
-        qWarning() << "Model is null";
-        return;
-    }
-
-    // Get the last row index
-    int lastRow = model->rowCount() - 1;
-
-    if (lastRow >= 0) {
-        // Remove the last row
-        model->removeRow(lastRow);
-    }
-
-    int sectionSize = ui->tableView->verticalHeader()->defaultSectionSize();
-    int rowCount = model->rowCount();
-    int rowHeight = sectionSize * 2;
-    if(rowCount > 0) rowHeight = sectionSize * (rowCount + 1);
-    ui->tableView->setMaximumHeight(rowHeight);
-}
-
-
-
-void PFormExpToolBoxPage::on_pushButton_addCol_clicked() {
-    QAbstractItemModel* model = m_exportCSV->getTableModel();
-
-    if (!model) {
-        qWarning() << "Model is null";
-        return;
-    }
-
-    // Insert a new column at the end of the table
-    int columnCount = model->columnCount();
-    model->insertColumn(columnCount);
-}
-
-void PFormExpToolBoxPage::on_pushButton_delCol_clicked() {
-    QAbstractItemModel* model = m_exportCSV->getTableModel();
-
-    if (!model) {
-        qWarning() << "Model is null";
-        return;
-    }
-
-    // Get the last column index
-    int lastColumn = model->columnCount() - 1;
-
-    if (lastColumn >= 0) {
-        // Remove the last column
-        model->removeColumn(lastColumn);
-    }
-}
-
-

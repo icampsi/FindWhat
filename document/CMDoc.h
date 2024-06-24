@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "CExportPathDoc.h"
+#include "document/CEsquemaDoc.h"
 #include "src/CEsquema.h"
 #include "CDocument.h"
 
@@ -41,6 +42,8 @@ public:
 
     void deleteEsquema(const size_t index);
 
+    void reorderEsqDocs(const size_t objectToMoveIndex, const size_t destinationIndex);
+
     // SERIALIZATION
     void serializeFullEsquemaArray(std::ofstream& out);
     void serializeEsquema(std::ofstream& out, CEsquemaDoc* esquemaDoc);
@@ -62,16 +65,36 @@ private:
     // OBSERVERS ARCHITECTURE
 private:   
     // Vector to store observer functions for Esquema document changes
-    std::vector<std::function<void(const std::vector<QString>&)>> m_esquemaDocObservers;
-
+    // std::vector<std::function<void(const std::vector<QString>&)>> m_esquemaDocObservers; // NEW BOOKMARK
+    std::vector<std::pair<size_t, std::function<void(const std::vector<QString>&)>>> m_esquemaDocObservers; // NEW BOOKMARK
+    size_t m_nextHandle = 0;
     // Notify all registered Esquema document observers
-    void esquemaListUpdated();
+    // void esquemaListUpdated();
+    void esquemaListUpdated() {
+            std::vector<QString> updatedEsquemaDocList;
+            for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
+                updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
+            }
+        for (const auto& pair : m_esquemaDocObservers) {
+            pair.second(updatedEsquemaDocList);
+        }
+    }
 
 public:
     // Register and unregister observers for Esquema document changes
-    void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); }
-    void removeObserver(std::function<void(const std::vector<QString>&)> observer);
+    // void addObserver(std::function<void(const std::vector<QString>&)> observer) { m_esquemaDocObservers.push_back(observer); }
+    size_t addObserver(std::function<void(const std::vector<QString>&)> observer) {
+        m_esquemaDocObservers.emplace_back(m_nextHandle, observer);
+        return m_nextHandle++;
+    }
+    // void removeObserver(std::function<void(const std::vector<QString>&)> observer);
+    void removeObserver(size_t handle) {
+        auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
+                                 [&](const auto& pair) { return pair.first == handle; });
+        m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
+    }
     void onDocumentDestroyed(CDocument *pDoc);
+
 };
 
 #endif // CMDOC_H

@@ -35,7 +35,8 @@ protected:
     PDockPreview      *m_dockPreview    = nullptr;
     newEsquema_dlg    *newEsquemadlg    = nullptr;
     exportEsquema_dlg *exportEsquemaDlg = nullptr;
-    CMDoc& m_cmdoc;
+    CMDoc&             m_cmdoc;
+    std::vector<size_t> m_observerHandle;
 
 private:
     Ui::MainWindow *ui;

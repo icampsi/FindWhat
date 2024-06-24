@@ -64,8 +64,9 @@ public slots:
 private slots:
     // VIEWS ==============================================================
     void on_listWidget_function_itemSelectionChanged() { loadFunction();  }
-    void on_pushButton_addFormula_clicked()           { newFormula();    }
-    void on_pushButton_addStaticData_clicked()        { newStaticData(); }
+    void on_pushButton_addFormula_clicked()            { newFormula();    }
+    void on_pushButton_addStaticData_clicked()         { newStaticData(); }
+    void handleFunctionDelete(int rowToDelete);
 
     void on_treeView_formula_clicked(const QModelIndex &index); // Loads selected formula
     void handleFunctionItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
@@ -76,16 +77,19 @@ private slots:
     void on_lineEdit_functionName_textChanged(const QString &arg1);
     void on_pushButton_deleteFunctin_clicked();
 
-    // STACKED BOX UI =====================================================
+    // STACKED BOX UI ======================================================
     // Static data
     void on_plainTextEdit_staticDataString_textChanged();
 
     // Find function UI
-    void on_lineEdit_textToFind_textChanged(const QString &arg1);
     void on_comboBox_setIndexAt_currentIndexChanged(int index);
     void on_comboBox_startFrom_currentIndexChanged(int index);
     void on_checkBox_lookOnlyAtPage_stateChanged(int arg1);
     void on_spinBox_lookOnlyAtPage_valueChanged(int arg1);
+    void handleFindBlock_textChanged(size_t i, const QString& str) { static_cast<CIndexingFunction*>(m_activeFunction)->modifyTextBlock(i, str); }
+    void handleFindBlock_lblAdded(size_t count);
+    void handleFindBlock_lblDeleted(size_t i) { static_cast<CIndexingFunction*>(m_activeFunction)->deleteTextBlockMember(i); }
+    void on_checkBox_goBackwards_stateChanged(int arg1);
 
     // Extracting function UI
     void on_comboBox_readDirection_currentIndexChanged(int index);
@@ -101,7 +105,7 @@ private slots:
 
     // Move lines UI
     void on_spinBox_moveLinesNum_valueChanged(int arg1);
-    void on_comboBox_placeInLine_activated(int index);
+    void on_comboBox_placeInLine_currentIndexChanged(int index);
 
     // Append String UI
     void on_lineEdit_stringToAppend_textChanged(const QString &arg1);
@@ -116,7 +120,7 @@ private slots:
     void on_lineEdit_globalToReplace_textChanged(const QString &arg1);
     void on_lineEdit_globalReplaceFor_textChanged(const QString &arg1);
 
-    // Menú actions for the "New Function" push button
+    // Menu actions for the "New Function" push button
     void handle_newFunActions(CFunction::Function functionType);
 
     void on_comboBox_operator_currentIndexChanged(int index);

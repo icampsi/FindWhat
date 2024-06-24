@@ -88,12 +88,14 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
      * int      m_num
      * bool     m_option
      * bool     m_startFromBeggining
+     * bool     m_goBackwards
     */
 
     SerializationUtils::writeCustomQStringContainer(out, m_text);                  // m_text
     out.write(reinterpret_cast<const char*>(&m_num), sizeof(int));                 // m_num
     out.write(reinterpret_cast<const char*>(&m_option), sizeof(bool));             // m_option
     out.write(reinterpret_cast<const char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
+    out.write(reinterpret_cast<const char*>(&m_goBackwards), sizeof(bool));        // m_goBackwards
 }
 
 void CIndexingFunction::deserialize(std::ifstream& in) {
@@ -104,12 +106,14 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
      * int      m_num
      * bool     m_option
      * bool     m_startFromBeggining
+     * bool     m_goBackwards
     */
 
     SerializationUtils::readCustomQStringContainer(in, m_text);            // m_text
     in.read(reinterpret_cast<char*>(&m_num), sizeof(int));                 // m_num
     in.read(reinterpret_cast<char*>(&m_option), sizeof(bool));             // m_option
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
+    in.read(reinterpret_cast<char*>(&m_goBackwards), sizeof(bool));        // m_goBackwards
 }
 
 CExtractingFunction::CExtractingFunction(Function name) : CFunction(name), m_endingStr() {}
@@ -154,7 +158,7 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
 
     out.write(reinterpret_cast<const char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
     out.write(reinterpret_cast<const char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::writeCustomQStringContainer(out, m_endingStr);                 // m_endingStr - BOOKMARK - NEEDS FIXING
+    SerializationUtils::writeCustomQStringContainer(out, m_endingStr);                 // m_endingStr
     out.write(reinterpret_cast<const char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     out.write(reinterpret_cast<const char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::writeQString(out, m_toAllow);                                  // m_toAllow
@@ -185,7 +189,7 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
 
     in.read(reinterpret_cast<char*>(&m_charsToGet) , sizeof(int));             // m_charsToGet
     in.read(reinterpret_cast<char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::readCustomQStringContainer(in, m_endingStr);           // m_endingStr - BOOKMARK - NEEDS FIXING
+    SerializationUtils::readCustomQStringContainer(in, m_endingStr);           // m_endingStr
     in.read(reinterpret_cast<char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     in.read(reinterpret_cast<char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
     SerializationUtils::readQString(in, m_toAllow);                            // m_toAllow

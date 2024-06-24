@@ -6,9 +6,11 @@
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
 
+#include "qstandarditemmodel.h"
 #include <QString>
 #include <QWidget>
 #include <fstream>
+#include <QFile>
 
 QString getUserHomeDirectory();
 

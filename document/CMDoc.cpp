@@ -61,6 +61,32 @@ void CMDoc::deleteEsquema(const size_t index) {
     esquemaListUpdated();
 }
 
+void CMDoc::reorderEsqDocs(const size_t objectToMoveIndex, const size_t destinationIndex) {
+    if (objectToMoveIndex >= m_loadedEsquemaDocs.size() || destinationIndex >= m_loadedEsquemaDocs.size()) {
+        qDebug() << "Invalid object index or destination index";
+        return;
+    }
+
+    if (objectToMoveIndex == destinationIndex) {
+        // No need to move if the indices are the same
+        return;
+    }
+
+    if (objectToMoveIndex < destinationIndex) {
+        // Move forward: Move the element at objectToMoveIndex to destinationIndex,
+        // shifting the elements between them to the left
+        std::rotate(m_loadedEsquemaDocs.begin() + objectToMoveIndex,
+                    m_loadedEsquemaDocs.begin() + objectToMoveIndex + 1,
+                    m_loadedEsquemaDocs.begin() + destinationIndex + 1);
+    } else {
+        // Move backward: Move the element at objectToMoveIndex to destinationIndex,
+        // shifting the elements between them to the right
+        std::rotate(m_loadedEsquemaDocs.begin() + destinationIndex,
+                    m_loadedEsquemaDocs.begin() + objectToMoveIndex,
+                    m_loadedEsquemaDocs.begin() + objectToMoveIndex + 1);
+    }
+}
+
 // SERIALIZATOIN
 void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
     // BOOKMARK - use template function but neeed to add serialization to esquema doc
@@ -98,22 +124,22 @@ void CMDoc::deserializeEsquema(std::ifstream& in, std::vector<CEsquemaDoc*> &loa
     }
 }
 
-void CMDoc::esquemaListUpdated() {
-    std::vector<QString> updatedEsquemaDocList;
-    for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
-        updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
-    }
+// void CMDoc::esquemaListUpdated() {
+//     std::vector<QString> updatedEsquemaDocList;
+//     for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
+//         updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
+//     }
 
-    // Proceed with observer notification
-    for (const auto &observer : m_esquemaDocObservers) {
-        observer(updatedEsquemaDocList);
-    }
-}
+//     // Proceed with observer notification
+//     for (const auto &observer : m_esquemaDocObservers) {
+//         observer(updatedEsquemaDocList);
+//     }
+// }
 
-void CMDoc::removeObserver(std::function<void(const std::vector<QString>&)> observer) {
-    auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
-                             [&](const std::function<void(const std::vector<QString>&)>& storedObserver) { return &observer == &storedObserver; }
-                             );
-    m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
-}
+// void CMDoc::removeObserver(std::function<void(const std::vector<QString>&)> observer) {
+//     auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
+//                              [&](const std::function<void(const std::vector<QString>&)>& storedObserver) { return &observer == &storedObserver; }
+//                              );
+//     m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
+// }
 

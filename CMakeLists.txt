@@ -65,7 +65,8 @@ set(MAIN_FILES
     ui/WLoadedFilesTreeView.cpp ui/WLoadedFilesTreeView.h
     ui/WToolBarPreview.cpp      ui/WToolBarPreview.h
     ui/WToolBarEsquema.cpp      ui/WToolBarEsquema.h
-    ui/WFuncList.cpp             ui/WFuncList.h
+    ui/WExtendedListWidget.cpp            ui/WExtendedListWidget.h
+    ui/WSpreadSheet.cpp            ui/WSpreadSheet.h
 
     ui/dialogs/NewEsquema_dlg.cpp       ui/dialogs/NewEsquema_dlg.h      ui/dialogs/NewEsquema_dlg.ui
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui

@@ -75,6 +75,7 @@ public:
     std::vector<std::vector<QString>> convertModelToVector(QStandardItemModel* model);
 
     void buildStructure(std::vector<std::vector<QString>> *xsvStructure, ProgBarExport_dlg *progressDialog, size_t maxColumns);
+    void buildStructure(QStandardItemModel* combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns);
 
     QStandardItemModel *getTableModel() { return &m_tableModel; }
 

@@ -10,7 +10,7 @@
 
 class CFormula;
 
-class CFunction {
+class CFunction { // Base class
 public:
     enum class Function { Find,
                         MoveIndex,
@@ -52,6 +52,7 @@ protected:
     int     m_num{ 0 };
     bool    m_option{ true };
     bool    m_startFromBeggining{ false };
+    bool    m_goBackwards{ false };
 
 public:
     // CONSTRUCTORS&DESTRUCTORS
@@ -78,6 +79,9 @@ public:
 
     bool getStartFromBeggining() const            { return m_startFromBeggining;   }
     void setStartFromBeggining(const bool option) { m_startFromBeggining = option; }
+
+    bool getGoBackwards() const           { return m_goBackwards; }
+    void setGoBackwards(bool goBackwards) { m_goBackwards = goBackwards; }
 
     // SERIALIZATION
     void serialize(std::ofstream& out)  const override;
@@ -129,7 +133,7 @@ public:
     void setCharsToRead(int charsToRead) { m_charsToRead = charsToRead; }
 
     const std::vector<QString>& getEndingStringBlock() const { return m_endingStr; }
-    void addEndingStringBlock(const QString& endingString)   { m_endingStr.push_back(std::move(endingString)); }
+    void pushEndingString(const QString& endingString)       { m_endingStr.push_back(std::move(endingString)); }
     void deleteEndingStringBlockMember(size_t index);
 
     void modifyEndingStringBlock(size_t i, const QString& str) { m_endingStr.at(i) = std::move(str); }

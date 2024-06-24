@@ -37,8 +37,17 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 # Latest updates
 NEW
+- Improved observer design
+- Added "add and delete" rows and columns functionality to the WSpreadSheet class
+- Added a look backward option to find function
+- fixed some minor bugs
+
+21/06/24
 - Fixed a bug with the ending string block and cleaned code
+- Created a QTibleView derived widget with spreadsheet like functionality in terms of copy-cut-paste
 - Made PEndingStringBlock a rehusable class and changed its name to WTextEdDynamicBlk
+- The "Find" function now allows to add more possible strings in case preious ones are not found. Intended for esquemas targeting a multilingual range of documents.
+- Fixed a bug where "act only if" option was working backwards.
 
 17/06/24
 - Added a dialog with a spreadSheet to show the result of parsed files and allowing edition before exporting them to csv.
@@ -61,23 +70,6 @@ Note: Because of that, serialization temporaly doesen't work properly.
 - Added a way to replace extracted characters (so now user can, for example, say that each extracted whitespace should be a "-").
 - Started a basic view menu to toggle visibility of docked windows.
 - Some minor code clean up.
-
-15/03/2024
-- Switched from qmake to CMake build system.
-- Cleaned code and made some re-estructuring.
-- Fixed minor bugs.
-  
-03/03/2024
-- Improved Serialization and serialization UI.
-- Added a way to rename files.
-- Fixed minor bugs.
-- Cleaned code.
-
-01/03/2024
-- Added serialization features to save and load esquemes merging serialization branch. Still needs a bit of pulishing.
-- Added option to delete loaded esquemas (press "del" on selected esquema).
-- Fixed some minor bugs.
-- Cleaned code.
 
 # Planned future updates
 - A feature to Relocate or copy parsed PDF files to another folder.

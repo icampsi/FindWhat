@@ -215,8 +215,11 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
         const QString& textToFind = *iter;
         if (textToFind.isEmpty()) continue;
 
-        if (text.indexOf(textToFind, indexPos_initial) != -1) {
-            relativeIndexInitial = text.indexOf(textToFind, relativeIndexInitial);
+        qsizetype textIndex{0};
+        if(!pFunctionToApply->getGoBackwards()) textIndex = text.indexOf(textToFind, indexPos_initial);     // Look forward
+        else                                    textIndex = text.lastIndexOf(textToFind, indexPos_initial); // Look backwards
+        if (textIndex != -1) { // if found
+            relativeIndexInitial = textIndex;
 
             if (pFunctionToApply->getOption()) {
                 relativeIndexInitial += textToFind.length();
@@ -449,6 +452,8 @@ CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFun
 }
 
 void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
+    if(pFunctionToApply->getEndingStringBlock().empty()) return; // NEW BOOKMARK
+
     QString text = pPdfDoc->getFullText(); // PDF in text format
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
 

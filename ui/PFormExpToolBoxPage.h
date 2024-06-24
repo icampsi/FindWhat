@@ -8,6 +8,7 @@
 
 #include "document/CExportCSV.h"
 #include "ui/ui_PFormExpToolBoxPage.h"
+#include "document/CMDoc.h"
 #include <QWidget>
 
 namespace Ui { class PExpFormToolBoxPage; }
@@ -18,7 +19,13 @@ class PFormExpToolBoxPage : public QWidget { // Pages for Format Export ToolBox
 public:
     // CONSTRUCTORS&DESTRUCTORS
     explicit PFormExpToolBoxPage(QWidget *parent = nullptr, CExportCSV *exportCSV = nullptr);
-    ~PFormExpToolBoxPage() { delete ui; }
+    ~PFormExpToolBoxPage() {
+        // Remove observers
+        for(size_t& handle : m_observerHandle) {
+            CMDoc::getMDoc().removeObserver(handle);
+        }
+        delete ui;
+    }
 
     // PUBLIC FUNCTIONS
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
@@ -33,16 +40,11 @@ private slots:
     void on_lineEdit_renameDocs_textChanged(const QString &arg1)   { m_exportCSV->setFileNamePlaceholder(arg1); }
     void on_lineEdit_actOnlyIf_textChanged(const QString &arg1)    { m_exportCSV->setIdText(arg1); }
 
-    void on_pushButton_addRow_clicked();
-    void on_pushButton_delRow_clicked();
-    void on_pushButton_addCol_clicked();
-    void on_pushButton_delCol_clicked();
-
 private:
     // MEMBERS
     Ui::PExpFormToolBoxPage *ui;
     CExportCSV *m_exportCSV;
-
+    std::vector<size_t> m_observerHandle;
 };
 
 #endif // PFORMEXPTOOLBOXPAGE_H
