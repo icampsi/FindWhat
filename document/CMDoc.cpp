@@ -87,6 +87,28 @@ void CMDoc::reorderEsqDocs(const size_t objectToMoveIndex, const size_t destinat
     }
 }
 
+// OBSERVER ARCHITECTURE
+void CMDoc::esquemaListUpdated() {
+    std::vector<QString> updatedEsquemaDocList;
+    for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
+        updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
+    }
+    for (const auto& pair : m_esquemaDocObservers) {
+        pair.second(updatedEsquemaDocList);
+    }
+}
+
+size_t CMDoc::addObserver(std::function<void(const std::vector<QString>&)> observer) {
+    m_esquemaDocObservers.emplace_back(m_nextHandle, observer);
+    return m_nextHandle++;
+}
+
+void CMDoc::removeObserver(size_t handle) {
+    auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
+                             [&](const auto& pair) { return pair.first == handle; });
+    m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
+}
+
 // SERIALIZATOIN
 void CMDoc::serializeFullEsquemaArray(std::ofstream& out) {
     // BOOKMARK - use template function but neeed to add serialization to esquema doc
@@ -123,23 +145,4 @@ void CMDoc::deserializeEsquema(std::ifstream& in, std::vector<CEsquemaDoc*> &loa
         loadedEsquemaDocs.push_back(newDoc(esquema));
     }
 }
-
-// void CMDoc::esquemaListUpdated() {
-//     std::vector<QString> updatedEsquemaDocList;
-//     for (CEsquemaDoc *esquemaDoc : m_loadedEsquemaDocs) {
-//         updatedEsquemaDocList.push_back(esquemaDoc->getEsquema()->getName());
-//     }
-
-//     // Proceed with observer notification
-//     for (const auto &observer : m_esquemaDocObservers) {
-//         observer(updatedEsquemaDocList);
-//     }
-// }
-
-// void CMDoc::removeObserver(std::function<void(const std::vector<QString>&)> observer) {
-//     auto it = std::remove_if(m_esquemaDocObservers.begin(), m_esquemaDocObservers.end(),
-//                              [&](const std::function<void(const std::vector<QString>&)>& storedObserver) { return &observer == &storedObserver; }
-//                              );
-//     m_esquemaDocObservers.erase(it, m_esquemaDocObservers.end());
-// }
 

@@ -19,13 +19,7 @@ class PFormExpToolBoxPage : public QWidget { // Pages for Format Export ToolBox
 public:
     // CONSTRUCTORS&DESTRUCTORS
     explicit PFormExpToolBoxPage(QWidget *parent = nullptr, CExportCSV *exportCSV = nullptr);
-    ~PFormExpToolBoxPage() {
-        // Remove observers
-        for(size_t& handle : m_observerHandle) {
-            CMDoc::getMDoc().removeObserver(handle);
-        }
-        delete ui;
-    }
+    ~PFormExpToolBoxPage();
 
     // PUBLIC FUNCTIONS
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);

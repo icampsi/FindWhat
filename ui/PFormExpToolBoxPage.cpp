@@ -53,6 +53,14 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getTableModel());
 }
 
+PFormExpToolBoxPage::~PFormExpToolBoxPage() {
+    // Remove observers
+    for(size_t& handle : m_observerHandle) {
+        CMDoc::getMDoc().removeObserver(handle);
+    }
+    delete ui;
+}
+
 void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updatedEsquemaDocList) {
     // Delete current items
     ui->comboBox_esquemaName->clear();
