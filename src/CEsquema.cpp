@@ -107,7 +107,7 @@ void CEsquema::serialize(std::ofstream& out) const {
      */
 
     SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
-    SerializationUtils::writeCustomContainer(out, m_extractDataFormula); // t_extractDataFormula
+    SerializationUtils::writeCustomContainer(out, m_extractDataFormula); // m_extractDataFormula
     SerializationUtils::writeCustomContainer(out, m_staticData);         // m_valorsEstatics
 }
 

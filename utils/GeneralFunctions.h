@@ -6,7 +6,6 @@
 #ifndef GENERALFUNCTIONS_H
 #define GENERALFUNCTIONS_H
 
-#include "qstandarditemmodel.h"
 #include <QString>
 #include <QWidget>
 #include <fstream>
@@ -38,12 +37,7 @@ namespace SerializationUtils {
         out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
 
         for (const auto& item : container) {
-            // Check if the type of 'item' is QString
-            // if constexpr (std::is_same_v<typename q20::remove_cvref_t<decltype(item)>, QString>) {
-            //     writeQString(out, item);
-            // } else {
                 item->serialize(out); // If 'item' is not QString, use the custom serialization methot all my source classes have
-            // }
         }
     }
 
@@ -64,13 +58,6 @@ namespace SerializationUtils {
 
         for (const auto& item : container) {
             SerializationUtils::writeQString(out, item);
-
-            // // Check if the type of 'item' is QString
-            // if constexpr (std::is_same_v<typename q20::remove_cvref_t<decltype(item)>, QString>) {
-            //     writeQString(out, item);
-            // } else {
-            //     item->serialize(out); // If 'item' is not QString, use the custom serialization methot all my source classes have
-            // }
         }
     }
 
@@ -82,26 +69,6 @@ namespace SerializationUtils {
             QString tempStr;
             readQString(in, tempStr);
             container.push_back(std::move(tempStr));
-        }
-    }
-
-    template<typename primContainer>
-    void writePrimitiveContainer(std::ofstream& out, const primContainer& container) {
-        size_t size = container.size();
-        out.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
-        for (const auto& item : container) {
-            out.write(reinterpret_cast<const char*>(&item), sizeof(typename primContainer::value_type));
-        }
-    }
-
-    template<typename primContainer>
-    void readPrimitiveContainer(std::ifstream& in, primContainer& container) {
-        size_t size;
-        in.read(reinterpret_cast<char*>(&size), sizeof(size_t));
-        for (size_t i = 0; i < size; ++i) {
-            typename primContainer::value_type item;
-            in.read(reinterpret_cast<char*>(&item), sizeof(typename primContainer::value_type));
-            container.push_back(item);
         }
     }
 }

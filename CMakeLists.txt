@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(FindWhat VERSION 0.1.0 LANGUAGES CXX)
+project(FindWhat VERSION 0.2.0 LANGUAGES CXX)
 
 # Warning level
 if (MSVC)
@@ -20,6 +20,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 # Find QT Widgets
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+
 if(Qt${QT_VERSION_MAJOR}_FOUND)
     message("Found Poppler library: ${POPPLER_CPP_LIB}")
 else()
@@ -50,7 +51,6 @@ set(MAIN_FILES
     ui/MainWindow.cpp         ui/MainWindow.h           ui/MainWindow.ui
     ui/QCItemDelegateFormulaTreeView.cpp
 
-
     ui/PDockPreview.cpp        ui/PDockPreview.h        ui/PDockPreview.ui
     ui/PEsquemaPage.cpp        ui/PEsquemaPage.h        ui/PEsquemaPage.ui
     ui/PFormExpToolBoxPage.cpp ui/PFormExpToolBoxPage.h ui/PFormExpToolBoxPage.ui
@@ -65,8 +65,8 @@ set(MAIN_FILES
     ui/WLoadedFilesTreeView.cpp ui/WLoadedFilesTreeView.h
     ui/WToolBarPreview.cpp      ui/WToolBarPreview.h
     ui/WToolBarEsquema.cpp      ui/WToolBarEsquema.h
-    ui/WExtendedListWidget.cpp            ui/WExtendedListWidget.h
-    ui/WSpreadSheet.cpp            ui/WSpreadSheet.h
+    ui/WExtendedListWidget.cpp  ui/WExtendedListWidget.h
+    ui/WSpreadSheet.cpp         ui/WSpreadSheet.h
 
     ui/dialogs/NewEsquema_dlg.cpp       ui/dialogs/NewEsquema_dlg.h      ui/dialogs/NewEsquema_dlg.ui
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui
@@ -97,13 +97,12 @@ endif()
 
 # Set the output directory for the executable
 set_target_properties(FindWhat PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-# Set the output directory for the executable
-set_target_properties(FindWhat PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" )
+
 # Add current source dir as a include path
 target_include_directories(FindWhat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # LINK LIBRARIES
-#QT
+# QT
 target_link_libraries(FindWhat PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
 )

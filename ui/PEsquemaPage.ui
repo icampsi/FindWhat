@@ -727,8 +727,8 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>275</width>
-                          <height>171</height>
+                          <width>218</width>
+                          <height>68</height>
                          </rect>
                         </property>
                         <layout class="QGridLayout" name="gridLayout_2">
@@ -1180,6 +1180,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>WExtendedListWidget</class>
+   <extends>QListWidget</extends>
+   <header>WExtendedListWidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>WFormulaTreeView</class>
    <extends>QTreeView</extends>
    <header>WFormulaTreeView.h</header>
@@ -1189,11 +1194,6 @@
    <extends>QWidget</extends>
    <header>WTextEdDynamicBlk.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WExtendedListWidget</class>
-   <extends>QListWidget</extends>
-   <header>WExtendedListWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
