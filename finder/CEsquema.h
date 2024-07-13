@@ -6,6 +6,7 @@
 #ifndef CESQUEMA_H
 #define CESQUEMA_H
 
+#include "CPagedText.h"
 #include <QString>
 #include <QMessageBox>
 
@@ -47,7 +48,7 @@ public:
 
     void addExtractDataFormula(CFormula* formula);
 
-    void parseDoc(CPdfDoc* doc, std::unordered_map<QString, QString> *result);
+    void parseDoc(const CPagedText *doc, std::unordered_map<QString, QString> *result);
 
     void setFormulaName(CFormula* formula, const QString &name);
 

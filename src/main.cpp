@@ -26,7 +26,7 @@
 
 #include "ui/mainwindow.h"
 #include <QApplication>
-#include "utils/GeneralFunctions.h"
+#include "utils/USystem.h"
 
 int main(int argc, char *argv[]) {
     SystemUtils::setEndianness();

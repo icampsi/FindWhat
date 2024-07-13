@@ -68,7 +68,7 @@
   <customwidget>
    <class>WSpreadSheet</class>
    <extends>QTableView</extends>
-   <header>WSpreadSheet.h</header>
+   <header>ui/WSpreadSheet.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

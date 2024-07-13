@@ -8,7 +8,7 @@
 
 #include "qpushbutton.h"
 
-#include "utils/GeneralFunctions.h"
+#include "utils/USystem.h"
 
 InvalidFileName_dlg::InvalidFileName_dlg(QWidget *parent, QString *fileName, const QString &oldFilePath)
     : QDialog(parent), ui(new Ui::InvalidFileName_dlg), m_fileName{fileName} {
@@ -26,7 +26,7 @@ void InvalidFileName_dlg::on_buttonBox_accepted() {
 
 
 void InvalidFileName_dlg::on_lineEdit_newFileName_textChanged(const QString &arg1) {
-    if (arg1.size() > 0 && !SystemUtils::containsInvalidFileNameChars(arg1)) {
+    if (arg1.size() > 0 && !SystemUtils::hasInvalidFileNameChr(arg1)) {
         ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     else {

@@ -7,7 +7,7 @@
 
 #include <fstream>
 
-#include "utils/GeneralFunctions.h"
+#include "utils/USerialize.h"
 #include "CFormula.h"
 
 CFunction::CFunction(Function functionType, CFormula *parent) : m_action{ functionType }, m_parent{parent} {
@@ -45,7 +45,7 @@ void CFunction::serialize(std::ofstream& out) const {
     */
     
     out.write(reinterpret_cast<const char*>(&m_action), sizeof(Function)); // m_action
-    SerializationUtils::writeQString(out, m_functionTypeName);           // m_functionTypeName
+    USerialize::writeQString(out, m_functionTypeName);           // m_functionTypeName
 }
 
 
@@ -58,7 +58,7 @@ void CFunction::deserialize(std::ifstream& in) {
     */
     
     in.read(reinterpret_cast<char*>(&m_action), sizeof(Function)); // m_action
-    SerializationUtils::readQString(in, m_functionTypeName);     // m_functionTypeName
+    USerialize::readQString(in, m_functionTypeName);     // m_functionTypeName
 }
 
 CMathFunction::CMathFunction(Function name) : CFunction(name) {}
@@ -91,7 +91,7 @@ void CIndexingFunction::serialize(std::ofstream& out) const {
      * bool     m_goBackwards
     */
 
-    SerializationUtils::writeCustomQStringContainer(out, m_text);                  // m_text
+    USerialize::writeCustomQStringContainer(out, m_text);                  // m_text
     out.write(reinterpret_cast<const char*>(&m_num), sizeof(int));                 // m_num
     out.write(reinterpret_cast<const char*>(&m_option), sizeof(bool));             // m_option
     out.write(reinterpret_cast<const char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
@@ -109,7 +109,7 @@ void CIndexingFunction::deserialize(std::ifstream& in) {
      * bool     m_goBackwards
     */
 
-    SerializationUtils::readCustomQStringContainer(in, m_text);            // m_text
+    USerialize::readCustomQStringContainer(in, m_text);            // m_text
     in.read(reinterpret_cast<char*>(&m_num), sizeof(int));                 // m_num
     in.read(reinterpret_cast<char*>(&m_option), sizeof(bool));             // m_option
     in.read(reinterpret_cast<char*>(&m_startFromBeggining), sizeof(bool)); // m_startFromBeggining
@@ -158,13 +158,13 @@ void CExtractingFunction::serialize(std::ofstream& out) const {
 
     out.write(reinterpret_cast<const char*>(&m_charsToGet), sizeof(int));              // m_charsToGet
     out.write(reinterpret_cast<const char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::writeCustomQStringContainer(out, m_endingStr);                 // m_endingStr
+    USerialize::writeCustomQStringContainer(out, m_endingStr);                 // m_endingStr
     out.write(reinterpret_cast<const char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     out.write(reinterpret_cast<const char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
-    SerializationUtils::writeQString(out, m_toAllow);                                  // m_toAllow
-    SerializationUtils::writeQString(out, m_toAvoid);                                  // m_toAvoid
-    SerializationUtils::writeQString(out, m_toReplace);                                // m_toReplace
-    SerializationUtils::writeQString(out, m_replaceFor);                               // m_replaceFor
+    USerialize::writeQString(out, m_toAllow);                                  // m_toAllow
+    USerialize::writeQString(out, m_toAvoid);                                  // m_toAvoid
+    USerialize::writeQString(out, m_toReplace);                                // m_toReplace
+    USerialize::writeQString(out, m_replaceFor);                               // m_replaceFor
 }
 
 void CExtractingFunction::deserialize(std::ifstream& in) {
@@ -189,13 +189,13 @@ void CExtractingFunction::deserialize(std::ifstream& in) {
 
     in.read(reinterpret_cast<char*>(&m_charsToGet) , sizeof(int));             // m_charsToGet
     in.read(reinterpret_cast<char*>(&m_charsToRead), sizeof(int));             // m_charsToRead
-    SerializationUtils::readCustomQStringContainer(in, m_endingStr);           // m_endingStr
+    USerialize::readCustomQStringContainer(in, m_endingStr);           // m_endingStr
     in.read(reinterpret_cast<char*>(&m_invertDirection), sizeof(bool));        // m_invertDirection
     in.read(reinterpret_cast<char*>(&m_charTypeToGet), sizeof(CharTypeToGet)); // m_charTypeToGet
-    SerializationUtils::readQString(in, m_toAllow);                            // m_toAllow
-    SerializationUtils::readQString(in, m_toAvoid);                            // m_toAvoid
-    SerializationUtils::readQString(in, m_toReplace);                          // m_toReplace
-    SerializationUtils::readQString(in, m_replaceFor);                         // m_replaceFor
+    USerialize::readQString(in, m_toAllow);                            // m_toAllow
+    USerialize::readQString(in, m_toAvoid);                            // m_toAvoid
+    USerialize::readQString(in, m_toReplace);                          // m_toReplace
+    USerialize::readQString(in, m_replaceFor);                         // m_replaceFor
 }
 
 // MODFUNCTION
@@ -207,8 +207,8 @@ void CModFunction::serialize(std::ofstream& out) const {
      * QString       m_replaceFor
      */
 
-    SerializationUtils::writeQString(out, m_toReplace);  // m_toReplace
-    SerializationUtils::writeQString(out, m_replaceFor); // m_replaceFor
+    USerialize::writeQString(out, m_toReplace);  // m_toReplace
+    USerialize::writeQString(out, m_replaceFor); // m_replaceFor
 }
 
 void CModFunction::deserialize(std::ifstream& in) {
@@ -218,8 +218,8 @@ void CModFunction::deserialize(std::ifstream& in) {
      * QString       m_replaceFor
      */
 
-    SerializationUtils::readQString(in, m_toReplace);  // m_toReplace
-    SerializationUtils::readQString(in, m_replaceFor); // m_replaceFor
+    USerialize::readQString(in, m_toReplace);  // m_toReplace
+    USerialize::readQString(in, m_replaceFor); // m_replaceFor
 }
 
 // ConditionFunction
@@ -235,7 +235,7 @@ void CConditionFunction::serialize(std::ofstream& out) const {
      */
 
     out.write(reinterpret_cast<const char*>(&m_operator), sizeof(Operator));    // m_compared
-    SerializationUtils::writeQString(out, m_compared);                          // m_operator
+    USerialize::writeQString(out, m_compared);                          // m_operator
     out.write(reinterpret_cast<const char*>(&m_action), sizeof(Action));        // m_compared
     out.write(reinterpret_cast<const char*>(&m_nJump), sizeof(size_t));         // m_nJump
 }
@@ -250,7 +250,7 @@ void CConditionFunction::deserialize(std::ifstream& in) {
      */
 
     in.read(reinterpret_cast<char*>(&m_operator), sizeof(Operator));    // m_operator
-    SerializationUtils::readQString(in, m_compared);                    // m_compared
+    USerialize::readQString(in, m_compared);                    // m_compared
     in.read(reinterpret_cast<char*>(&m_action), sizeof(Action));        // m_operator
     in.read(reinterpret_cast<char*>(&m_nJump), sizeof(size_t));         // m_operator
 }

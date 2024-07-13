@@ -1,3 +1,8 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef WTEXTEDDYNAMICBLK_H
 #define WTEXTEDDYNAMICBLK_H
 
@@ -8,7 +13,7 @@
 #include <QVBoxLayout>
 #include <QTextOption>
 
-#include "src/CFunctionClasses.h"
+#include "finder/CFunctionClasses.h"
 
 class WTextEdDynamicBlk : public QWidget {
     Q_OBJECT

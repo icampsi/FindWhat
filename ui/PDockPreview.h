@@ -8,7 +8,7 @@
 
 #include <QDockWidget>
 #include "ui_PDockPreview.h"
-#include "src/CFormula.h"
+#include "finder/CFormula.h"
 #include "document/CPdfDoc.h"
 
 namespace Ui { class PDockPreview; }

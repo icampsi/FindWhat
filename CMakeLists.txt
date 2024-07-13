@@ -21,8 +21,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# SUBDIRECTORIES
+add_subdirectory(utils)
+if(NOT TARGET finder)
+    add_subdirectory(finder)
+endif()
+add_subdirectory(poppler_interface)
+
+
 if(Qt${QT_VERSION_MAJOR}_FOUND)
-    message("Found Poppler library: ${POPPLER_CPP_LIB}")
+    message("Found Qt library: ${QT_VERSION_MAJOR}")
 else()
     message(FATAL_ERROR "Qt Widgets not found")
 endif()
@@ -31,11 +39,6 @@ set(MAIN_FILES
     # SRC
     src/main.cpp
 
-    src/CData.cpp               src/CData.h
-    src/CEsquema.cpp            src/CEsquema.h
-    src/CFormula.cpp            src/CFormula.h
-    src/CFunctionClasses.cpp    src/CFunctionClasses.h
-
     # DOCUMENT
     document/CMDoc.cpp              document/CMDoc.h
     document/CDocument.cpp          document/CDocument.h
@@ -43,9 +46,6 @@ set(MAIN_FILES
     document/CExportPathDoc.cpp     document/CExportPathDoc.h
     document/CExportCSV.cpp         document/CExportCSV.h
     document/CPdfDoc.cpp            document/CPdfDoc.h
-
-    # UTILS
-    utils/GeneralFunctions.cpp  utils/GeneralFunctions.h
 
     # UI
     ui/MainWindow.cpp         ui/MainWindow.h           ui/MainWindow.ui
@@ -79,58 +79,41 @@ set(MAIN_FILES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(FindWhat
+    qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
         ${MAIN_FILES}
     )
-
 else()
     if(ANDROID)
-        add_library(FindWhat SHARED
+        add_library(${PROJECT_NAME} SHARED
         )
     else()
-        add_executable(FindWhat
+        add_executable(${PROJECT_NAME}
             ${MAIN_FILES}
         )
     endif()
 endif()
 
 # Set the output directory for the executable
-set_target_properties(FindWhat PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Add current source dir as a include path
-target_include_directories(FindWhat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # LINK LIBRARIES
 # QT
-target_link_libraries(FindWhat PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
+    utils
+    finder
+    poppler_interface
 )
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.FindWhat)
 endif()
 
-# POPPLER
-find_library(POPPLER_CPP_LIB NAMES poppler-cpp)
-if (POPPLER_CPP_LIB)
-    message("Found Poppler library: ${POPPLER_CPP_LIB}")
-    target_link_libraries(FindWhat PRIVATE
-        ${POPPLER_CPP_LIB}
-    )
-    # Poppler includes
-    find_path(POPPER_CPP_INCLUDE_DIR poppler/cpp)
-    if (POPPER_CPP_INCLUDE_DIR)
-        message("Found Poppler include directory: ${POPPER_CPP_INCLUDE_DIR}")
-        target_include_directories(FindWhat PRIVATE ${POPPER_CPP_INCLUDE_DIR})
-    else ()
-        message(FATAL_ERROR "Poppler include directory not found")
-    endif ()
-else ()
-    message(FATAL_ERROR "Poppler library not found. You can download and install it from https://gitlab.freedesktop.org/poppler/poppler")
-endif ()
-
-set_target_properties(FindWhat PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -150,5 +133,5 @@ install(TARGETS FindWhat
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(FindWhat)
+    qt_finalize_executable(${PROJECT_NAME})
 endif()

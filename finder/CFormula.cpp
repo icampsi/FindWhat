@@ -84,7 +84,9 @@ CFormula::~CFormula() {
     }
 }
 
-const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, int to, CFormula::Result *halfWayResult) {
+const CFormula::Result& CFormula::applyFormula(const CPagedText* pPagedText, size_t from, int to, CFormula::Result *halfWayResult) {
+    const QString text = pPagedText->getFullText(); // NEW BOOKMARK
+
     m_result.result.clear(); // Reset result
     if(m_formulaPath.size() == 0) return m_result; // If there are no functions loaded, we have reseted the result value and stop here.
 
@@ -119,16 +121,16 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
         switch (m_formulaPath[i]->getFunctionType()) {
         case CFunction::Function::Find:
             if (pIndexFun) {
-                if (findText(pPdfDoc, pIndexFun) == -1) return m_result;
+                if (findText(pPagedText, pIndexFun) == -1) return m_result;
             }
             break;
 
         case CFunction::Function::MoveIndex:
-            if (pIndexFun) { moveIndex(pPdfDoc, pIndexFun); }
+            if (pIndexFun) { moveIndex(text, pIndexFun); }
             break;
 
         case CFunction::Function::MoveLine:
-            if (pIndexFun) { moveLine(pPdfDoc, pIndexFun); }
+            if (pIndexFun) { moveLine(text, pIndexFun); }
             break;
 
         case CFunction::Function::AppendString:
@@ -141,7 +143,7 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
             
         case CFunction::Function::Condition:
             if(pCondFun) {
-                switch (doCondition(pPdfDoc, pCondFun)) {
+                switch (doCondition(text, pCondFun)) {
                     using Act = CConditionFunction::Action;
                 case Act::DoNothing:
                     break;
@@ -162,7 +164,7 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
 
         case CFunction::Function::ExtractData:
             CExtractingFunction* pExctracFun = static_cast<CExtractingFunction*>(m_formulaPath[i]);
-            extractData(pPdfDoc, pExctracFun);
+            extractData(text, pExctracFun);
             break;
 
         }
@@ -178,7 +180,7 @@ const CFormula::Result& CFormula::applyFormula(CPdfDoc* pPdfDoc, size_t from, in
     return m_result;
 }
 
-int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
+int CFormula::findText(const CPagedText *pagedText, CIndexingFunction* pFunctionToApply) {
     size_t indexPos_final   = m_result.indexPosition.final;
     size_t indexPos_initial = m_result.indexPosition.initial;
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
@@ -195,16 +197,15 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
 
     // Set up what pages to look for the text
     int pageToLook = pFunctionToApply->getNum() - 1;
-    if(pageToLook >= static_cast<int>(pPdfDoc->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
+    if(pageToLook >= static_cast<int>(pagedText->pageCount())) pageToLook = -1; // If the page number is bigger than the total pages, look full document.
 
     if(pageToLook < 0) { // if negative looks the entire document
-       text = pPdfDoc->getFullText();
+       text = pagedText->getFullText();
     }
     else {
-        CPdfDoc::Page page = pPdfDoc->getPage(pageToLook);
-        text = pPdfDoc->getPage(pageToLook).pageText;
-        pPdfDoc->calculateComprehensiveIndex(relativeIndexInitial, pageToLook);
-        pPdfDoc->calculateComprehensiveIndex(relativeIndexFinal, pageToLook);
+        text = pagedText->getPage(pageToLook).pageText;
+        pagedText->calculateComprehensiveIndex(relativeIndexInitial, pageToLook);
+        pagedText->calculateComprehensiveIndex(relativeIndexFinal, pageToLook);
     }
 
     // TRUE = end text. FALSE = begin text
@@ -239,8 +240,8 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     }
 
     if(pageToLook >= 0) {
-        relativeIndexInitial += pPdfDoc->getPage(pageToLook).pageCharRange.from;
-        relativeIndexFinal   += pPdfDoc->getPage(pageToLook).pageCharRange.from;
+        relativeIndexInitial += pagedText->getPage(pageToLook).pageCharRange.from;
+        relativeIndexFinal   += pagedText->getPage(pageToLook).pageCharRange.from;
     }
     m_result.indexPosition.initial = relativeIndexInitial;
     m_result.indexPosition.final   = relativeIndexFinal;
@@ -248,8 +249,7 @@ int CFormula::findText(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
     return 0;
 }
 
-void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
-    QString text = pPdfDoc->getFullText();
+void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToApply) {
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
@@ -265,8 +265,7 @@ void CFormula::moveIndex(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) 
     }
 }
 
-void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
-    QString text = pPdfDoc->getFullText();
+void CFormula::moveLine(const QString& text, CIndexingFunction* pFunctionToApply) {
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
@@ -289,7 +288,7 @@ void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
         while (1) {
             if (m_result.indexPosition.initial < static_cast<size_t>(text.size())) { m_result.indexPosition.initial++; }
             else {
-                BeginLine(pPdfDoc);
+                BeginLine(text);
                 break;
             }
             if (text[m_result.indexPosition.initial] == '\n') {
@@ -302,11 +301,10 @@ void CFormula::moveLine(CPdfDoc* pPdfDoc, CIndexingFunction* pFunctionToApply) {
         }
         m_result.indexPosition.final = m_result.indexPosition.initial;
     }
-    if(pFunctionToApply->getOption()) EndLine(pPdfDoc);
+    if(pFunctionToApply->getOption()) EndLine(text);
 }
 
-void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of current line
-    QString text = pPdfDoc->getFullText();
+void CFormula::BeginLine(const QString& text) { // Moves index to the beggining of current line
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
@@ -321,8 +319,7 @@ void CFormula::BeginLine(CPdfDoc* pPdfDoc) { // Moves index to the beggining of 
     m_result.indexPosition.final = m_result.indexPosition.initial;
 }
 
-void CFormula::EndLine(CPdfDoc* pPdfDoc) { // Moves index to the ending of current line
-    QString text = pPdfDoc->getFullText();
+void CFormula::EndLine(const QString& text) { // Moves index to the ending of current line
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.
     if (m_result.indexPosition.final > m_result.indexPosition.initial) m_result.indexPosition.initial = m_result.indexPosition.final;
 
@@ -422,7 +419,7 @@ bool CFormula::MathData(CMathFunction* pMathFunctionToApply) {
     return true;
 }
 
-CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFunction *pFunctionToApply) {
+CConditionFunction::Action CFormula::doCondition(const QString& text, CConditionFunction *pFunctionToApply) {
     bool flag = false;
     QString &result = m_result.result;
     switch(pFunctionToApply->getOperator()) {
@@ -440,10 +437,10 @@ CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFun
         flag = (result != pFunctionToApply->getCompared());
         break;
     case CConditionFunction::Operator::Found:
-        flag = (pPdfDoc->getFullText().contains(pFunctionToApply->getCompared()));
+        flag = (text.contains(pFunctionToApply->getCompared()));
         break;
     case CConditionFunction::Operator::NotFound:
-        flag = !(pPdfDoc->getFullText().contains(pFunctionToApply->getCompared()));
+        flag = !(text.contains(pFunctionToApply->getCompared()));
         break;
     }
 
@@ -451,10 +448,9 @@ CConditionFunction::Action CFormula::doCondition(CPdfDoc* pPdfDoc, CConditionFun
     else     return CConditionFunction::Action::DoNothing;
 }
 
-void CFormula::extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply) {
+void CFormula::extractData(const QString& text, CExtractingFunction* pFunctionToApply) {
     if(pFunctionToApply->getEndingStringBlock().empty()) return; // NEW BOOKMARK
 
-    QString text = pPdfDoc->getFullText(); // PDF in text format
     bool directionInverted = pFunctionToApply->isInverted(); // Flag to check wether we should extract upwards or backwards
 
     // Initial check for indexPos. If final > initial last function was extracting, so indexes need to be brought together.

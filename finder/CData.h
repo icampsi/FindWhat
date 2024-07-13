@@ -39,6 +39,12 @@ public:
     void serialize(std::ofstream& out) const;
     void deserialize(std::ifstream& in);
 
+    friend bool operator==(const CData& lhs, const CData& rhs) {
+        return lhs.m_dataName == rhs.m_dataName &&
+               lhs.m_dataString == rhs.m_dataString &&
+               lhs.m_parentFormula == rhs.m_parentFormula;
+    }
+
     // enum class DataType { integer, floating, string, empty };
     // DataType m_dataType { DataType::empty }; // Tipus de dada
 

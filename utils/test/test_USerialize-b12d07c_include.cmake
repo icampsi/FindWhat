@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/brams/source/repos/FindWhat Project/src/utils/test/test_USerialize-b12d07c_tests.cmake")
+  include("C:/Users/brams/source/repos/FindWhat Project/src/utils/test/test_USerialize-b12d07c_tests.cmake")
+else()
+  add_test(test_USerialize_NOT_BUILT-b12d07c test_USerialize_NOT_BUILT-b12d07c)
+endif()

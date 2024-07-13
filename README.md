@@ -41,6 +41,7 @@ NEW
 - Added "add and delete" rows and columns functionality to the WSpreadSheet class
 - Added a look backward option to find function
 - fixed some minor bugs
+- Started a new branch to re-organize the full architecture and make the program modular
 
 21/06/24
 - Fixed a bug with the ending string block and cleaned code

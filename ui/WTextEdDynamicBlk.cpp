@@ -1,8 +1,13 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #include "WTextEdDynamicBlk.h"
 
 #include <QLabel>
 
-#include "utils/generalfunctions.h"
+#include "utils/UText.h"
 
 WTextEdDynamicBlk::WTextEdDynamicBlk(QWidget *parent) : QWidget(parent), m_Btn_addBlock("+", this), m_mainLbl("UNDEFINED TEXT", this), m_secondaryLblTxt("") {
     setupUi();
@@ -60,7 +65,7 @@ void WTextEdDynamicBlk::addNewLabel(bool isSecondary/*flag to avoid atttaching r
         if (it != m_textEdtBlock.end()) {
             size_t i = std::distance(m_textEdtBlock.begin(), it);
 
-            QString parsedText = parseFromText(textEdit->toPlainText());
+            QString parsedText = UText::parseFromText(textEdit->toPlainText());
             emit labelTextChanged(i, parsedText);
             if (!m_blockUpdate) emit blockUpdated();
         }

@@ -11,8 +11,9 @@
 #include "CMDoc.h"
 #include "CPdfDoc.h"
 #include "CEsquemaDoc.h"
-#include "src/CEsquema.h"
-#include "utils/generalfunctions.h"
+#include "finder/CEsquema.h"
+#include "utils/UText.h"
+#include "utils/USerialize.h"
 
 #include "ui/dialogs/ProgBarExport_dlg.h"
 #include "ui/dialogs/InvalidFileName_dlg.h"
@@ -72,7 +73,7 @@ void CExportCSV::buildStructure(std::vector<std::vector<QString>> *xsvStructure,
 
         // Extract data
         std::unordered_map<QString, QString> extractedData;
-        esquema->parseDoc(pdfDoc, &extractedData);
+        esquema->parseDoc(&pdfDoc->getPagedText(), &extractedData);
 
         auto replacer = [&extractedData](const QString& capturedString) -> QString {
             auto it = extractedData.find(capturedString);
@@ -85,7 +86,7 @@ void CExportCSV::buildStructure(std::vector<std::vector<QString>> *xsvStructure,
 
         for (std::vector<QString> row : format) {
             for(QString& cell : row) {
-                replacePlaceholders(cell, "<(.*?)>", replacer);
+                UText::replacePlaceholders(cell, "<(.*?)>", replacer);
             }
             xsvStructure->push_back(std::move(row));
         }
@@ -134,7 +135,7 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
 
         // Extract data
         std::unordered_map<QString, QString> extractedData;
-        esquema->parseDoc(pdfDoc, &extractedData);
+        esquema->parseDoc(&pdfDoc->getPagedText(), &extractedData);
 
         auto replacer = [&extractedData](const QString& capturedString) -> QString {
             auto it = extractedData.find(capturedString);
@@ -149,7 +150,7 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
         for (const std::vector<QString>& row : format) {
             QList<QStandardItem*> newRowItems;
             for (QString cell : row) {
-                replacePlaceholders(cell, "<(.*?)>", replacer);
+                UText::replacePlaceholders(cell, "<(.*?)>", replacer);
                 newRowItems.append(new QStandardItem(cell));
             }
             combinedModel->appendRow(newRowItems);
@@ -216,7 +217,7 @@ void serializeModel(std::ofstream &out, const QStandardItemModel* model) {
     for (int row = 0; row < rowCount; ++row) {
         for (int column = 0; column < columnCount; ++column) {
             QStandardItem* item = model->item(row, column);
-            SerializationUtils::writeQString(out, item ? item->text() : QString());
+            USerialize::writeQString(out, item ? item->text() : QString());
         }
     }
 }
@@ -249,10 +250,10 @@ void CExportCSV::serialize(std::ofstream &out) const {
     size_t index = std::distance(esquemaDocs->begin(), it);
     out.write(reinterpret_cast<const char*>(&index), sizeof(size_t));  // m_associatedEsquemaDoc index
 
-    SerializationUtils::writeQString(out, m_exportFileRename);                          // m_exportFileRename
+    USerialize::writeQString(out, m_exportFileRename);                          // m_exportFileRename
     out.write(reinterpret_cast<const char*>(&m_renameParsedPDFFlag), sizeof(bool));     // m_renameParsedPDFFlag
-    SerializationUtils::writeQString(out, m_fileNamePlaceholder);                       // m_fileNamePlaceholder
-    SerializationUtils::writeQString(out, m_idText);                                    // m_idText
+    USerialize::writeQString(out, m_fileNamePlaceholder);                       // m_fileNamePlaceholder
+    USerialize::writeQString(out, m_idText);                                    // m_idText
 
     // Serialize the QStandardItemModel
     serializeModel(out, &m_tableModel);
@@ -271,7 +272,7 @@ void deserializeModel(std::ifstream &in, QStandardItemModel* model) {
     for (int row = 0; row < rowCount; ++row) {
         for (int column = 0; column < columnCount; ++column) {
             QString text;
-            SerializationUtils::readQString(in, text);
+            USerialize::readQString(in, text);
             QStandardItem* item = new QStandardItem(text);
             model->setItem(row, column, item);
         }
@@ -296,10 +297,10 @@ void CExportCSV::deserialize(std::ifstream &in) {
     in.read(reinterpret_cast<char*>(&index), sizeof(size_t));
     m_associatedEsquemaDoc = CMDoc::getMDoc().getEsquemaFromIndex(index);
 
-    SerializationUtils::readQString(in, m_exportFileRename);                 // m_exportFileRename
+    USerialize::readQString(in, m_exportFileRename);                 // m_exportFileRename
     in.read(reinterpret_cast<char*>(&m_renameParsedPDFFlag), sizeof(bool));  // m_renameParsedPDFFlag
-    SerializationUtils::readQString(in, m_fileNamePlaceholder);              // m_fileNamePlaceholder
-    SerializationUtils::readQString(in, m_idText);                           // m_idText
+    USerialize::readQString(in, m_fileNamePlaceholder);              // m_fileNamePlaceholder
+    USerialize::readQString(in, m_idText);                           // m_idText
 
     // Deserialize the QStandardItemModel
     deserializeModel(in, &m_tableModel);

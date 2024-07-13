@@ -6,11 +6,11 @@
 #ifndef CMDOC_H
 #define CMDOC_H
 
-#include <vector>
 #include "CExportPathDoc.h"
 #include "document/CEsquemaDoc.h"
-#include "src/CEsquema.h"
+#include "finder/CEsquema.h"
 #include "CDocument.h"
+#include <vector>
 
 class CDocument;
 class CPdfDoc;

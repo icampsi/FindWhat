@@ -5,7 +5,7 @@
 
 #include "CData.h"
 #include "CFormula.h"
-#include "utils/GeneralFunctions.h"
+#include "utils/USerialize.h"
 
 #include <fstream>
 
@@ -39,8 +39,8 @@ void CData::serialize(std::ofstream& out) const {
      * CFormula *m_parentFormula - NEED TO CHECK HOW TO DO THAT
     */
 
-    SerializationUtils::writeQString(out, m_dataName);   // m_dataName
-    SerializationUtils::writeQString(out, m_dataString); // m_dataString
+    USerialize::writeQString(out, m_dataName);   // m_dataName
+    USerialize::writeQString(out, m_dataString); // m_dataString
 }
 
 void CData::deserialize(std::ifstream& in) {
@@ -52,8 +52,8 @@ void CData::deserialize(std::ifstream& in) {
      * CFormula *m_parentFormula - NEED TO CHECK HOW TO DO THAT
     */
 
-    SerializationUtils::readQString(in, m_dataName);   // m_dataName
-    SerializationUtils::readQString(in, m_dataString); // m_dataString
+    USerialize::readQString(in, m_dataName);   // m_dataName
+    USerialize::readQString(in, m_dataString); // m_dataString
 }
 
 // CData::CData(QString dataName, QString dataString, DataType dataType, QString assocBegin, QString assocEnd) {

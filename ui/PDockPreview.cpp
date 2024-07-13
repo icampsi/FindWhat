@@ -60,8 +60,8 @@ void PDockPreview::updateCursor(CFormula::IndexPosition index) {
     // Sets the cursor to the needed tab depending on index.
     int highlightedTabIndex; // To keep track of the highlighted tab so we can automatically scroll to it later
     QTextCursor cursor;
-    CPdfDoc::RelativeIndex from_relativeIndex;
-    CPdfDoc::RelativeIndex to_relativeIndex;
+    CPagedText::RelativeIndex from_relativeIndex;
+    CPagedText::RelativeIndex to_relativeIndex;
     if(ui->tabWidget_preview->count() == 1) { // If there is only one tab
         from_relativeIndex.charIndex = index.initial;
         to_relativeIndex.charIndex = index.final;
@@ -69,8 +69,9 @@ void PDockPreview::updateCursor(CFormula::IndexPosition index) {
         highlightedTabIndex = 0;
         cursor =  QTextCursor(static_cast<PTabTextPreview*>(ui->tabWidget_preview->widget(highlightedTabIndex))->document());
     } else { // If there are multiple pages on different tabs
-        from_relativeIndex = m_previewDoc->getPageRelativeIndex(index.initial);
-        to_relativeIndex   = m_previewDoc->getPageRelativeIndex(index.final);
+        const CPagedText &pagedText = m_previewDoc->getPagedText();
+        from_relativeIndex = pagedText.getPageRelativeIndex(index.initial);
+        to_relativeIndex   = pagedText.getPageRelativeIndex(index.final);
 
         highlightedTabIndex = static_cast<int>(from_relativeIndex.pageIndex);
         cursor = QTextCursor(static_cast<PTabTextPreview*>(ui->tabWidget_preview->widget(highlightedTabIndex))->document());
@@ -133,9 +134,10 @@ void PDockPreview::setPreviewText() {
         tab->setPreviewText(docText);
     } else { // For breaking the document into pages
         clearTabs();
-        for (size_t i{0}; i < m_previewDoc->pageCount(); i++) {
+        const CPagedText &pagedText = m_previewDoc->getPagedText();
+        for (size_t i{0}; i < pagedText.pageCount(); i++) {
             QString label = "Page " + QString::number(i + 1);
-            PTabTextPreview *tab = new PTabTextPreview(m_previewDoc->getPage(i).pageText, ui->tabWidget_preview);
+            PTabTextPreview *tab = new PTabTextPreview(pagedText.getPage(i).pageText, ui->tabWidget_preview);
             ui->tabWidget_preview->addTab(tab, label);
         }
     }

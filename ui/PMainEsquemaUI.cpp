@@ -23,7 +23,7 @@
 #include "document/CEsquemaDoc.h"
 #include "document/CExportPathDoc.h"
 
-#include "utils/generalfunctions.h"
+#include "utils/USystem.h"
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     : QWidget(parent), ui(new Ui::PMainEsquemaUI), m_emptyPage(this)
@@ -251,6 +251,6 @@ void PMainEsquemaUI::deleteEsquema(const int index, const bool askConfirmation) 
     CMDoc::getMDoc().deleteEsquema(index);
 
     // Perform a check in main window for disabling Export Esquema menu action if needed
-    qobject_cast<MainWindow*>(getLastParent(this))->checkExortEsquemaActionEnable();
+    qobject_cast<MainWindow*>(SystemUtils::getLastParent(this))->checkExortEsquemaActionEnable();
 }
 

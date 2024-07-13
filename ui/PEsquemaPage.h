@@ -6,8 +6,8 @@
 #ifndef PESQUEMAPAGE_H
 #define PESQUEMAPAGE_H
 
-#include "src/CFormula.h"
-#include "src/CFunctionClasses.h"
+#include "finder/CFormula.h"
+#include "finder/CFunctionClasses.h"
 
 #include <QWidget>
 #include <QFileSystemModel>

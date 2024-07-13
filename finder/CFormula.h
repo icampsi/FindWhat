@@ -7,9 +7,8 @@
 #define CFORMULA_H
 
 #include "CData.h"
-#include "src/CFunctionClasses.h"
-
-class CPdfDoc;
+#include "CFunctionClasses.h"
+#include "CPagedText.h"
 
 // EXTRACTS A DATA FROM GIVEN PARAMETERS (each formula extracts only one value)
 class CFormula {
@@ -27,7 +26,7 @@ public:
 protected:
     Result m_result;
     CData  m_data;
-    std::vector<CFunction*> m_formulaPath; // Marc the path to find the variable data
+    std::vector<CFunction*> m_formulaPath; // Marks the path to find the variable data
 
 public:
     // CONSTRUCTORS AND DESTRUCTORS
@@ -51,14 +50,14 @@ public:
     size_t     getPathSize() const          { return m_formulaPath.size(); }
 
     // FORMULA FUNCTIONS
-    const Result& applyFormula(CPdfDoc* pPdfDoc, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
+    const Result& applyFormula(const CPagedText* pagedText, size_t from = 0, int to = -1, Result* halfWayResult = nullptr);
 
 protected:
-    int  findText (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
-    void moveIndex(CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
-    void moveLine (CPdfDoc *pPdfDoc, CIndexingFunction* pFunctionToApply);
-    void BeginLine(CPdfDoc *pPdfDoc); // Sets index at the begining of current line
-    void EndLine  (CPdfDoc *pPdfDoc); // Sets index at the begining of current line
+    int  findText (const CPagedText *pagedText, CIndexingFunction* pFunctionToApply);
+    void moveIndex(const QString& text, CIndexingFunction* pFunctionToApply);
+    void moveLine (const QString& text, CIndexingFunction* pFunctionToApply);
+    void BeginLine(const QString &text); // Sets index at the begining of current line
+    void EndLine  (const QString &text); // Sets index at the begining of current line
     void appendString(CIndexingFunction* pFunctionToApply); //Appends or prepends string to m_result
 
     void appendData(CIndexingFunction* pFunctionToApply, std::vector<CData>* thisContainer);
@@ -67,9 +66,9 @@ protected:
     // Replaces text in the result
     void replaceString(CModFunction *pFunctionToApply){ m_result.result.replace(pFunctionToApply->getToReplace(), pFunctionToApply->getReplaceFor()); }
     // Activates a condition
-    CConditionFunction::Action doCondition(CPdfDoc *pPdfDoc, CConditionFunction *pFunctionToApply);
+    CConditionFunction::Action doCondition(const QString &text, CConditionFunction *pFunctionToApply);
 
-    void extractData(CPdfDoc* pPdfDoc, CExtractingFunction* pFunctionToApply);
+    void extractData(const QString& text, CExtractingFunction* pFunctionToApply);
 
 public:
     // m_formulaPath INTERFACE

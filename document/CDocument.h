@@ -6,7 +6,7 @@
 #ifndef CDOCUMENT_H
 #define CDOCUMENT_H
 
-#include "src/CEsquema.h"
+#include "finder/CEsquema.h"
 
 class CMDoc;
 

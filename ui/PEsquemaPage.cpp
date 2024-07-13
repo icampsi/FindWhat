@@ -10,18 +10,15 @@
 
 #include "MainWindow.h"
 
-#include "utils/GeneralFunctions.h"
+#include "utils/USystem.h"
+#include "utils/UText.h"
 
-#include "src/CData.h"
-#include "src/CEsquema.h"
+#include "finder/CData.h"
+#include "finder/CEsquema.h"
 
 #include "document/CMDoc.h"
 #include "document/CPdfDoc.h"
 #include "document/CEsquemaDoc.h"
-
-// From generalfunctions.h
-QString parseFromText(const QString& text);
-QString parseToText(const QString& text);
 
 // CONSTRUCTORS AND DESTRUCTORS ====================================================
 void PEsquemaPage::sharedConstructorSetup() { // Shared constructor options for DRY code
@@ -46,7 +43,7 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
     ui->dynamicBlck_textToFind->setSecondaryLabelText("else");
 
     connect(ui->treeView_formula, &WFormulaTreeView::removeSecondLevel, this, &PEsquemaPage::handleRemoveSecondLevel);
-    connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(getLastParent(this)), &MainWindow::functionUpdated);
+    connect(this, &PEsquemaPage::functionUpdated, static_cast<MainWindow*>(SystemUtils::getLastParent(this)), &MainWindow::functionUpdated);
     connect(ui->listWidget_function->model(), &QAbstractItemModel::rowsMoved, this, &PEsquemaPage::handleFunctionItemsMoved);
 
     // Connections with the dynamic block ending strings widget
@@ -151,7 +148,7 @@ void PEsquemaPage::loadFunction() {
         ui->comboBox_placeInLine->setCurrentIndex(indexingFunction->getOption());
         break;
     case CFunction::Function::AppendString:
-        parsedText = parseToText(indexingFunction->getText());
+        parsedText = UText::parseToText(indexingFunction->getText());
         ui->lineEdit_stringToAppend->setText(parsedText);
         if(!indexingFunction->getOption()) ui->radioButton_append->setChecked(true);
         if(indexingFunction->getOption()) ui->radioButton_preppend->setChecked(true);
@@ -202,7 +199,7 @@ void PEsquemaPage::updateFunctionProcess() {
     if(activePdfDoc) {
         // Update extracted data and result text widgets
         CFormula::Result halfResult;
-        CFormula::Result result = m_loadedFormula->applyFormula(activePdfDoc, 0, functionIndex, &halfResult);
+        CFormula::Result result = m_loadedFormula->applyFormula(&activePdfDoc->getPagedText(), 0, functionIndex, &halfResult);
         ui->plainTextEdit_resultToSelectedFunction->setPlainText(result.result);
 
         {
@@ -520,13 +517,13 @@ void PEsquemaPage::on_comboBox_readDirection_currentIndexChanged(int index) {
 
 void PEsquemaPage::on_lineEdit_charsToAllow_textEdited(const QString &arg1) {
     CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
-    function->setToAllow(parseFromText(arg1));
+    function->setToAllow(UText::parseFromText(arg1));
     updateFunctionProcess();
 }
 
 void PEsquemaPage::on_lineEdit_charsToAvoid_textEdited(const QString &arg1) {
     CExtractingFunction* function = static_cast<CExtractingFunction*>(m_itemFunctionMap[ui->listWidget_function->currentItem()]);
-    function->setToAvoid(parseFromText(arg1));
+    function->setToAvoid(UText::parseFromText(arg1));
     updateFunctionProcess();
 }
 

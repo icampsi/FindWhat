@@ -4,7 +4,9 @@
  * =================================================== */
 
 #include "CEsquema.h"
-#include "utils/GeneralFunctions.h"
+#include "utils/UText.h"
+#include "utils/USystem.h"
+#include "utils/USerialize.h"
 
 #include "CFormula.h"
 
@@ -29,9 +31,9 @@ bool CEsquema::createFileName(QString& newFileName, const QString &fileNamePlace
     };
 
     newFileName = fileNamePlaceholder;
-    replacePlaceholders(newFileName, "<(.*?)>", replacer);
-
-    return !SystemUtils::containsInvalidFileNameChars(newFileName);
+    UText::replacePlaceholders(newFileName, "<(.*?)>", replacer);
+    
+    return !SystemUtils::hasInvalidFileNameChr(newFileName);
 }
 
 void CEsquema::deleteFormula(const size_t index) {
@@ -84,7 +86,7 @@ void CEsquema::addExtractDataFormula(CFormula* formula) {
     m_extractDataFormula.push_back(formula);
 }
 
-void CEsquema::parseDoc(CPdfDoc* doc, std::unordered_map<QString, QString> *result) {
+void CEsquema::parseDoc(const CPagedText* doc, std::unordered_map<QString, QString> *result) {
     // Add static data to the map
     for(CData* data : m_staticData) {
         result->emplace(data->getDataName(), data->getDataString());
@@ -100,28 +102,28 @@ void CEsquema::serialize(std::ofstream& out) const {
     /* - SERIALIZATION ORDER -
      * QString                          m_nameEsquema
      * std::vector<CFormula*>           m_extractDataFormula
-     * std::vector<CData*>              m_valorsEstatics
+     * std::vector<CData*>              m_staticData
      *
      * - NO NEED -
-     * m_dataMap                - TO BE RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
+     * m_dataMap                - TO BE RECONSTRUCTED ON DESERIALIZATION from m_staticData and m_extractDataFormula
      */
 
-    SerializationUtils::writeQString(out, m_nameEsquema);                // m_nameEsquema
-    SerializationUtils::writeCustomContainer(out, m_extractDataFormula); // m_extractDataFormula
-    SerializationUtils::writeCustomContainer(out, m_staticData);         // m_valorsEstatics
+    USerialize::writeQString(out, m_nameEsquema);                // m_nameEsquema
+    USerialize::writeCustomContainer(out, m_extractDataFormula); // m_extractDataFormula
+    USerialize::writeCustomContainer(out, m_staticData);         // m_staticData
 }
 
 void CEsquema::deserliazile(std::ifstream& in) {
     /* - DESERIALIZATION ORDER -
      * QString                          m_nameEsquema
      * std::vector<CFormula*>           m_extractDataFormula
-     * std::vector<CData*>              m_valorsEstatics
+     * std::vector<CData*>              m_staticData
      *
      * - RECONSTRUCTION -
-     * m_dataMap                - RECONSTRUCTED ON DESERIALIZATION from m_valorsEstatics and t_extractDataFormula
+     * m_dataMap                - RECONSTRUCTED ON DESERIALIZATION from m_staticData and m_extractDataFormula
      */
 
-    SerializationUtils::readQString(in, m_nameEsquema); // m_nameEsquema
+    USerialize::readQString(in, m_nameEsquema); // m_nameEsquema
 
     size_t extractDataFormulaSize{ 0 };
     in.read(reinterpret_cast<char*>(&extractDataFormulaSize), sizeof(size_t));
@@ -130,9 +132,9 @@ void CEsquema::deserliazile(std::ifstream& in) {
         addExtractDataFormula(formula);
     }
 
-    size_t valorsEstaticsSize;
-    in.read(reinterpret_cast<char*>(&valorsEstaticsSize), sizeof(size_t));
-    for(size_t i{0}; i < valorsEstaticsSize; i++ ) {
+    size_t staticDataSize;
+    in.read(reinterpret_cast<char*>(&staticDataSize), sizeof(size_t));
+    for(size_t i{0}; i < staticDataSize; i++ ) {
         CData* data = new CData(in);
         addStaticData(data);
     }

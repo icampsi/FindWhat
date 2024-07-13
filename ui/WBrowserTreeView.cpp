@@ -5,7 +5,7 @@
 
 #include "WBrowserTreeView.h"
 #include "qmimedata.h"
-#include "utils/generalfunctions.h"
+#include "utils/USystem.h"
 
 WBrowserTreeView::WBrowserTreeView(QWidget *parent) : QTreeView(parent) {
     setAcceptDrops(true);
@@ -20,7 +20,7 @@ WBrowserTreeView::WBrowserTreeView(QWidget *parent) : QTreeView(parent) {
 
     // Set the model for the browser
     setModel(model);
-    setRootIndex(model->index(getUserHomeDirectory()));  // Set the root index to the root path
+    setRootIndex(model->index(SystemUtils::getHomeDirectory()));  // Set the root index to the root path
     setColumnHidden(1, true);  // Hide Size column
     setColumnHidden(2, true);  // Hide Type column
     setColumnHidden(3, true);  // Hide modified column
