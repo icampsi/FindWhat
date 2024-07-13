@@ -1,3 +1,8 @@
+# =================================================== *
+# ====         Copyright (c) 2024 icampsi        ==== *
+# ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+# =================================================== */
+
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # Locate Catch2 (Assuming Catch2 is already installed or provided by vcpkg)

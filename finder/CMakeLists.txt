@@ -1,3 +1,8 @@
+# =================================================== *
+# ====         Copyright (c) 2024 icampsi        ==== *
+# ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+# =================================================== */
+
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(finder VERSION 0.1.0 LANGUAGES CXX)
 
