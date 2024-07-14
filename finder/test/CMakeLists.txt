@@ -21,6 +21,9 @@ set(TEST_SOURCES
     test_CFunctionClasses.cpp
 )
 
+add_executable(test_finder test_finder.cpp)
+target_link_libraries(test_finder PRIVATE utils Catch2::Catch2WithMain Qt${QT_VERSION_MAJOR}::Widgets)
+
 # Create executables for testing and link with necessary libraries
 foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)

@@ -1,0 +1,23 @@
+Nom Complet Empresa S.L.
+F00000000
+c/ Carr 0 Escala A 00001 Poble
+FACTURA FE2024/92
+Data de factura
+01/4/2024
+UEC 4rt 5a
+Nom Cognom1 Cognom2 00000000A
+C. Carr 0 Escala A 1r 2n 00001 Poble
+Concepte B.I. IVA IVA% SUBTOTAL
+Quota d'ús habitatge 277.63€ 0€ 0% 277.63€
+Manteniment i serveis comunitaris 53.61€ 11.26€ 21% 64.87€
+Internet 15.8€ 4.2€ 21% 20€
+Subministrament aigua 0€ 0€ 21% 0€
+Subministrament gas 0€ 0€ 21% 0€
+Subministrament llum 3.73€ 0.78€ 21% 4.51€
+Total 367.01€
+Factures de subministraments incloses
+FE2400280955 – Som Energia, SCCL
+*Seguint l’acord d’assamblea de maig 2022, cada UEC pot avisar fins a 48 hores després de rebre el rebut si no
+pot fer front al pagament i té també la responsabilitat d'avisar de canvis de correu o compte bancari. Aquests
+avisos es poden fer per correu electrònic a correuelectronic@empresa.coop. Els recàrrecs que es puguin ocasionar de
+no fer els avisos pertinents en termini aniran a càrrec de L'UEC.

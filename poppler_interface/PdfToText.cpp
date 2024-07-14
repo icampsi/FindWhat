@@ -8,6 +8,8 @@
 
 #include <QString>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 #include "poppler/cpp/poppler-document.h"
 #include "poppler/cpp/poppler-page.h"
@@ -29,5 +31,18 @@ namespace Poppler_interface {
             pgDoc->push_back(std::move(pageText), true);
         }
         delete doc;
+        qDebug() << "File Created: " << filePath;
+    }
+
+    void saveAsText(CPagedText& pgDoc, QString filePath) {
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qDebug() << "Failed to open file" << filePath;
+            return;
+        }
+
+        QTextStream out(&file);
+        out << pgDoc.getFullText();
+        file.close();
     }
 }

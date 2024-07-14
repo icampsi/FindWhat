@@ -21,14 +21,12 @@ set(TEST_SOURCES
 # Set the relative path for my test_pdf.pdf
 set(PROJECT_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
 add_definitions(-DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
-set(TEST_PDF_PATH "${CMAKE_SOURCE_DIR}/test_pdf.pdf")
-add_definitions(-DTEST_PDF_PATH="${TEST_PDF_PATH}")
 
 # Create executables for testing and link with necessary libraries
 foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)
     add_executable(${test_name} ${test_source})
-    target_link_libraries(${test_name} PRIVATE utils Catch2::Catch2WithMain Qt${QT_VERSION_MAJOR}::Widgets)
+    target_link_libraries(${test_name} PRIVATE poppler_interface utils Catch2::Catch2WithMain Qt${QT_VERSION_MAJOR}::Widgets)
     catch_discover_tests(${test_name} TEST_PREFIX "poppler_interface.")
 endforeach()
 

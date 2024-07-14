@@ -5,8 +5,19 @@
 
 #include <catch2/catch_all.hpp>
 #include "../CFormula.h"
-// BOOKMARK - NEEDS IMPLEMENTATION
+#include "../CData.h"
+#include "../CEsquema.h"
+#include "../CFunctionClasses.h"
 
-TEST_CASE("3") {
-    // CFormula("")
+void setupData() {
+    // CEsquema esq;
+    // CFormula form;
+    // CIndexingFunction fInd(CFunction::Function::);
+    // CExtractingFunction fEx("FEx");
+
+
+}
+
+TEST_CASE("") {
+
 }

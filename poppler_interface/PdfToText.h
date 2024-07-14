@@ -11,6 +11,7 @@ class QString;
 
 namespace Poppler_interface {
     void loadPdfDocument(const QString& filePath, CPagedText *pgDoc);
+    void saveAsText(CPagedText& pgDoc, QString filePath);
 }
 
 

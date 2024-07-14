@@ -42,7 +42,7 @@ find_package(poppler)
 
 
 # Add current source dir and utils dir as include paths
-target_include_directories(poppler_interface
+target_include_directories(${MODULE_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/../
