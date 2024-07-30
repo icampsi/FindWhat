@@ -22,6 +22,4 @@ namespace UText {
     void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<QString(const QString&)> replacer);
 }
 
-
-
 #endif // UTEXT_H

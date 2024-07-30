@@ -41,6 +41,7 @@ public:
     CExportPathDoc& getExportPathDoc() { return m_exportPathDoc; }
 
     void deleteEsquema(const size_t index);
+    void deleteEsquema(CEsquemaDoc* docToDelete);
 
     void reorderEsqDocs(const size_t objectToMoveIndex, const size_t destinationIndex);
 

@@ -46,7 +46,7 @@ void newEsquema_dlg::on_buttonBox_accepted() {
     CEsquemaDoc* esquemaDoc = CMDoc::getMDoc().newDoc(esquema);
 
     // Check and loads it to the ui
-    if(esquemaDoc && esquema) mainWin->loadEsquema(esquemaDoc);
+    if(esquemaDoc && esquema) mainWin->loadEsquema(esquemaDoc->getEsquema());
     else                      qDebug() << "Failed to create CEsquemaDoc.";
 
     delete this;

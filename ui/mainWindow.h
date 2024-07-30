@@ -14,7 +14,6 @@
 #include "PDockPreview.h"
 
 class CMDoc;
-class CEsquemaDoc;
 class newEsquema_dlg;
 class exportEsquema_dlg;
 
@@ -70,6 +69,6 @@ public slots:
     void checkExortEsquemaActionEnable();
 
 public:
-    void loadEsquema(CEsquemaDoc* esquemaDoc) { ui->mainEsquemaUI->newEsquema(esquemaDoc); }};
+    void loadEsquema(CEsquema* esquema) { ui->mainEsquemaUI->newEsquema(esquema); }};
 
 #endif // MMAINWINDOW_H

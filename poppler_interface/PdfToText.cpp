@@ -31,7 +31,6 @@ namespace Poppler_interface {
             pgDoc->push_back(std::move(pageText), true);
         }
         delete doc;
-        qDebug() << "File Created: " << filePath;
     }
 
     void saveAsText(CPagedText& pgDoc, QString filePath) {

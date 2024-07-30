@@ -27,7 +27,7 @@ public:
     ~PMainEsquemaUI();
 
     // PUBLIC FUNCTIONS
-    void newEsquema(CEsquemaDoc* esquemaDoc);
+    void newEsquema(CEsquema* esquema);
     void changeCurrentPage(PEsquemaPage* page) { ui->stackedWidget_esquemaPage->setCurrentWidget(page); }
     void addExportCSV(CExportCSV *exportCSV);
     void deletePage(int index); // Deletes a page from the toobox
@@ -52,5 +52,8 @@ private:
     Ui::PMainEsquemaUI *ui;
     PEsquemaPage m_emptyPage; // empty page to load when no esquema is loaded
     QMap<QListWidgetItem*, PEsquemaPage*> m_itemPageMap;
+
+    // NEW BOOKMARK - ESQ TREE VIEW
+    // QStandardItemModel * m_esqModel;
 };
 #endif // PMAINESQUEMAUI_H

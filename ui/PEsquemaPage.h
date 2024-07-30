@@ -14,7 +14,6 @@
 #include <QListWidget>
 #include <QStandardItemModel>
 
-class CEsquemaDoc;
 class CEsquema;
 class CData;
 
@@ -25,13 +24,13 @@ class PEsquemaPage : public QWidget {
 
 public:
     void sharedConstructorSetup(); // Shared constructor options for DRY code
-    explicit PEsquemaPage(CEsquemaDoc *esquema, QWidget *parent = nullptr);
+    explicit PEsquemaPage(CEsquema *esquema, QWidget *parent = nullptr);
     explicit PEsquemaPage(QWidget *parent = nullptr);
 
     PEsquemaPage() = default;
     ~PEsquemaPage();
 
-    const CEsquemaDoc* getEsquemaDoc() const { return m_esquemaDoc; }
+    const CEsquema* getEsquema() const { return m_esquema; }
 
 protected:
     Ui::PEsquemaPage *ui;
@@ -44,9 +43,9 @@ protected:
     CFormula    *m_loadedFormula    = nullptr;
     CData       *m_loadedStaticData = nullptr;
     CFunction   *m_activeFunction   = nullptr;
-    CEsquemaDoc *m_esquemaDoc;
+    CEsquema    *m_esquema;
 
-    QStandardItemModel *model_esquema; // BOOKMARK - Pretty sure this should be deleted in the destructor but program crashes when I try it, even with a check for double deletition. I'll check latter
+    QStandardItemModel *m_modelFormula; // BOOKMARK - Pretty sure this should be deleted in the destructor but program crashes when I try it, even with a check for double deletition. I'll check latter
 
     bool m_blockFunUpdate;
     void newStaticData();

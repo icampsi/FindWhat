@@ -25,6 +25,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 # Find QT Widgets
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+option(ENABLE_DBMANAGER "Enable dbManager module" ON)
 
 # SUBDIRECTORIES
 add_subdirectory(utils)
@@ -32,7 +33,6 @@ if(NOT TARGET finder)
     add_subdirectory(finder)
 endif()
 add_subdirectory(poppler_interface)
-
 
 if(Qt${QT_VERSION_MAJOR}_FOUND)
     message("Found Qt library: ${QT_VERSION_MAJOR}")
@@ -87,6 +87,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
         ${MAIN_FILES}
+        ui/WEsqView.h ui/WEsqView.cpp
+
     )
 else()
     if(ANDROID)
@@ -98,6 +100,13 @@ else()
         )
     endif()
 endif()
+
+if(ENABLE_DBMANAGER)
+    add_subdirectory(dbManager)
+    target_link_libraries(${PROJECT_NAME} PRIVATE dbManager)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_DBMANAGER)
+endif()
+
 
 # Set the output directory for the executable
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

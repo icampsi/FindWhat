@@ -61,6 +61,14 @@ void CMDoc::deleteEsquema(const size_t index) {
     esquemaListUpdated();
 }
 
+void CMDoc::deleteEsquema(CEsquemaDoc* docToDelete) {
+    auto it = std::remove(m_loadedEsquemaDocs.begin(), m_loadedEsquemaDocs.end(), docToDelete);
+    if (it != m_loadedEsquemaDocs.end()) {
+        m_loadedEsquemaDocs.erase(it, m_loadedEsquemaDocs.end());
+        delete docToDelete;
+    }
+}
+
 void CMDoc::reorderEsqDocs(const size_t objectToMoveIndex, const size_t destinationIndex) {
     if (objectToMoveIndex >= m_loadedEsquemaDocs.size() || destinationIndex >= m_loadedEsquemaDocs.size()) {
         qDebug() << "Invalid object index or destination index";
@@ -145,4 +153,3 @@ void CMDoc::deserializeEsquema(std::ifstream& in, std::vector<CEsquemaDoc*> &loa
         loadedEsquemaDocs.push_back(newDoc(esquema));
     }
 }
-

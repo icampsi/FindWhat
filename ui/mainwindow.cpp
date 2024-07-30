@@ -111,7 +111,7 @@ void MainWindow::action_loadSession() {
         m_cmdoc.deserializeSession(file, loadedEsquemaDocs);
         file.close();
         for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
-            loadEsquema(esquemaDoc);
+            loadEsquema(esquemaDoc->getEsquema());
         }
 
     } else {
@@ -148,7 +148,7 @@ void MainWindow::action_importEsquema() {
         m_cmdoc.deserializeEsquema(file, loadedEsquemaDocs);
         file.close();
         for (CEsquemaDoc* esquemaDoc : loadedEsquemaDocs) {
-            loadEsquema(esquemaDoc);
+            loadEsquema(esquemaDoc->getEsquema());
         }
 
     } else {
@@ -204,6 +204,3 @@ void MainWindow::checkExortEsquemaActionEnable() {
         m_exportEsquemaAction->setEnabled(true);
     }
 }
-
-
-

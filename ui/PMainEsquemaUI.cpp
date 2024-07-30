@@ -20,10 +20,10 @@
 #include "WExtendedListWidget.h"
 
 #include "document/CMDoc.h"
-#include "document/CEsquemaDoc.h"
 #include "document/CExportPathDoc.h"
 
 #include "utils/USystem.h"
+
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     : QWidget(parent), ui(new Ui::PMainEsquemaUI), m_emptyPage(this)
@@ -49,13 +49,16 @@ PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
         ui->pushButton_parse->setEnabled(false);
         ui->DeletePage->setEnabled(false);
     }
+
+    // NEW BOOKMRAK  - ESQ TREE VIEW
+    // m_esqModel = new QStandardItemModel();
+    // ui->esqView->setModel(m_esqModel);
 }
 
 PMainEsquemaUI::~PMainEsquemaUI() { delete ui; }
 
-void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
-    CEsquema* esquema = esquemaDoc->getEsquema();
-    PEsquemaPage *newPage = new PEsquemaPage(esquemaDoc, this);
+void PMainEsquemaUI::newEsquema(CEsquema* esquema) {
+    PEsquemaPage *newPage = new PEsquemaPage(esquema, this);
     ui->stackedWidget_esquemaPage->addWidget(newPage);
     ui->stackedWidget_esquemaPage->setCurrentWidget(newPage);
 
@@ -67,6 +70,38 @@ void PMainEsquemaUI::newEsquema(CEsquemaDoc* esquemaDoc) {
     // Add the item to the QListWidget and select it
     ui->esqList->addItem(esquemaItem);
     ui->esqList->setCurrentItem(esquemaItem);
+
+    // NEW BOOKMARK - ESQ TREE VIEW
+    // QStandardItem* esquemaItem2 = new QStandardItem(esquema->getName());
+    // esquemaItem2->setData(QVariant::fromValue(esquema));  // Store pointer to CEsquema
+
+    // for (const CFormula* formula : esquema->getExtractDataFormula()) {
+    //     QStandardItem* formulaItem = new QStandardItem(formula->getDataName());
+    //     formulaItem->setData(QVariant::fromValue(formula));  // Store pointer to CFormula
+    //     esquemaItem2->appendRow(formulaItem);
+    // }
+
+    // m_esqModel->appendRow(esquemaItem2);
+
+
+    // // Retrieving pointers
+    // QStandardItem* topLevelItem = m_esqModel->item(1, 0);
+    // if (topLevelItem) {
+    //     CEsquema* retrievedEsq = topLevelItem->data().value<CEsquema*>();
+    //     qDebug() << "Retrieved Esquema pointer:" << retrievedEsq;
+    //     qDebug() << "Loaded Esquema name: " << retrievedEsq->getName();
+
+    //     QStandardItem* childItem = topLevelItem->child(3, 3);
+    //     if (childItem) {
+    //         CFormula* retrievedFormula = childItem->data().value<CFormula*>();
+    //         qDebug() << "Retrieved Formula pointer:" << retrievedFormula;
+    //         qDebug() << "Loaded Formula name: " << retrievedFormula->getDataName();
+    //     } else {
+    //         qDebug() << "No child item found at index" << 0;
+    //     }
+    // } else {
+    //     qDebug() << "No top-level item found at index" << 0;
+    // }
 }
 
 void PMainEsquemaUI::handleEsquemaSelectionChanged() {
@@ -253,4 +288,3 @@ void PMainEsquemaUI::deleteEsquema(const int index, const bool askConfirmation) 
     // Perform a check in main window for disabling Export Esquema menu action if needed
     qobject_cast<MainWindow*>(SystemUtils::getLastParent(this))->checkExortEsquemaActionEnable();
 }
-

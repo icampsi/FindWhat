@@ -241,7 +241,7 @@ void CExportCSV::serialize(std::ofstream &out) const {
     const std::vector<CEsquemaDoc*>* esquemaDocs = CMDoc::getMDoc().getLoadedEsquemaDocs();
     QString assocEsquemaName = m_associatedEsquemaDoc->getEsquema()->getName();
 
-    // Use std::find_if with a lambda function to search for the object with m_name matching the searchString
+    // Search for the object with m_name matching the searchString
     auto it = std::find_if(esquemaDocs->begin(), esquemaDocs->end(), [&assocEsquemaName](const CEsquemaDoc* obj) {
         return obj->getEsquema()->getName() == assocEsquemaName;
     });

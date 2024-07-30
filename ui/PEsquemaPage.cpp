@@ -18,7 +18,6 @@
 
 #include "document/CMDoc.h"
 #include "document/CPdfDoc.h"
-#include "document/CEsquemaDoc.h"
 
 // CONSTRUCTORS AND DESTRUCTORS ====================================================
 void PEsquemaPage::sharedConstructorSetup() { // Shared constructor options for DRY code
@@ -27,13 +26,13 @@ void PEsquemaPage::sharedConstructorSetup() { // Shared constructor options for 
     ui->endingStringBlock->setLableText("Ending String:");
 }
 
-PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
-    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {esquemaDoc}, m_blockFunUpdate{false} {
+PEsquemaPage::PEsquemaPage(CEsquema* esquema, QWidget *parent)
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquema {esquema}, m_blockFunUpdate{false} {
     sharedConstructorSetup();
-    model_esquema = new QStandardItemModel();
+    m_modelFormula = new QStandardItemModel();
     ui->stackedWidget_general->setCurrentIndex(0);
 
-    ui->treeView_formula->setModel(model_esquema);
+    ui->treeView_formula->setModel(m_modelFormula);
     connect(ui->treeView_formula, &WFormulaTreeView::itemEditingFinished, this, &PEsquemaPage::handleItemEditFinish);
 
     loadEsquema();
@@ -62,7 +61,7 @@ PEsquemaPage::PEsquemaPage(CEsquemaDoc* esquemaDoc, QWidget *parent)
 }
 
 PEsquemaPage::PEsquemaPage(QWidget *parent)
-    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquemaDoc {nullptr}, m_blockFunUpdate{false} {
+    : QWidget(parent), ui(new Ui::PEsquemaPage), m_esquema {nullptr}, m_blockFunUpdate{false} {
     sharedConstructorSetup();
     ui->frame_esquema->setEnabled(false);
 }
@@ -80,14 +79,14 @@ void PEsquemaPage::handleRemoveSecondLevel(const int index, const QModelIndex &p
         // HANDLE REMOVE STATIC DATA
         if(parentIndex.row() == 0) {
             m_itemDataMap.remove(item);
-            m_esquemaDoc->getEsquema()->deleteStaticData(index);
+            m_esquema->deleteStaticData(index);
             ui->treeView_formula->model()->removeRow(index, parentIndex);
         }
 
         // HANDLE REMOVE FORMULA
         if(parentIndex.row() == 1) {
             m_itemFormulaMap.remove(item);
-            m_esquemaDoc->getEsquema()->deleteFormula(index);
+            m_esquema->deleteFormula(index);
             ui->treeView_formula->model()->removeRow(index, parentIndex);
         }
 
@@ -220,26 +219,24 @@ void PEsquemaPage::updateFunctionProcess() {
 }
 
 void PEsquemaPage::loadEsquema() {
-    CEsquema* esquema = m_esquemaDoc->getEsquema();
-
     QStandardItem *staticDataParentItem = new QStandardItem("Static Data");
     QStandardItem *formulas = new QStandardItem("Formulas");
-    QStandardItem *rootItem = model_esquema->invisibleRootItem();
+    QStandardItem *rootItem = m_modelFormula->invisibleRootItem();
     rootItem->appendRow(staticDataParentItem);
     rootItem->appendRow(formulas);
     // Create third level items from esquema.m_staticData[] attached to "Static Data"
-    for(size_t i{0}; i < esquema->getStaticData().size(); i++) {
-        QStandardItem *staticDataItem = new QStandardItem(esquema->getStaticData()[i]->getDataName()); // Create new item for each member of the vector
-        CData *staticData = esquema->getStaticData()[i];
+    for(size_t i{0}; i < m_esquema->getStaticData().size(); i++) {
+        QStandardItem *staticDataItem = new QStandardItem(m_esquema->getStaticData()[i]->getDataName()); // Create new item for each member of the vector
+        CData *staticData = m_esquema->getStaticData()[i];
         staticDataItem->setData(QVariant::fromValue(staticData), Qt::UserRole);
         m_itemDataMap[staticDataItem] = staticData;
         staticDataParentItem->appendRow(staticDataItem);
     }
 
     // Create third level items from esquema.t_extractDataFormula[] attached to "Formulas"
-    for(size_t i{0}; i < esquema->getExtractDataFormula().size(); i++) {
-        QStandardItem *formulaItem = new QStandardItem(esquema->getExtractDataFormula()[i]->getDataName()); // Create new item for each member of the vector
-        CFormula *formula = esquema->getExtractDataFormula()[i];
+    for(size_t i{0}; i < m_esquema->getExtractDataFormula().size(); i++) {
+        QStandardItem *formulaItem = new QStandardItem(m_esquema->getExtractDataFormula()[i]->getDataName()); // Create new item for each member of the vector
+        CFormula *formula = m_esquema->getExtractDataFormula()[i];
         formulaItem->setData(QVariant::fromValue(formula), Qt::UserRole);
         m_itemFormulaMap[formulaItem] = formula;
         formulas->appendRow(formulaItem);
@@ -248,28 +245,26 @@ void PEsquemaPage::loadEsquema() {
 
 void PEsquemaPage::newFormula() {
     CFormula* newFormula = new CFormula("Unnamed formula");
-    CEsquema* esquema = m_esquemaDoc->getEsquema();
 
-    esquema->addExtractDataFormula(newFormula);
+    m_esquema->addExtractDataFormula(newFormula);
 
     // Create second level items from esquema.t_extractDataFormula attached to "Formulas"
     QStandardItem* formulaItem = new QStandardItem(newFormula->getDataName());
     formulaItem->setData(QVariant::fromValue(newFormula), Qt::UserRole);
     m_itemFormulaMap[formulaItem] = newFormula;
-    model_esquema->item(1, 0)->appendRow(formulaItem);
+    m_modelFormula->item(1, 0)->appendRow(formulaItem);
 }
 
 void PEsquemaPage::newStaticData() {
     CData *newStaticData = new CData("Unnamed data", "");
-    CEsquema *esquema    = m_esquemaDoc->getEsquema();
 
-    esquema->addStaticData(newStaticData);
+    m_esquema->addStaticData(newStaticData);
 
     // Create second level items from esquema.t_extractDataFormula attached to "Formulas"
     QStandardItem *staticDataItem = new QStandardItem(newStaticData->getDataName());
     staticDataItem->setData(QVariant::fromValue(newStaticData), Qt::UserRole);
     m_itemDataMap[staticDataItem] = newStaticData;
-    model_esquema->item(0, 0)->appendRow(staticDataItem);
+    m_modelFormula->item(0, 0)->appendRow(staticDataItem);
 }
 
 // SLOTS
@@ -306,8 +301,8 @@ void PEsquemaPage::on_treeView_formula_clicked(const QModelIndex &index) {
     ui->stackedWidget_general->setCurrentIndex(1);
 
     // STATIC DATA - item clicked
-    if(index.parent().row() == 0) {       
-        QStandardItem *retrievedDataItem = model_esquema->itemFromIndex(index);
+    if(index.parent().row() == 0) {
+        QStandardItem *retrievedDataItem = m_modelFormula->itemFromIndex(index);
         // Load data member
         m_loadedStaticData = m_itemDataMap.value(retrievedDataItem);
         // Update label and text editor
@@ -320,7 +315,7 @@ void PEsquemaPage::on_treeView_formula_clicked(const QModelIndex &index) {
 
     // FORMULA - item clicked
     if(index.parent().row() == 1) {
-        QStandardItem *retrievedFormulaItem = model_esquema->itemFromIndex(index);
+        QStandardItem *retrievedFormulaItem = m_modelFormula->itemFromIndex(index);
         // Load formula member
         m_loadedFormula = m_itemFormulaMap.value(retrievedFormulaItem);
         // Update label
@@ -360,11 +355,11 @@ void PEsquemaPage::handleFunctionItemsMoved(const QModelIndex &parent, int start
 
 void PEsquemaPage::handleItemEditFinish(const QModelIndex &index, const QString &text) {
     if(index.parent().row() == 0) { // Handle Static Data Name edition
-        m_esquemaDoc->getEsquema()->setStaticDataName(m_loadedStaticData, text);
+        m_esquema->setStaticDataName(m_loadedStaticData, text);
         ui->label_dataName->setText(text);
     }
     else if(index.parent().row() == 1)  { // Handle formula name edition
-        m_esquemaDoc->getEsquema()->setFormulaName(m_loadedFormula, text);
+        m_esquema->setFormulaName(m_loadedFormula, text);
         ui->label_dataName->setText(m_loadedFormula->getDataName());
     }
 }
@@ -650,4 +645,3 @@ void PEsquemaPage::on_lineEdit_compare_textChanged(const QString &arg1) {
     function->setCompared(arg1);
     updateFunctionProcess();
 }
-

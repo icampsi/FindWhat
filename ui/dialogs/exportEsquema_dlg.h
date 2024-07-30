@@ -8,9 +8,7 @@
 
 #include <QDialog>
 
-namespace Ui {
-class exportEsquema_dlg;
-}
+namespace Ui { class exportEsquema_dlg; }
 
 class exportEsquema_dlg : public QDialog
 {
