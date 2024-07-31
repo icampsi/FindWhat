@@ -22,8 +22,9 @@ set(PROJECT_SOURCES
 add_library(${PROJECT_NAME} STATIC
     WDbView.h       WDbView.cpp         WDbView.ui
     WTVH.h          WTVH.cpp
-    DMemberEdit.h   DMemberEdit.cpp     DMemberEdit.ui
+    DMemberEdit.h   DMemberEdit.cpp
     CDbConnection.h CDbConnection.cpp
+    WRecEditTable.h WRecEditTable.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Core)

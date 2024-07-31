@@ -1,5 +1,9 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #include "DMemberEdit.h"
-#include "ui_DMemberEdit.h"
 
 #include <QFormLayout>
 #include <QComboBox>
@@ -8,45 +12,16 @@
 #include <QSqlError>
 
 DMemberEdit::DMemberEdit(QSqlTableModel *model, const QModelIndex &modelIndex,  QWidget *parent)
-    : QDialog(parent), ui(new Ui::DMemberEdit), m_model{model}, m_index{modelIndex}
+    : QDialog(parent), m_model{model}, m_index{modelIndex}, m_recModel(model, modelIndex.row(), this)
 {
     QBoxLayout *Layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
-    // QFormLayout *formLayout = new QFormLayout(this);
     setLayout(Layout);
 
     // Initialize the table widget
-    m_table = new QTableWidget(this);
-    m_table->setColumnCount(2);
-    m_table->setHorizontalHeaderLabels(QStringList() << "Field" << "Value");
-    m_table->horizontalHeader()->setStretchLastSection(true);
-    m_table->verticalHeader()->setVisible(false);
-    m_table->setEditTriggers(QAbstractItemView::AllEditTriggers);
-    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_table = new WRecEditTable(this);
+    m_table->setSqlRecordModel(&m_recModel);
 
-    // Populate the table with data from the record
-    int rowCount = 0;
-    QSqlRecord rec = model->record(m_index.row());
-
-    rowCount = rec.count();
-    m_table->setRowCount(rowCount);
-    for (int i = 0; i < rowCount; ++i) {
-        QTableWidgetItem *fieldItem = new QTableWidgetItem(rec.fieldName(i));
-        fieldItem->setFlags(fieldItem->flags() & ~Qt::ItemIsEditable);  // Make the field name non-editable
-        QTableWidgetItem *valueItem = new QTableWidgetItem(rec.value(i).toString());
-        m_table->setItem(i, 0, fieldItem);
-        m_table->setItem(i, 1, valueItem);
-    }
-
-    // Calculate the appropriate maximum height for the table
-    int rowHeight = m_table->verticalHeader()->defaultSectionSize();
-    int headerHeight = m_table->horizontalHeader()->height();
-    int maxTableHeight = rowHeight * rowCount + headerHeight + 2; // 2 added to avoid scrollbar to appear
-
-    // Set the maximum height for the table
-    m_table->setMaximumHeight(maxTableHeight);
-
-    // Add the table to the form layout
+    // Add the table to layout
     Layout->addWidget(m_table);
     m_table->show();
 
@@ -54,12 +29,22 @@ DMemberEdit::DMemberEdit(QSqlTableModel *model, const QModelIndex &modelIndex,  
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DMemberEdit::submit);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-    connect(m_table, &QTableWidget::cellChanged, this, &DMemberEdit::updateModel);
     Layout->addWidget(buttonBox);
 
-    int maxWindowHeight = maxTableHeight + buttonBox->height() + 25;
+    // Calculate the appropriate maximum height for the table
+    QSqlRecord rec = model->record(m_index.row());
+    int rowCount = rec.count();
+
+    int rowHeight       = m_table->verticalHeader()->defaultSectionSize();
+    int headerHeight    = m_table->horizontalHeader()->height();
+    int maxTableHeight  = rowHeight * rowCount + headerHeight;
+    int maxWindowHeight = maxTableHeight + buttonBox->height() + 24;
+
+    setMinimumSize(QSize(178, 287));
+    setMaximumSize(QSize(330, 287));
+
     setFixedHeight(maxWindowHeight);
-    setMaximumWidth(300);
+    setMaximumWidth(330);
 }
 
 DMemberEdit::~DMemberEdit() {
@@ -67,10 +52,10 @@ DMemberEdit::~DMemberEdit() {
 }
 
 bool DMemberEdit::updateRecord() {
+    updateModel();
     // Submit changes to the database
     if (m_model->submitAll()) {
         qDebug() << "Row modified successfully!";
-        accept();
         return true;
     } else {
         qDebug() << "Error modifying row:" << m_model->lastError().text();
@@ -78,10 +63,16 @@ bool DMemberEdit::updateRecord() {
     }
 }
 
-void DMemberEdit::updateModel(int row, int column) {
-    const QString value = m_table->item(row, column)->text();
-    QModelIndex index = m_model->index(m_index.row(), row);
-    m_model->setData(index, value); // Set new data
+void DMemberEdit::updateModel() {
+    QAbstractItemModel *model = m_table->model();
+
+    if (model) {
+        for (int row = 0; row < model->rowCount(); ++row) {
+                QVariant value = m_table->value(row);
+                QModelIndex i = m_model->index(m_index.row(), row);
+                m_model->setData(i, value);
+        }
+    }
 }
 
 void DMemberEdit::submit() {

@@ -3,7 +3,6 @@
 
 #include "WTVH.h"
 #include "qsortfilterproxymodel.h"
-#include "CDbConnection.h"
 
 #include <QSqlTableModel>
 #include <QWidget>
@@ -34,7 +33,6 @@ private:
     WTVH *m_head;
     QVector<QString> insertionOrder;
 
-    CDbConnection m_dbConn;
     QSqlTableModel *m_activeModel;
 };
 

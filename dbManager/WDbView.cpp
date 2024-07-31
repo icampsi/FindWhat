@@ -3,6 +3,7 @@
 
 #include "DMemberEdit.h"
 #include "WTVH.h"
+#include "CDbConnection.h"
 
 #include <QMessageBox>
 #include <QSqlDatabase>
@@ -15,9 +16,8 @@
 
 
 WDbView::WDbView(QWidget *parent)
-    : QWidget(parent), ui(new Ui::WDbView), m_dbConn("localhost", "closca", "user", "password") {
+    : QWidget(parent), ui(new Ui::WDbView) {
     ui->setupUi(this);
-    // Connect to the database
 
     // Create a QSortFilterProxyModel to enable filtering
     m_proxyModel = new QSortFilterProxyModel();
@@ -42,7 +42,7 @@ WDbView::WDbView(QWidget *parent)
 
 void WDbView::changeTable(const QString& tableName) {
     // Sets the new table, performs the select statement and hides/shows columns custimized
-    m_activeModel = m_dbConn.getModel(tableName);
+    m_activeModel = CDbConnection::getConnection().getModel(tableName);
     m_proxyModel->setSourceModel(m_activeModel);
 
     if(tableName == "occupancy_view") {

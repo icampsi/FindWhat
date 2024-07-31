@@ -37,8 +37,7 @@ public:
 
 private slots:
     void esquemaOptionChanged(WToolBarEsquema::EsquemaOption option) { ui->stackedWidget_esquemaUI->setCurrentIndex(static_cast<int>(option)); }
-    void on_pushButton_addPage_clicked();
-    void on_DeletePage_clicked() { deletePage(ui->toolBox_formatEsquema->currentIndex()); }
+    void addPage() { addExportCSV(nullptr); }
     void on_pushButton_parse_clicked();
     void handleEsquemaSelectionChanged();
     void handleEsqItemsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
@@ -56,4 +55,5 @@ private:
     // NEW BOOKMARK - ESQ TREE VIEW
     // QStandardItemModel * m_esqModel;
 };
+
 #endif // PMAINESQUEMAUI_H

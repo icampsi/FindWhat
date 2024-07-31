@@ -75,6 +75,8 @@ public:
     void insertPage(const QString& page, const size_t index)
     { Q_UNUSED(page); Q_UNUSED(index); } // Not implemented
 
+    bool isEmpty() { return m_pages.empty(); }
+
 protected:
     // MEMBERS
     QString m_fullText;        // Appended full text (not divided by pages). Gets poppulated first time getFullText is called.

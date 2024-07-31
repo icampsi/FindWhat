@@ -28,8 +28,18 @@
 #include <QApplication>
 #include "utils/USystem.h"
 
+#ifdef ENABLE_DBMANAGER
+#include "dbManager/CDbConnection.h"
+#endif
+
+
 int main(int argc, char *argv[]) {
     SystemUtils::setEndianness();
+
+// FIRST INSTANCE GETTER TO SETUP CONNECTION
+#ifdef ENABLE_DBMANAGER
+    CDbConnection::getConnection("localhost", "closca", "user", "password");
+#endif
 
     QApplication a(argc, argv);
     MainWindow w;

@@ -14,15 +14,23 @@ class WToolBarEsquema : public QToolBar {
     Q_OBJECT
 public:
     explicit WToolBarEsquema(QWidget* parent);
-    enum class EsquemaOption { EditEsquema, ParseDocument };
+    enum class EsquemaOption { EditEsquema, ParseDocument,
+                            #ifdef ENABLE_DBMANAGER
+                               DbManager
+                            #endif
+    };
 
 signals:
-    void previewOptionChanged(WToolBarEsquema::EsquemaOption option);
+    void optionChanged(WToolBarEsquema::EsquemaOption option);
 
 private:
     QActionGroup m_toggleButtonsGroup;
     QAction m_editEsquema;
     QAction m_parseDoc;
+
+#ifdef ENABLE_DBMANAGER
+    QAction m_dbManager;
+#endif
 };
 
 #endif // WTOOLBARESQUEMA_H

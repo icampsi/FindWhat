@@ -1,28 +1,36 @@
 #include "dbManager/CDbConnection.h"
-
 #include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlTableModel>
+#include <QDebug>
 
-CDbConnection::CDbConnection(const QString& host, const QString& db, const QString& user, const QString& pass) {
-    // Connect to the database
-    connectDatabase(host, db, user, pass);
+bool CDbConnection::isInitialized = false;
 
-    // Set-up query model
-    addModel("Members");
-    addModel("Flats_view", "Flats");
-    addModel("ru_bills", "Utility Bills");
-    addModel("occupancy_view", "Occupancy");
+// Method to get the singleton instance
+CDbConnection& CDbConnection::getConnection(const QString &host, const QString &db, const QString &user, const QString &pass) {
+    static CDbConnection instance(host, db, user, pass);
+
+    if (!isInitialized && !host.isEmpty() && !db.isEmpty() && !user.isEmpty() && !pass.isEmpty()) {
+        instance.connectDatabase(host, db, user, pass);
+        isInitialized = true;
+    }
+
+    return instance;
 }
 
+CDbConnection::CDbConnection(const QString& host, const QString& db, const QString& user, const QString& pass)
+    : m_host(host), m_dbName(db), m_user(user), m_pass(pass) {}
+
 CDbConnection::~CDbConnection() {
-    for(auto& pair : m_models) {
+    for (auto& pair : m_models) {
         delete pair.second;
         pair.second = nullptr;
     }
 
-    if(m_db.open()) m_db.close();
+    if (m_db.isOpen()) {
+        m_db.close();
+    }
 }
 
 bool CDbConnection::connectDatabase(const QString& host, const QString& db, const QString& user, const QString& pass) {
@@ -36,6 +44,13 @@ bool CDbConnection::connectDatabase(const QString& host, const QString& db, cons
     // Open connection
     if (m_db.open()) {
         qDebug() << "Connected";
+
+        // Set-up query models after successful connection
+        addModel("Members");
+        addModel("Flats_view", "Flats");
+        addModel("ru_bills", "Utility Bills");
+        addModel("occupancy_view", "Occupancy");
+
         return true;
     } else {
         qDebug() << "Couldn't connect";
@@ -50,8 +65,11 @@ bool CDbConnection::addModel(const QString& tableName, const QString& alias) {
     model->setTable(tableName);
     bool ok = model->select();
 
-    if(ok) m_models.emplace(upAlias, model);
-    else delete model;
+    if (ok) {
+        m_models.emplace(upAlias, model);
+    } else {
+        delete model;
+    }
     return ok;
 }
 
@@ -119,8 +137,9 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
         return false;
     }
 
-    m_models.at(tableName)->select();
+    if (m_models.find(tableName) != m_models.end()) {
+        m_models.at(tableName)->select();
+    }
 
     return true;
 }
-

@@ -1,3 +1,8 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef DMEMBEREDIT_H
 #define DMEMBEREDIT_H
 
@@ -6,27 +11,28 @@
 #include <QSqlRecord>
 #include <QDialog>
 
-namespace Ui { class DMemberEdit; }
+#include "WRecEditTable.h"
 
 class DMemberEdit : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DMemberEdit(QSqlTableModel  *model, const QModelIndex &modelIndex, QWidget *parent = nullptr);
+    explicit DMemberEdit(QSqlTableModel *model, const QModelIndex &modelIndex, QWidget *parent = nullptr);
     ~DMemberEdit();
 
 private:
     bool updateRecord();
-    void updateModel(int row, int column);
+    void updateModel(); // Updates the original model with all the field from m_table
 
 private slots:
     void submit();
 
 private:
-    Ui::DMemberEdit *ui;
-    QTableWidget    *m_table;
-    QSqlTableModel  *m_model;
-    const QModelIndex     &m_index;
+    WRecEditTable     *m_table;
+    QSqlTableModel    *m_model;
+    const QModelIndex &m_index;
+
+    CSqlRecordModel m_recModel;
 };
 
 #endif // DMEMBEREDIT_H

@@ -179,13 +179,37 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="WSpreadSheet" name="spreadSheet_formatTable">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QStackedWidget" name="stackedWidget_parseOpt">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="stackedWidget_2Page1">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="WSpreadSheet" name="spreadSheet_formatTable">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="WRecEditTable" name="tableView"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -200,6 +224,11 @@
    <class>WLoadedFilesTreeView</class>
    <extends>QListWidget</extends>
    <header>WLoadedFilesTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WRecEditTable</class>
+   <extends>QTableView</extends>
+   <header>dbManager/WRecEditTable.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

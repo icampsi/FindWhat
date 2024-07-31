@@ -8,7 +8,6 @@
 
 #include "document/CExportCSV.h"
 #include "ui/ui_PFormExpToolBoxPage.h"
-#include "document/CMDoc.h"
 #include <QWidget>
 
 namespace Ui { class PExpFormToolBoxPage; }
@@ -24,6 +23,7 @@ public:
     // PUBLIC FUNCTIONS
     void onEsquemaListChanged(const std::vector<QString> &updatedEsquemaDocList);
     void updateFields();
+    void changePageOpt(int index) { ui->stackedWidget_parseOpt->setCurrentIndex(index); }
 
 public slots:
     void handlePathContentChanged(const std::vector<QString>& paths) { m_exportCSV->setPathFiles(paths); }
@@ -31,8 +31,8 @@ public slots:
 private slots:
     void on_comboBox_esquemaName_currentIndexChanged(int index);
     void on_checkBox_renameDocs_stateChanged(int arg1);
-    void on_lineEdit_renameDocs_textChanged(const QString &arg1)   { m_exportCSV->setFileNamePlaceholder(arg1); }
-    void on_lineEdit_actOnlyIf_textChanged(const QString &arg1)    { m_exportCSV->setIdText(arg1); }
+    void on_lineEdit_renameDocs_textChanged(const QString &arg1) { m_exportCSV->setFileNamePlaceholder(arg1); }
+    void on_lineEdit_actOnlyIf_textChanged(const QString &arg1)  { m_exportCSV->setIdText(arg1); }
 
 private:
     // MEMBERS

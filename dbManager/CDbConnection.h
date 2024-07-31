@@ -7,8 +7,17 @@
 class CDbConnection {
 public:
     enum class TableName { Members, Flats, Utility_Bills, Occupancy };
-    explicit CDbConnection(const QString &host, const QString &db, const QString &user, const QString &pass);
+
+    static CDbConnection& getConnection(const QString &host = "", const QString &db = "", const QString &user = "", const QString &pass = "");
+
+    // Delete copy constructor and assignment operator to ensure singleton properties
+    CDbConnection(const CDbConnection&) = delete;
+    CDbConnection& operator=(const CDbConnection&) = delete;
+
     ~CDbConnection();
+
+private:
+    explicit CDbConnection(const QString &host, const QString &db, const QString &user, const QString &pass);
 
 public:
     // Creates a database connection
@@ -23,13 +32,18 @@ public:
     bool addModel(const QString& tableName, const QString& alias = "");
     bool bulkInsert(const QString& tableName, const std::vector<std::vector<QString>>& data);
 
-
 signals:
     void queryChanged();
 
 private:
     QSqlDatabase m_db;
     std::unordered_map<QString, QSqlTableModel*> m_models;
+    QString m_host;
+    QString m_dbName;
+    QString m_user;
+    QString m_pass;
+
+    static bool isInitialized;
 };
 
 #endif // CDBCONNECTION_H

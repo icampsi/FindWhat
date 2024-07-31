@@ -7,6 +7,8 @@
 
 #include <QComboBox>
 
+#include "CDbConnection.h"
+#include "WRecEditTable.h"
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
 
@@ -50,7 +52,9 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
         m_exportCSV->setAsocEsquemaDoc(esquemadocs->front());
     }
     
-    ui->spreadSheet_formatTable->setModel(m_exportCSV->getTableModel());
+    ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
+    m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills"));
+    ui->tableView->setSqlRecordModel(m_exportCSV->getDbTableModel());
 }
 
 PFormExpToolBoxPage::~PFormExpToolBoxPage() {

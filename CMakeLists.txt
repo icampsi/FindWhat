@@ -88,7 +88,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${MAIN_FILES}
         ui/WEsqView.h ui/WEsqView.cpp
-
+        ui/ExtTabWidget.h ui/ExtTabWidget.cpp
     )
 else()
     if(ANDROID)

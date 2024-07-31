@@ -24,32 +24,61 @@
 
 #include "utils/USystem.h"
 
+#ifdef ENABLE_DBMANAGER
+#include "dbManager/WDbView.h"
+#endif
 
 PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
     : QWidget(parent), ui(new Ui::PMainEsquemaUI), m_emptyPage(this)
 {
     ui->setupUi(this);
 
-    // CONNECTIONS
-    connect(ui->toolBar, &WToolBarEsquema::previewOptionChanged       , this, &PMainEsquemaUI::esquemaOptionChanged);
-    connect(ui->esqList, &WExtendedListWidget::itemDeletitionRequested, this, &PMainEsquemaUI::handleDeleteEsquema);
-    connect(ui->esqList, &QListWidget::itemSelectionChanged           , this, &PMainEsquemaUI::handleEsquemaSelectionChanged);
+    // TOOL BAR SETUP
+    connect(ui->toolBar, &WToolBarEsquema::optionChanged, this, &PMainEsquemaUI::esquemaOptionChanged);
 
-    connect(ui->esqList->model(), &QAbstractItemModel::rowsMoved, this, &PMainEsquemaUI::handleEsqItemsMoved);
+    // ESQUEMA LIST SETUP
+    {
+        WExtendedListWidget* esqList = ui->esqList;
 
-    // Set esquemaPage to empty and remove .ui generated toolBox_formatEsquema page
-    ui->stackedWidget_esquemaPage->addWidget(&m_emptyPage);
-    setCurrentPageToEmptyPage();
-    ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+        connect(esqList, &WExtendedListWidget::itemDeletitionRequested, this, &PMainEsquemaUI::handleDeleteEsquema);
+        connect(esqList, &QListWidget::itemSelectionChanged           , this, &PMainEsquemaUI::handleEsquemaSelectionChanged);
 
-    ui->toolBox_formatEsquema->removeItem(0); // Needed since the .ui file interface doesent allow for empty pages in the toolbox widget
-
-    // Disable "export CSV" and "delete esquema" buttons if no toolbox pages are loaded
-    if(ui->toolBox_formatEsquema->count() == 0) {
-        ui->pushButton_parse->setEnabled(false);
-        ui->DeletePage->setEnabled(false);
+        connect(esqList->model(), &QAbstractItemModel::rowsMoved, this, &PMainEsquemaUI::handleEsqItemsMoved);
     }
 
+    // ESQUEMA PAGE SETUP
+    {
+        ui->stackedWidget_esquemaPage->addWidget(&m_emptyPage);
+        setCurrentPageToEmptyPage();
+        ui->stackedWidget_esquemaUI->setCurrentIndex(0);
+    }
+
+    // TAB WIDGET SETUP
+    {
+        ExtTabWidget* wtab = ui->toolBox_formatEsquema;
+
+        // Disable "export CSV" button if no toolbox pages are loaded
+        if(ui->toolBox_formatEsquema->count() == 0) {
+            ui->pushButton_parse->setEnabled(false);
+        }
+
+        wtab->setTabsClosable(true);
+        connect(wtab, &QTabWidget::tabCloseRequested, this, &PMainEsquemaUI::deletePage);
+        connect(static_cast<ExtTabBar*>(wtab->tabBar()), &ExtTabBar::addTabClicked, this, &PMainEsquemaUI::addPage);
+    }
+
+    // PARSER SETUP
+    {
+        ui->radioButton_csvParse->setChecked(true);
+    }
+
+    // DBMANAGER SETUP
+#ifdef ENABLE_DBMANAGER
+    {
+        WDbView *dbView = new WDbView(ui->stackedWidget_esquemaUI);
+        ui->stackedWidget_esquemaUI->addWidget(dbView);
+    }
+#endif
     // NEW BOOKMRAK  - ESQ TREE VIEW
     // m_esqModel = new QStandardItemModel();
     // ui->esqView->setModel(m_esqModel);
@@ -131,27 +160,20 @@ void PMainEsquemaUI::addExportCSV(CExportCSV *exportCSV) {
     PFormExpToolBoxPage *newToolBoxPage = new PFormExpToolBoxPage(ui->toolBox_formatEsquema, exportCSV);
 
     // Set a meaningful name or label for the page (adjust as needed)
-    QString pageName = QString("Page %1").arg(ui->toolBox_formatEsquema->count() + 1);
-    ui->toolBox_formatEsquema->addItem(newToolBoxPage, pageName);
+    QString pageName = QString("New Page");
+    ui->toolBox_formatEsquema->addTab(newToolBoxPage, pageName);
 
+    // Connect the radio buttons to the stackedbox index of the PFormExpToolBoxPage.
+    // BOOKMARK - This is a stupid way to do that and works only because for now i have 2 options, so sending the state of one
+    // radiobutton is enough to get the correct page to display. Should change it at some point.
+    connect(ui->radioButton_dbParse, &QRadioButton::toggled, newToolBoxPage, &PFormExpToolBoxPage::changePageOpt);
+    newToolBoxPage->changePageOpt(ui->radioButton_dbParse->isChecked()); // setup current option for new pages
     // Ensure the new page is visible
     ui->toolBox_formatEsquema->setCurrentWidget(newToolBoxPage);
 
     // Enable UI elements based on the number of pages loaded
     int pageCount = ui->toolBox_formatEsquema->count();
     ui->pushButton_parse->setEnabled(pageCount > 0);
-    ui->DeletePage->setEnabled(pageCount > 1); // Enable delete button if more than one page
-}
-
-
-void PMainEsquemaUI::on_pushButton_addPage_clicked() {
-    /* Disable the button until actions are finished so there are
-       no conflicts with he document types we acces on the toolboxpage constructor */
-    ui->pushButton_addPage->setEnabled(false);
-
-    addExportCSV(nullptr);
-
-    ui->pushButton_addPage->setEnabled(true);
 }
 
 void PMainEsquemaUI::deletePage(int index) {
@@ -166,7 +188,7 @@ void PMainEsquemaUI::deletePage(int index) {
 
     // Remove the page from the toolBox
     QWidget *pageWidget = ui->toolBox_formatEsquema->widget(index);
-    ui->toolBox_formatEsquema->removeItem(index);
+    ui->toolBox_formatEsquema->removeTab(index);
     if (pageWidget) {
         delete pageWidget; // This deletes the object associated with the page
     }
@@ -177,9 +199,8 @@ void PMainEsquemaUI::deletePage(int index) {
     if (count > 0) {
         ui->toolBox_formatEsquema->setCurrentIndex(count - 1);
     } else {
-        // Update the state of buttons based on the number of pages left
+        // Update the state of parse button based on the number of pages left
         ui->pushButton_parse->setEnabled(false);
-        ui->DeletePage->setEnabled(false);
     }
 }
 
@@ -194,7 +215,7 @@ void PMainEsquemaUI::clearPages() {
 void PMainEsquemaUI::on_pushButton_parse_clicked() {
     CMDoc& cmdoc = CMDoc::getMDoc();
     if (cmdoc.getLoadedEsquemaDocs()->size() == 0) {
-        QMessageBox::information(this, "Empty esquema list", "You need to define at least one esquema to extract data from PDF files");
+        QMessageBox::information(this, "Empty esquema list", "Need to define at least one esquema to extract data from PDF files");
         return;
     }
 
@@ -213,18 +234,24 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
         progressDlg->show();
         QCoreApplication::processEvents(); // Needed to display progress bar
 
-        size_t maxColumns{ 0 };
-        for (CExportCSV* it : exportCSVs) {
-            QStandardItemModel *model = it->getTableModel();
-            size_t columnCount = model->columnCount();
-            if(columnCount > maxColumns) maxColumns = columnCount;
+        // Counts the max ammount of columns there are in any format table
+        size_t maxColumns{ 1 }; // 1 if dbParser is checked. Iterate through exportCSVs to count otherwise
+        if(ui->radioButton_csvParse->isChecked()) {
+            for (CExportCSV* it : exportCSVs) {
+                QAbstractItemModel *model = it->getCsvTableModel();
+                if(!model) continue;
+                size_t columnCount = model->columnCount();
+                if(columnCount > maxColumns) maxColumns = columnCount;
+            }
         }
+
         std::vector<std::vector<QString>> newData;
         for (CExportCSV* it : exportCSVs) {
             newData.clear();
             // DOING THE ACTUAL WORK: Build the structure
-            it->buildStructure(combinedModel, progressDlg, maxColumns);
+            it->buildStructure(combinedModel, progressDlg, maxColumns, ui->radioButton_dbParse->isChecked());
         }
+
         // Delete progress dialog
         delete progressDlg;
         progressDlg = nullptr;
@@ -288,3 +315,4 @@ void PMainEsquemaUI::deleteEsquema(const int index, const bool askConfirmation) 
     // Perform a check in main window for disabling Export Esquema menu action if needed
     qobject_cast<MainWindow*>(SystemUtils::getLastParent(this))->checkExortEsquemaActionEnable();
 }
+
