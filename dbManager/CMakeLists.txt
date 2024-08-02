@@ -21,7 +21,7 @@ set(PROJECT_SOURCES
 
 add_library(${PROJECT_NAME} STATIC
     WDbView.h       WDbView.cpp         WDbView.ui
-    WTVH.h          WTVH.cpp
+    WSearcherHeader.h          WSearcherHeader.cpp
     DMemberEdit.h   DMemberEdit.cpp
     CDbConnection.h CDbConnection.cpp
     WRecEditTable.h WRecEditTable.cpp

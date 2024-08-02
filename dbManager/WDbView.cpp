@@ -2,7 +2,7 @@
 #include "ui_WDbView.h"
 
 #include "DMemberEdit.h"
-#include "WTVH.h"
+#include "WSearcherHeader.h"
 #include "CDbConnection.h"
 
 #include <QMessageBox>
@@ -28,14 +28,14 @@ WDbView::WDbView(QWidget *parent)
     ui->treeView->setSortingEnabled(true);
 
     // Set custom header that includes a search box in each column
-    m_head = new WTVH(Qt::Horizontal, ui->treeView);
+    m_head = new WSearcherHeader(Qt::Horizontal, ui->treeView);
     m_head->setModel(m_proxyModel);
     ui->treeView->setHeader(m_head);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Make connections to delete searchBoxes and create new ones everytime the header data changes
-    connect(m_proxyModel, &QAbstractTableModel::modelReset, m_head, &WTVH::handleHeaderDataChanged);
-    connect(m_head, &WTVH::filterChanged, this, &WDbView::filterChanged);
+    connect(m_proxyModel, &QAbstractTableModel::modelReset, m_head, &WSearcherHeader::updateHeader);
+    connect(m_head, &WSearcherHeader::filterChanged, this, &WDbView::filterChanged);
 
     changeTable("Members");
 }

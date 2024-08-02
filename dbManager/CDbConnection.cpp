@@ -7,7 +7,6 @@
 
 bool CDbConnection::isInitialized = false;
 
-// Method to get the singleton instance
 CDbConnection& CDbConnection::getConnection(const QString &host, const QString &db, const QString &user, const QString &pass) {
     static CDbConnection instance(host, db, user, pass);
 
@@ -28,21 +27,23 @@ CDbConnection::~CDbConnection() {
         pair.second = nullptr;
     }
 
-    if (m_db.isOpen()) {
-        m_db.close();
+    QSqlDatabase db = QSqlDatabase::database(m_dbName);
+    if (db.isOpen()) {
+        db.close();
     }
 }
 
-bool CDbConnection::connectDatabase(const QString& host, const QString& db, const QString& user, const QString& pass) {
+bool CDbConnection::connectDatabase(const QString& host, const QString& dbName, const QString& user, const QString& pass) {
     // Set-up connection
-    m_db = QSqlDatabase::addDatabase("QMYSQL");
-    m_db.setHostName(host);
-    m_db.setDatabaseName(db);
-    m_db.setUserName(user);
-    m_db.setPassword(pass);
+    QSqlDatabase::addDatabase("QMYSQL", m_dbName);
+    QSqlDatabase db = QSqlDatabase::database(m_dbName);
+    db.setHostName(host);
+    db.setDatabaseName(dbName);
+    db.setUserName(user);
+    db.setPassword(pass);
 
     // Open connection
-    if (m_db.open()) {
+    if (db.open()) {
         qDebug() << "Connected";
 
         // Set-up query models after successful connection
@@ -61,7 +62,7 @@ bool CDbConnection::connectDatabase(const QString& host, const QString& db, cons
 bool CDbConnection::addModel(const QString& tableName, const QString& alias) {
     const QString upAlias = alias.isEmpty() ? tableName : alias; // if alias was not provided, we use tableName as alias
 
-    QSqlTableModel* model = new QSqlTableModel();
+    QSqlTableModel* model = new QSqlTableModel(this, QSqlDatabase::database(m_dbName));
     model->setTable(tableName);
     bool ok = model->select();
 
@@ -74,7 +75,8 @@ bool CDbConnection::addModel(const QString& tableName, const QString& alias) {
 }
 
 bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::vector<QString>>& data) {
-    if (!m_db.isOpen()) {
+    QSqlDatabase db = QSqlDatabase::database(m_dbName);
+    if (!db.isOpen()) {
         qWarning() << "Database is not open!";
         return false;
     }
@@ -84,7 +86,7 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
         return false;
     }
 
-    QSqlQuery query(m_db);
+    QSqlQuery query(db);
 
     // Constructing the SQL insert statement with placeholders for each value
     QString insertStr = QString("INSERT INTO %1 VALUES (").arg(tableName);
@@ -102,8 +104,8 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
     qDebug() << "Prepared insert query:" << insertStr;
 
     // Begin transaction
-    if (!m_db.transaction()) {
-        qWarning() << "Failed to start transaction:" << m_db.lastError();
+    if (!db.transaction()) {
+        qWarning() << "Failed to start transaction:" << db.lastError();
         return false;
     }
 
@@ -111,7 +113,7 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
         // Ensure each row has the same number of columns
         if (row.size() != data[0].size()) {
             qWarning() << "Row size mismatch!";
-            m_db.rollback();
+            db.rollback();
             return false;
         }
 
@@ -126,14 +128,14 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
         // Execute the query
         if (!query.exec()) {
             qWarning() << "Insert failed:" << query.lastError().text();
-            m_db.rollback();
+            db.rollback();
             return false;
         }
     }
 
     // Commit transaction
-    if (!m_db.commit()) {
-        qWarning() << "Failed to commit transaction:" << m_db.lastError();
+    if (!db.commit()) {
+        qWarning() << "Failed to commit transaction:" << db.lastError();
         return false;
     }
 

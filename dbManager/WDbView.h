@@ -1,9 +1,9 @@
 #ifndef WDBVIEW_H
 #define WDBVIEW_H
 
-#include "WTVH.h"
-#include "qsortfilterproxymodel.h"
+#include "WSearcherHeader.h"
 
+#include <QSortFilterProxyModel>
 #include <QSqlTableModel>
 #include <QWidget>
 
@@ -30,7 +30,7 @@ signals:
 private:
     Ui::WDbView *ui;
     QSortFilterProxyModel *m_proxyModel;
-    WTVH *m_head;
+    WSearcherHeader *m_head;
     QVector<QString> insertionOrder;
 
     QSqlTableModel *m_activeModel;

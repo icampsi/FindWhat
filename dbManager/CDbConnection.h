@@ -4,7 +4,8 @@
 #include <QSqlTableModel>
 #include <QSqlDatabase>
 
-class CDbConnection {
+class CDbConnection : QObject {
+    Q_OBJECT
 public:
     enum class TableName { Members, Flats, Utility_Bills, Occupancy };
 
@@ -21,9 +22,9 @@ private:
 
 public:
     // Creates a database connection
-    bool connectDatabase(const QString& host, const QString& db, const QString& user, const QString& pass);
+    bool connectDatabase(const QString& host, const QString& dbName, const QString& user, const QString& pass);
     // Closes the database connection. The database is also closed in the destructor so this is only for explicit closeing.
-    void closeDb() { m_db.close(); }
+    const QString& dbName() const { return m_dbName; }
     // Returns the model pointing to the table with the requested name
     QSqlTableModel* getModel(const QString& tableName) { return m_models.at(tableName); }
 
@@ -36,10 +37,9 @@ signals:
     void queryChanged();
 
 private:
-    QSqlDatabase m_db;
     std::unordered_map<QString, QSqlTableModel*> m_models;
     QString m_host;
-    QString m_dbName;
+    QString m_dbName = "closcaConn";
     QString m_user;
     QString m_pass;
 
