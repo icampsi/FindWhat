@@ -55,3 +55,6 @@ compile_commands.json
 
 #Other
 *.pdf
+
+# MAC System Files
+.DS_Store
