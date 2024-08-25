@@ -162,12 +162,12 @@
   <customwidget>
    <class>WBrowserTreeView</class>
    <extends>QTreeView</extends>
-   <header>WBrowserTreeView.h</header>
+   <header>ui/WBrowserTreeView.h</header>
   </customwidget>
   <customwidget>
    <class>PMainEsquemaUI</class>
    <extends>QWidget</extends>
-   <header>PMainEsquemaUI.h</header>
+   <header>ui/PMainEsquemaUI.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

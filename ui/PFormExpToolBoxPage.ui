@@ -204,11 +204,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="WRecEditTable" name="tableView"/>
-       </item>
-      </layout>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
      </widget>
     </widget>
    </item>
@@ -224,11 +220,6 @@
    <class>WLoadedFilesTreeView</class>
    <extends>QListWidget</extends>
    <header>WLoadedFilesTreeView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>WRecEditTable</class>
-   <extends>QTableView</extends>
-   <header>dbManager/WRecEditTable.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

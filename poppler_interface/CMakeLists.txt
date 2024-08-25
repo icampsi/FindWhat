@@ -38,9 +38,6 @@ else ()
     message(FATAL_ERROR "Poppler library not found. You can download and install it from https://gitlab.freedesktop.org/poppler/poppler")
 endif ()
 
-find_package(poppler)
-
-
 # Add current source dir and utils dir as include paths
 target_include_directories(${MODULE_NAME}
     PUBLIC

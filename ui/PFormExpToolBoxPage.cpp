@@ -7,10 +7,13 @@
 
 #include <QComboBox>
 
-#include "CDbConnection.h"
-#include "WRecEditTable.h"
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
+
+#ifdef ENABLE_DBMANAGER
+#include "WRecEditTable.h"
+#include "CDbConnection.h"
+#endif
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     : QWidget(parent), ui(new Ui::PExpFormToolBoxPage), m_exportCSV{exportCSV}
@@ -54,7 +57,13 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
     // m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills")); new BOOKMARK
-    ui->tableView->setSqlRecordModel(m_exportCSV->getDbTableModel());
+
+#ifdef ENABLE_DBMANAGER
+    WRecEditTable *dbTable = new WRecEditTable(ui->stackedWidget_parseOpt);
+    dbTable->setSqlRecordModel(m_exportCSV->getDbTableModel());
+    ui->stackedWidget_parseOpt->insertWidget(1, dbTable);
+    ui->stackedWidget_parseOpt->setCurrentWidget(dbTable);
+#endif
 }
 
 PFormExpToolBoxPage::~PFormExpToolBoxPage() {

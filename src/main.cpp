@@ -24,14 +24,13 @@
  * as published by the Free Software Foundation. See https://poppler.freedesktop.org/ for more information.
 */
 
-#include "CRecModel.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
 #include "utils/USystem.h"
 
 #ifdef ENABLE_DBMANAGER
+#include "CRecModel.h"
 #include "dbManager/CDbConnection.h"
-#endif
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -58,7 +57,7 @@ void debug(QWidget &window) {
     window.resize(600, 400); // Set window size
     window.show(); // Show the window
 }
-
+#endif
 
 int main(int argc, char *argv[]) {
     SystemUtils::setEndianness();

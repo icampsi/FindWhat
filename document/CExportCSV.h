@@ -7,11 +7,11 @@
 #define CEXPORTCSV_H
 
 #include <QStandardItemModel>
-#include "dbManager/WRecEditTable.h"
 #include <QString>
 
 #ifdef ENABLE_DBMANAGER
 class CRecModel;
+#include "dbManager/WRecEditTable.h"
 #endif
 
 class InvalidFileName_dlg;
@@ -23,9 +23,16 @@ class CExportCSV {
 
 public:
     // CONSTRUCTORS AND DESTRUCTORS
-    explicit CExportCSV() : m_pdfFilePaths(), m_associatedEsquemaDoc(nullptr), m_exportFileRename(), m_renameParsedPDFFlag(false), m_fileNamePlaceholder(), m_idText(""), m_csvTableModel(10, 10),
+    explicit CExportCSV()
+        : m_pdfFilePaths(),
+        m_associatedEsquemaDoc(nullptr),
+        m_exportFileRename(),
+        m_renameParsedPDFFlag(false),
+        m_fileNamePlaceholder(),
+        m_idText(""),
+        m_csvTableModel(10, 10)
 #ifdef ENABLE_DBMANAGER
-        m_dbTableModel()  // Table model for the db format table
+        , m_dbTableModel()  // Table model for the db format table
 #endif
     {}
     explicit CExportCSV(std::ifstream& in) { CExportCSV::deserialize(in); }

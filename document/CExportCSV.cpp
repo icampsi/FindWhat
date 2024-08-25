@@ -64,6 +64,7 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
         if(!dbParser) {
             convertModelToVector(&m_csvTableModel, &format);
         } else {
+#ifdef ENABLE_DBMANAGER
             // Note: m_csvTableModel has rows where columns should be!
             int rowCount = m_dbTableModel.rowCount();
             format.reserve(1);  // Reserve space for rows
@@ -92,6 +93,7 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
             }
 
             format.emplace_back(std::move(rowVector));
+#endif
         }
 
         // Ensure each row in format has at least maxColumns columns

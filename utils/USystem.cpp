@@ -5,8 +5,11 @@
 
 #include "USystem.h"
 
-#include <cstdlib>   // For getenv on Unix-like systems
+#ifdef _WIN32
 #include <Windows.h> // For GetEnvironmentVariable on Windows
+#else
+#include <cstdlib>   // For getenv on Unix-like systems
+#endif
 
 #include <QWidget>
 #include <QString>
