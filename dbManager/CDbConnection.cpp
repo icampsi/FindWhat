@@ -1,9 +1,12 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #include "dbManager/CDbConnection.h"
-#include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSqlTableModel>
-#include <QDebug>
+#include <QSqlRelationalTableModel>
 
 bool CDbConnection::isInitialized = false;
 
@@ -12,6 +15,11 @@ CDbConnection& CDbConnection::getConnection(const QString &host, const QString &
 
     if (!isInitialized && !host.isEmpty() && !db.isEmpty() && !user.isEmpty() && !pass.isEmpty()) {
         instance.connectDatabase(host, db, user, pass);
+        instance.addModel("Members");
+        instance.addModel("Flats", "Flats");
+        instance.addModel("ru_bills", "Utility Bills");
+        instance.addModel("occupancy", "Occupancy");
+
         isInitialized = true;
     }
 
@@ -28,50 +36,45 @@ CDbConnection::~CDbConnection() {
     }
 
     QSqlDatabase db = QSqlDatabase::database(m_dbName);
-    if (db.isOpen()) {
-        db.close();
-    }
+    if (db.isOpen()) db.close();
 }
 
 bool CDbConnection::connectDatabase(const QString& host, const QString& dbName, const QString& user, const QString& pass) {
     // Set-up connection
     QSqlDatabase::addDatabase("QMYSQL", m_dbName);
+    qDebug() << m_dbName;
     QSqlDatabase db = QSqlDatabase::database(m_dbName);
     db.setHostName(host);
     db.setDatabaseName(dbName);
     db.setUserName(user);
     db.setPassword(pass);
 
-    // Open connection
-    if (db.open()) {
-        qDebug() << "Connected";
-
-        // Set-up query models after successful connection
-        addModel("Members");
-        addModel("Flats_view", "Flats");
-        addModel("ru_bills", "Utility Bills");
-        addModel("occupancy_view", "Occupancy");
-
-        return true;
-    } else {
-        qDebug() << "Couldn't connect";
-        return false;
-    }
+    return db.open();
 }
 
-bool CDbConnection::addModel(const QString& tableName, const QString& alias) {
+QSqlRelationalTableModel *CDbConnection::addModel(const QString& tableName, const QString& alias) {
     const QString upAlias = alias.isEmpty() ? tableName : alias; // if alias was not provided, we use tableName as alias
 
-    QSqlTableModel* model = new QSqlTableModel(this, QSqlDatabase::database(m_dbName));
+    QSqlRelationalTableModel* model = new QSqlRelationalTableModel(this, QSqlDatabase::database(m_dbName));
     model->setTable(tableName);
-    bool ok = model->select();
+    //model->select();
 
-    if (ok) {
+    if (model) {
         m_models.emplace(upAlias, model);
     } else {
         delete model;
     }
-    return ok;
+    return model;
+}
+
+void CDbConnection::deleteModel(std::unordered_map<QString, QSqlRelationalTableModel*>& models, const QString& key) {
+    auto it = models.find(key);
+    if (it != models.end()) {
+        // Delete model
+        delete it->second;
+        // Remove entry from map
+        models.erase(it);
+    }
 }
 
 bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::vector<QString>>& data) {

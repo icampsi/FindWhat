@@ -1,3 +1,8 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #include "WDbView.h"
 #include "ui_WDbView.h"
 
@@ -13,7 +18,6 @@
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlIndex>
-
 
 WDbView::WDbView(QWidget *parent)
     : QWidget(parent), ui(new Ui::WDbView) {
@@ -45,10 +49,10 @@ void WDbView::changeTable(const QString& tableName) {
     m_activeModel = CDbConnection::getConnection().getModel(tableName);
     m_proxyModel->setSourceModel(m_activeModel);
 
-    if(tableName == "occupancy_view") {
-        ui->treeView->hideColumn(1);
-        ui->treeView->hideColumn(2);
-        ui->treeView->hideColumn(3);
+    if(tableName == "Occupancy") {
+        // ui->treeView->hideColumn(1);
+        // ui->treeView->hideColumn(2);
+        // ui->treeView->hideColumn(3);
     }
     else {
         ui->treeView->showColumn(1);
@@ -75,8 +79,13 @@ void WDbView::on_comboBox_tables_currentIndexChanged(int index) {
         changeTable("Flats");
         break;
 
+    case 2:
+        changeTable("Utility Bills");
+        break;
+
     case 3: // Table Occupancy
         changeTable("Occupancy");
+        break;
 
     default:
         break;
@@ -91,10 +100,13 @@ bool WDbView::openEditDlg(const QModelIndex &index) {
     QModelIndex proxyIndex = m_proxyModel->mapToSource(index);
 
     // Create and show the dialog
-    DMemberEdit *dialog = new DMemberEdit(m_activeModel, proxyIndex, this);
-    dialog->exec();
+    DMemberEdit *dialog = new DMemberEdit(QString("SELECT * FROM %1").arg(m_activeModel->tableName()), QSqlDatabase::database("closca"), proxyIndex, this);
+    if (dialog->exec() == QDialog::Accepted) {
+        m_activeModel->select();
+    }
 
     delete dialog;
+
     return true;
 }
 

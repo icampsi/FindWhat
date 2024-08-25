@@ -1,3 +1,8 @@
+# =================================================== *
+# ====         Copyright (c) 2024 icampsi        ==== *
+# ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+# =================================================== */
+
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 project(dbManager VERSION 0.1 LANGUAGES CXX)
@@ -25,6 +30,10 @@ add_library(${PROJECT_NAME} STATIC
     DMemberEdit.h   DMemberEdit.cpp
     CDbConnection.h CDbConnection.cpp
     WRecEditTable.h WRecEditTable.cpp
+    CRecModel.h CRecModel.cpp
+    CRecItemDelegate.h CRecItemDelegate.cpp
+
+
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Core)

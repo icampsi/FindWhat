@@ -1,10 +1,18 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef WSEARCHERHEADER_H
 #define WSEARCHERHEADER_H
 
 #include <QHeaderView>
 
 class QLineEdit;
-// Header with an added option to add a search box on each column.
+/* Header with an added option to add a search box on each column.
+ * Search boxes doesen't automatically filter data, the filter needs
+ * to be created outside from the contents of the filterChanged signal.
+*/
 class WSearcherHeader : public QHeaderView {
     Q_OBJECT
 

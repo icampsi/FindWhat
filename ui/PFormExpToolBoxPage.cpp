@@ -53,7 +53,7 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     }
     
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
-    m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills"));
+    // m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills")); new BOOKMARK
     ui->tableView->setSqlRecordModel(m_exportCSV->getDbTableModel());
 }
 

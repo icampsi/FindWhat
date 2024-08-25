@@ -24,6 +24,7 @@
  * as published by the Free Software Foundation. See https://poppler.freedesktop.org/ for more information.
 */
 
+#include "CRecModel.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
 #include "utils/USystem.h"
@@ -31,6 +32,32 @@
 #ifdef ENABLE_DBMANAGER
 #include "dbManager/CDbConnection.h"
 #endif
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSqlField>
+
+void debug(QWidget &window) {
+    // Create a QTableView and QSqlQueryModel
+    QTableView *tableView = new QTableView(&window);
+    QSqlQueryModel *relModel = new QSqlQueryModel(tableView);
+    relModel->setQuery("SELECT * FROM flats", QSqlDatabase::database("closca"));
+    CRecModel *model = new CRecModel(tableView, 3);
+    //model->bindModel(relModel);
+    model->setQuery("SELECT name, surname, CONCAT(name, surname), member_id FROM members", QSqlDatabase::database("closca"));
+
+    // Set the model for the table view
+    tableView->setModel(model);
+
+    // Set up layout
+    QVBoxLayout *layout = new QVBoxLayout(&window);
+    layout->addWidget(tableView);
+
+    // Set layout for the main window
+    window.setLayout(layout);
+    window.resize(600, 400); // Set window size
+    window.show(); // Show the window
+}
 
 
 int main(int argc, char *argv[]) {
@@ -40,11 +67,13 @@ int main(int argc, char *argv[]) {
 #ifdef ENABLE_DBMANAGER
     CDbConnection::getConnection("localhost", "closca", "user", "password");
 #endif
-
     QApplication a(argc, argv);
+
     MainWindow w;
     w.showMaximized();
-
     w.show();
+    // QWidget window;
+    // debug(window);
+
     return a.exec();
 }

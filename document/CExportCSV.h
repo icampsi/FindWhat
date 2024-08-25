@@ -11,7 +11,7 @@
 #include <QString>
 
 #ifdef ENABLE_DBMANAGER
-class CSqlRecordModel;
+class CRecModel;
 #endif
 
 class InvalidFileName_dlg;
@@ -46,7 +46,7 @@ protected:
 
     QStandardItemModel m_csvTableModel; // Table model for the csv format table
 #ifdef ENABLE_DBMANAGER
-    CSqlRecordModel m_dbTableModel;  // Table model for the db format table
+    CRecModel m_dbTableModel;  // Table model for the db format table
 #endif
 
 public:
@@ -74,7 +74,7 @@ public:
 
     QStandardItemModel *getCsvTableModel() { return &m_csvTableModel; }
 #ifdef ENABLE_DBMANAGER
-    CSqlRecordModel *getDbTableModel() { return &m_dbTableModel; }
+    CRecModel *getDbTableModel() { return &m_dbTableModel; }
 #endif
 
     // PUBLIC FUNCTIONS

@@ -1,10 +1,15 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef WDBVIEW_H
 #define WDBVIEW_H
 
 #include "WSearcherHeader.h"
 
 #include <QSortFilterProxyModel>
-#include <QSqlTableModel>
+#include <QSqlRelationalTableModel>
 #include <QWidget>
 
 namespace Ui { class WDbView; }
@@ -33,7 +38,7 @@ private:
     WSearcherHeader *m_head;
     QVector<QString> insertionOrder;
 
-    QSqlTableModel *m_activeModel;
+    QSqlRelationalTableModel *m_activeModel;
 };
 
 #endif // WDBVIEW_H
