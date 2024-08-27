@@ -12,7 +12,7 @@
 
 #ifdef ENABLE_DBMANAGER
 #include "WRecEditTable.h"
-#include "CDbConnection.h"
+#include "CRecItemDelegate.h"
 #endif
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
@@ -59,8 +59,17 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     // m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills")); new BOOKMARK
 
 #ifdef ENABLE_DBMANAGER
+    // Create CRecTable for sql insertions. Used if parseDB is selected
     WRecEditTable *dbTable = new WRecEditTable(ui->stackedWidget_parseOpt);
+
+    // Disable custom widgets in order to only get line edits on every cell.
+    CRecItemDelegate* dbTableDelegate = qobject_cast<CRecItemDelegate*>(dbTable->itemDelegate());
+    dbTableDelegate->disableCustomWidgets(true);
+
+    // Set the recModel generated and sotred by the exportCSV as the table model.
     dbTable->setSqlRecordModel(m_exportCSV->getDbTableModel());
+
+    // Insert table into page 1 of stack widget.
     ui->stackedWidget_parseOpt->insertWidget(1, dbTable);
     ui->stackedWidget_parseOpt->setCurrentWidget(dbTable);
 #endif

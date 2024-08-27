@@ -19,6 +19,28 @@
 
 #include "../poppler_interface/PdfToText.h"
 
+#ifdef ENABLE_DBMANAGER
+#include "dbManager/CDbConnection.h"
+#endif
+
+CExportCSV::CExportCSV()
+    : m_pdfFilePaths(),
+    m_associatedEsquemaDoc(nullptr),
+    m_exportFileRename(),
+    m_renameParsedPDFFlag(false),
+    m_fileNamePlaceholder(),
+    m_idText(""),
+    m_csvTableModel(10, 10)
+#ifdef ENABLE_DBMANAGER
+    , m_dbTableModel()  // Table model for the db format table
+#endif
+{
+#ifdef ENABLE_DBMANAGER
+    m_dbTableModel.setBehaviourFlag(CRecModel::BehaviourFlag::Insert);
+    m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+#endif
+}
+
 void CExportCSV::convertModelToVector(QAbstractItemModel* model, std::vector<std::vector<QString>>* format) {
     int rowCount = model->rowCount();
     int columnCount = model->columnCount();
@@ -163,21 +185,6 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
 }
 
 // SERIALIZATION
-void serializeModel(std::ofstream &out, const QStandardItemModel* model) {
-    int rowCount = model->rowCount();
-    int columnCount = model->columnCount();
-
-    out.write(reinterpret_cast<const char*>(&rowCount), sizeof(int));
-    out.write(reinterpret_cast<const char*>(&columnCount), sizeof(int));
-
-    for (int row = 0; row < rowCount; ++row) {
-        for (int column = 0; column < columnCount; ++column) {
-            QStandardItem* item = model->item(row, column);
-            USerialize::writeQString(out, item ? item->text() : QString());
-        }
-    }
-}
-
 void CExportCSV::serialize(std::ofstream &out) const {
     /* - SERIALIZATION ORDER -
      * QString                 m_exportFileRename
@@ -185,7 +192,8 @@ void CExportCSV::serialize(std::ofstream &out) const {
      * QString                 m_fileNamePlaceholder
      * size_t                  index of m_associatedEsquemaDoc
      * QString                 m_idText
-     * QStandardItemModel      m_tableModel
+     * QStandardItemModel      m_csvTableModel
+     * CRecModel               m_dbTableModel
      *
      * - NO NEED -
      * m_invalidFileNameDlg
@@ -211,27 +219,21 @@ void CExportCSV::serialize(std::ofstream &out) const {
     USerialize::writeQString(out, m_idText);                                    // m_idText
 
     // Serialize the QStandardItemModel
-    serializeModel(out, &m_csvTableModel);
-}
+    USerialize::readModel(out, &m_csvTableModel);
 
-void deserializeModel(std::ifstream &in, QStandardItemModel* model) {
-    int rowCount;
-    int columnCount;
+    int rowCount    = m_dbTableModel.rowCount();
+    int columnCount = m_dbTableModel.columnCount();
 
-    in.read(reinterpret_cast<char*>(&rowCount), sizeof(int));
-    in.read(reinterpret_cast<char*>(&columnCount), sizeof(int));
-
-    model->setRowCount(rowCount);
-    model->setColumnCount(columnCount);
+    out.write(reinterpret_cast<const char*>(&rowCount), sizeof(int));
+    out.write(reinterpret_cast<const char*>(&columnCount), sizeof(int));
 
     for (int row = 0; row < rowCount; ++row) {
         for (int column = 0; column < columnCount; ++column) {
-            QString text;
-            USerialize::readQString(in, text);
-            QStandardItem* item = new QStandardItem(text);
-            model->setItem(row, column, item);
+            QString item = m_dbTableModel.data(m_dbTableModel.index(row, column)).toString();
+            USerialize::writeQString(out, item);
         }
     }
+
 }
 
 void CExportCSV::deserialize(std::ifstream &in) {
@@ -240,6 +242,8 @@ void CExportCSV::deserialize(std::ifstream &in) {
      * bool                    m_renameParsedPDFFlag
      * QString                 m_fileNamePlaceholder
      * QString                 m_idText
+     * QStandardItemModel      m_csvTableModel
+     * CRecModel               m_dbTableModel
 
      * - NO NEED -
      * m_associatedEsquemaDoc
@@ -257,5 +261,27 @@ void CExportCSV::deserialize(std::ifstream &in) {
     USerialize::readQString(in, m_idText);                           // m_idText
 
     // Deserialize the QStandardItemModel
-    deserializeModel(in, &m_csvTableModel);
+    USerialize::writeModel(in, &m_csvTableModel);
+
+#ifdef ENABLE_DBMANAGER
+    m_dbTableModel.setBehaviourFlag(CRecModel::BehaviourFlag::Insert);
+    m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+
+    USerialize::writeModel(in, &m_dbTableModel);
+
+    // int rowCount;
+    // int columnCount;
+
+    // in.read(reinterpret_cast<char*>(&rowCount), sizeof(int));
+    // in.read(reinterpret_cast<char*>(&columnCount), sizeof(int));
+
+    // for (int row = 0; row < rowCount; ++row) {
+    //     for (int column = 0; column < columnCount; ++column) {
+    //         QString text;
+    //         USerialize::readQString(in, text);
+    //         m_dbTableModel.setData(m_dbTableModel.index(row, column), QVariant(text));
+    //     }
+    // }
+#endif
+
 }

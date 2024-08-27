@@ -18,6 +18,8 @@ WRecEditTable::WRecEditTable(QWidget *parent)
     verticalHeader()->setVisible(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
+
+    // Set CRecItemDelegate as default item delegate
     CRecItemDelegate *delegate = new CRecItemDelegate(this);
     setItemDelegate(delegate);
 }

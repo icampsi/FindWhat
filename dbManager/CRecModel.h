@@ -25,6 +25,7 @@ class CRecModel : public QSqlQueryModel {
 
 private:
     class Field {
+        // INTERNAL DATA STRUCTURES
     public:
         Field(const QString& fieldName, bool hasFk = false, const QString&fkTableName = "", const QString& fkColumnName = "")
             : m_fieldName{fieldName}, m_hasFk{hasFk}, m_fkTableName{fkTableName}, m_fkColumnName{fkColumnName} {
@@ -53,9 +54,12 @@ private:
 
 public:
     enum class BehaviourFlag { Update, Insert };
+
+    // CONSTURCTORS & DESTRUCTORS
     explicit CRecModel(QObject *parent = nullptr, int index = 0, QString query = "", QSqlDatabase db = QSqlDatabase());
     ~CRecModel();
 
+    // PUBLIC METHODS
     void setBehaviourFlag(BehaviourFlag flag) { m_behaviourFlag = flag;}
     BehaviourFlag getBehaviourFlag() const { return m_behaviourFlag; }
 
@@ -81,6 +85,18 @@ public:
 
     // Binds values to the current update querries and submits the record on the database
     bool submitRecord();
+
+    // Made Non-functional. Not deleting it in order to avoid troubles when using QAbstractItemModel*
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override {
+        Q_UNUSED(row); Q_UNUSED(count); Q_UNUSED(parent);
+        return false;
+    }
+
+    // Made Non-functional. Not deleting it in order to avoid troubles when using QAbstractItemModel*
+    bool insertColumns(int col, int count, const QModelIndex &parent = QModelIndex()) override {
+        Q_UNUSED(col); Q_UNUSED(count); Q_UNUSED(parent);
+        return false;
+    }
 
 protected:
     // Retrieves the record information based on the index of m_activeRecordIndex

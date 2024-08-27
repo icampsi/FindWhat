@@ -9,10 +9,15 @@
 #include <QLineEdit>
 
 CRecItemDelegate::CRecItemDelegate(QObject *parent)
-    : QStyledItemDelegate{parent}
+    : QStyledItemDelegate{parent}, m_disableCustomWidgets{false}
 {}
 
 QWidget* CRecItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    // If m_disableCustomWidgets is set we will only return line edits.
+    if(m_disableCustomWidgets) {
+        QLineEdit *lineEdit = new QLineEdit(parent);
+        return lineEdit;
+    }
     // Check the custom role to see if this cell should use a QComboBox
     QVariant comboBoxData = index.model()->data(index, Qt::UserRole + 1);
 

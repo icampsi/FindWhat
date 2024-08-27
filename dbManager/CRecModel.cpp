@@ -124,7 +124,6 @@ bool CRecModel::setData(const QModelIndex &index, const QVariant &value, int rol
         // Notify that the data has changed
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
         emit cellValueChanged(row);
-        // submitRecord(); // BOOKMARK - COMMENTED
         return true;
     }
 

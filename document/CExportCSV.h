@@ -23,18 +23,7 @@ class CExportCSV {
 
 public:
     // CONSTRUCTORS AND DESTRUCTORS
-    explicit CExportCSV()
-        : m_pdfFilePaths(),
-        m_associatedEsquemaDoc(nullptr),
-        m_exportFileRename(),
-        m_renameParsedPDFFlag(false),
-        m_fileNamePlaceholder(),
-        m_idText(""),
-        m_csvTableModel(10, 10)
-#ifdef ENABLE_DBMANAGER
-        , m_dbTableModel()  // Table model for the db format table
-#endif
-    {}
+    explicit CExportCSV();
     explicit CExportCSV(std::ifstream& in) { CExportCSV::deserialize(in); }
 
     ~CExportCSV() = default;

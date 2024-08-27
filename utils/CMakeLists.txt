@@ -22,7 +22,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 # Add the utils library
 add_library(${PROJECT_NAME} STATIC
-    USerialize.cpp
+    USerialize.h    USerialize.cpp
     USystem.cpp
     UText.h         UText.cpp
     CPagedText.h    CPagedText.cpp

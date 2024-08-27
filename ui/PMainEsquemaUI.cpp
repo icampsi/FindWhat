@@ -78,6 +78,8 @@ PMainEsquemaUI::PMainEsquemaUI(QWidget *parent)
         WDbView *dbView = new WDbView(ui->stackedWidget_esquemaUI);
         ui->stackedWidget_esquemaUI->addWidget(dbView);
     }
+#else
+    ui->radioButton_dbParse->setDisabled(true);
 #endif
     // NEW BOOKMRAK  - ESQ TREE VIEW
     // m_esqModel = new QStandardItemModel();
@@ -220,7 +222,6 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
     }
 
     ui->pushButton_parse->setEnabled(false); // Disable button to avoid conflicts while parsing
-
     CExportPathDoc& exportPathDoc = CMDoc::getMDoc().getExportPathDoc();
     // Get all the loaded exportCSV as a vector
     const std::vector<CExportCSV*>& exportCSVs = exportPathDoc.getExportCSVs();
@@ -235,8 +236,9 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
         QCoreApplication::processEvents(); // Needed to display progress bar
 
         // Counts the max ammount of columns there are in any format table
+        bool CSVParser = ui->radioButton_csvParse->isChecked(); // Which parser is required
         size_t maxColumns{ 1 }; // 1 if dbParser is checked. Iterate through exportCSVs to count otherwise
-        if(ui->radioButton_csvParse->isChecked()) {
+        if(CSVParser) {
             for (CExportCSV* it : exportCSVs) {
                 QAbstractItemModel *model = it->getCsvTableModel();
                 if(!model) continue;
@@ -249,7 +251,7 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
         for (CExportCSV* it : exportCSVs) {
             newData.clear();
             // DOING THE ACTUAL WORK: Build the structure
-            it->buildStructure(combinedModel, progressDlg, maxColumns, ui->radioButton_dbParse->isChecked());
+            it->buildStructure(combinedModel, progressDlg, maxColumns, !CSVParser);
         }
 
         // Delete progress dialog

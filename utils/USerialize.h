@@ -9,6 +9,7 @@
 #include <QString>
 #include <fstream>
 
+class QAbstractItemModel;
 namespace USerialize {
     void writeQString(std::ofstream& out, const QString& str);
     void readQString(std::ifstream& in, QString& str);
@@ -63,6 +64,9 @@ namespace USerialize {
             container.push_back(std::move(tempStr));
         }
     }
+
+    void readModel(std::ofstream &out, const QAbstractItemModel* model);
+    void writeModel(std::ifstream &in, QAbstractItemModel* model);
 }
 
 #endif // USERIALIZE_H
