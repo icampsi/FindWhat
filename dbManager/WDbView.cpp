@@ -9,6 +9,7 @@
 #include "DMemberEdit.h"
 #include "WSearcherHeader.h"
 #include "CDbConnection.h"
+#include "CSqlMultiTableModel.h"
 
 #include <QMessageBox>
 #include <QSqlDatabase>
@@ -59,7 +60,6 @@ void WDbView::changeTable(const QString& tableName) {
         ui->treeView->showColumn(2);
         ui->treeView->showColumn(3);
     }
-    m_activeModel->select();
 }
 
 WDbView::~WDbView() {
@@ -100,13 +100,14 @@ bool WDbView::openEditDlg(const QModelIndex &index) {
     QModelIndex proxyIndex = m_proxyModel->mapToSource(index);
 
     // Create and show the dialog
-    DMemberEdit *dialog = new DMemberEdit(QString("SELECT * FROM %1").arg(m_activeModel->tableName()), QSqlDatabase::database("closca"), proxyIndex, this);
+    const QString& tableName = ui->comboBox_tables->currentText();
+    DMemberEdit *dialog = new DMemberEdit(QString("SELECT * FROM %1").arg(tableName), QSqlDatabase::database("closca"), proxyIndex, this);
+    // If accepted requery to update the data
     if (dialog->exec() == QDialog::Accepted) {
-        m_activeModel->select();
+        m_activeModel->requery();
     }
 
     delete dialog;
-
     return true;
 }
 

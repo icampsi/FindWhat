@@ -8,7 +8,7 @@
 
 #include <QObject>
 
-class QSqlRelationalTableModel;
+class CSqlMultiTableModel;
 
 class CDbConnection : QObject {
     Q_OBJECT
@@ -34,19 +34,19 @@ public:
     const QString& password()   const { return m_pass;   }
 
     // Returns the model pointing to the table with the requested alias
-    QSqlRelationalTableModel* getModel(const QString& tableAlias) { return m_models.at(tableAlias); }
+    CSqlMultiTableModel* getModel(const QString& tableAlias) { return m_models.at(tableAlias); }
 
     // This will add a new model pointing to a new db table. It doesent create the table or change anything from the db! table must already exist.
     // alias will be the given key to retrieve it from the map.
-    QSqlRelationalTableModel *addModel(const QString& tableName, const QString& alias = "");
-    void deleteModel(std::unordered_map<QString, QSqlRelationalTableModel*>& models, const QString& key);
+    CSqlMultiTableModel *addModel(const QString& tableName, const QString& alias = "");
+    void deleteModel(std::unordered_map<QString, CSqlMultiTableModel*>& models, const QString& key);
     bool bulkInsert(const QString& tableName, const std::vector<std::vector<QString>>& data);
 
 signals:
     void queryChanged();
 
 private:
-    std::unordered_map<QString, QSqlRelationalTableModel*> m_models;
+    std::unordered_map<QString, CSqlMultiTableModel*> m_models;
     QString m_host;
     QString m_dbName;
     QString m_user;

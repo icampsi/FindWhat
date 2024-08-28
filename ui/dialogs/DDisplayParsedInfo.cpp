@@ -7,7 +7,7 @@
 #include "document/CMDoc.h"
 #include "ui/dialogs/ui_DDisplayParsedInfo.h"
 
-DDisplayParsedInfo::DDisplayParsedInfo(QStandardItemModel *combinedModel,  QWidget *parent)
+DDisplayParsedInfo::DDisplayParsedInfo(QAbstractItemModel *combinedModel,  QWidget *parent)
     : QDialog(parent), ui(new Ui::DDisplayParsedInfo), m_combinedModel{combinedModel}
 {
     ui->setupUi(this);

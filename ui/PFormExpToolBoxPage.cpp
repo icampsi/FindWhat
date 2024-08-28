@@ -11,8 +11,8 @@
 #include "document/CEsquemaDoc.h"
 
 #ifdef ENABLE_DBMANAGER
-#include "WRecEditTable.h"
-#include "CRecItemDelegate.h"
+#include "WSqlMultiTable.h"
+#include "CSqlMultiTableDelegate.h"
 #endif
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
@@ -60,10 +60,10 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
 
 #ifdef ENABLE_DBMANAGER
     // Create CRecTable for sql insertions. Used if parseDB is selected
-    WRecEditTable *dbTable = new WRecEditTable(ui->stackedWidget_parseOpt);
+    WSqlMultiTable *dbTable = new WSqlMultiTable(ui->stackedWidget_parseOpt);
 
     // Disable custom widgets in order to only get line edits on every cell.
-    CRecItemDelegate* dbTableDelegate = qobject_cast<CRecItemDelegate*>(dbTable->itemDelegate());
+    CSqlMultiTableDelegate* dbTableDelegate = qobject_cast<CSqlMultiTableDelegate*>(dbTable->itemDelegate());
     dbTableDelegate->disableCustomWidgets(true);
 
     // Set the recModel generated and sotred by the exportCSV as the table model.

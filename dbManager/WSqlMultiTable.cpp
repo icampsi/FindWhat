@@ -3,13 +3,13 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#include "WRecEditTable.h"
-#include "CRecModel.h"
-#include "CRecItemDelegate.h"
+#include "WSqlMultiTable.h"
+#include "CSqlmultitableModel.h"
+#include "CSqlMultiTableDelegate.h"
 
 #include <QHeaderView>
 
-WRecEditTable::WRecEditTable(QWidget *parent)
+WSqlMultiTable::WSqlMultiTable(QWidget *parent)
     : QTableView(parent)
 {
     // CONFIGURATION
@@ -19,12 +19,12 @@ WRecEditTable::WRecEditTable(QWidget *parent)
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
 
-    // Set CRecItemDelegate as default item delegate
-    CRecItemDelegate *delegate = new CRecItemDelegate(this);
+    // Set CSqlMultiTableDelegate as default item delegate
+    CSqlMultiTableDelegate *delegate = new CSqlMultiTableDelegate(this);
     setItemDelegate(delegate);
 }
 
-void WRecEditTable::setSqlRecordModel(CRecModel *model) {
+void WSqlMultiTable::setSqlRecordModel(CSqlMultiTableModel *model) {
     if (model) {
         // Set the model using the base class method
         QTableView::setModel(model);
@@ -33,8 +33,8 @@ void WRecEditTable::setSqlRecordModel(CRecModel *model) {
     }
 }
 
-void WRecEditTable::setModel(QAbstractItemModel *model) {
-    if (dynamic_cast<CRecModel*>(model)) {
+void WSqlMultiTable::setModel(QAbstractItemModel *model) {
+    if (dynamic_cast<CSqlMultiTableModel*>(model)) {
         // If the model is of type CSqlRecordModel, set it
         QTableView::setModel(model);
     } else {

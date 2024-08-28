@@ -14,11 +14,12 @@
 DMemberEdit::DMemberEdit(const QString& query, const QSqlDatabase& db, const QModelIndex &modelIndex, QWidget *parent)
     : QDialog(parent), m_index{modelIndex}, m_recModel(this, modelIndex.row(), query, db)
 {
+    m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
     QBoxLayout *Layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     setLayout(Layout);
 
     // Initialize the table widget
-    m_table = new WRecEditTable(this);
+    m_table = new WSqlMultiTable(this);
     m_table->setSqlRecordModel(&m_recModel);
 
     // Add the table to layout

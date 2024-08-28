@@ -11,7 +11,7 @@
 #include <QSqlRecord>
 #include <QDialog>
 
-#include "WRecEditTable.h"
+#include "WSqlMultiTable.h"
 
 class DMemberEdit : public QDialog {
     Q_OBJECT
@@ -27,10 +27,10 @@ private slots:
     void submit();
 
 private:
-    WRecEditTable               *m_table;
+    WSqlMultiTable               *m_table;
     const QModelIndex           &m_index;
-
-    CRecModel                   m_recModel;
+    
+    CSqlMultiTableModel                   m_recModel;
 };
 
 #endif // DMEMBEREDIT_H

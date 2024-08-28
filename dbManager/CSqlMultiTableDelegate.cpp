@@ -3,16 +3,16 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#include "CRecItemDelegate.h"
+#include "CSqlMultiTableDelegate.h"
 
 #include <QComboBox>
 #include <QLineEdit>
 
-CRecItemDelegate::CRecItemDelegate(QObject *parent)
+CSqlMultiTableDelegate::CSqlMultiTableDelegate(QObject *parent)
     : QStyledItemDelegate{parent}, m_disableCustomWidgets{false}
 {}
 
-QWidget* CRecItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+QWidget* CSqlMultiTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     // If m_disableCustomWidgets is set we will only return line edits.
     if(m_disableCustomWidgets) {
         QLineEdit *lineEdit = new QLineEdit(parent);
@@ -32,7 +32,7 @@ QWidget* CRecItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
-void CRecItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+void CSqlMultiTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     if (QComboBox *comboBox = qobject_cast<QComboBox*>(editor)) {
         comboBox->setCurrentText(index.model()->data(index, Qt::EditRole).toString());
     } else {
@@ -40,7 +40,7 @@ void CRecItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
     }
 }
 
-void CRecItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+void CSqlMultiTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
     if (QComboBox *comboBox = qobject_cast<QComboBox*>(editor)) {
         model->setData(index, comboBox->currentText(), Qt::EditRole);
     } else {

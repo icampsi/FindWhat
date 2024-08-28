@@ -3,16 +3,19 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#ifndef CRECITEMDELEGATE_H
-#define CRECITEMDELEGATE_H
+#ifndef CSQLMULTITABLEDELEGATE_H
+#define CSQLMULTITABLEDELEGATE_H
 
 #include <QStyledItemDelegate>
 #include <QWidget>
 
-class CRecItemDelegate : public QStyledItemDelegate {
+/* Delegate that automatically handles the editor widget for CSqlMultiTableModel, assignin dropboxes with values on
+ * on foregin key relations.
+*/
+class CSqlMultiTableDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
-    explicit CRecItemDelegate(QObject *parent);
+    explicit CSqlMultiTableDelegate(QObject *parent);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
@@ -24,4 +27,4 @@ private:
     bool m_disableCustomWidgets; // If m_disableCustomWidgets is set we will only return line edits.
 };
 
-#endif // CRECITEMDELEGATE_H
+#endif // CSQLMULTITABLEDELEGATE_H

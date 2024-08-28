@@ -47,7 +47,7 @@ size_t CExportPathDoc::getFileCount() {
 }
 
 
-void CExportPathDoc::modelToFile(const QString& fileName, QStandardItemModel *model) {
+void CExportPathDoc::modelToFile(const QString& fileName, QAbstractItemModel *model) {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(nullptr, QStringLiteral("ERROR"), QStringLiteral("Couldn't create file"));

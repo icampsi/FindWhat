@@ -29,7 +29,7 @@
 #include "utils/USystem.h"
 
 #ifdef ENABLE_DBMANAGER
-#include "CRecModel.h"
+#include "CSqlMultiTableModel.h"
 #include "dbManager/CDbConnection.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -41,7 +41,7 @@ void debug(QWidget &window) {
     QTableView *tableView = new QTableView(&window);
     QSqlQueryModel *relModel = new QSqlQueryModel(tableView);
     relModel->setQuery("SELECT * FROM flats", QSqlDatabase::database("closca"));
-    CRecModel *model = new CRecModel(tableView, 3);
+    CSqlMultiTableModel *model = new CSqlMultiTableModel(tableView, 3);
     //model->bindModel(relModel);
     model->setQuery("SELECT name, surname, CONCAT(name, surname), member_id FROM members", QSqlDatabase::database("closca"));
 
@@ -57,6 +57,7 @@ void debug(QWidget &window) {
     window.resize(600, 400); // Set window size
     window.show(); // Show the window
 }
+
 #endif
 
 int main(int argc, char *argv[]) {

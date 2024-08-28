@@ -42,7 +42,7 @@ public:
     size_t getFileCount();
 
     // Creates a .csv File from a QStandardItemModel
-    void modelToFile(const QString& fileName, QStandardItemModel *model);
+    void modelToFile(const QString& fileName, QAbstractItemModel *model);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;

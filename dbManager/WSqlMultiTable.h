@@ -3,29 +3,30 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
-#ifndef WRECEDITTABLE_H
-#define WRECEDITTABLE_H
+#ifndef WSQLMULTITABLE_H
+#define WSQLMULTITABLE_H
 
 #include <QWidget>
 #include <QTableView>
 
-#include "CRecModel.h"
+#include "CSqlMultiTableModel.h"
 
-class WRecEditTable : public QTableView {
+    // Simple subclass with the hardcoded format i feel the QSqlMultiTableModel should have when in singleRecord mode.
+class WSqlMultiTable : public QTableView {
     Q_OBJECT
 
 public:
-    explicit WRecEditTable(QWidget* parent = nullptr);
+    explicit WSqlMultiTable(QWidget* parent = nullptr);
 
     // GETTERS
     const QString value(int index) const { return sqlRecordModel()->value(index).toString(); }
-    CRecModel* sqlRecordModel() const { return dynamic_cast<CRecModel*>(QTableView::model()); }
+    CSqlMultiTableModel* sqlRecordModel() const { return dynamic_cast<CSqlMultiTableModel*>(QTableView::model()); }
     // SETTERS
-    void setSqlRecordModel(CRecModel *model);
+    void setSqlRecordModel(CSqlMultiTableModel *model);
 
 private:
     // hide setModel so only setSqlRecordModel is allowed
     void setModel(QAbstractItemModel *model) override;
 };
 
-#endif // WRECEDITTABLE_H
+#endif // WSQLMULTITABLE_H

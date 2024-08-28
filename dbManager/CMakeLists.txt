@@ -22,9 +22,9 @@ add_library(${PROJECT_NAME} STATIC
     WSearcherHeader.h       WSearcherHeader.cpp
     DMemberEdit.h           DMemberEdit.cpp
     CDbConnection.h         CDbConnection.cpp
-    WRecEditTable.h         WRecEditTable.cpp
-    CRecModel.h             CRecModel.cpp
-    CRecItemDelegate.h      CRecItemDelegate.cpp
+    WSqlMultiTable.h        WSqlMultiTable.cpp
+    CSqlMultiTableDelegate.h   CSqlMultiTableDelegate.cpp
+    CSqlMultiTableModel.h   CSqlMultiTableModel.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Core)

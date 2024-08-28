@@ -36,8 +36,9 @@ CExportCSV::CExportCSV()
 #endif
 {
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setBehaviourFlag(CRecModel::BehaviourFlag::Insert);
+    m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
     m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+    m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
 #endif
 }
 
@@ -264,8 +265,9 @@ void CExportCSV::deserialize(std::ifstream &in) {
     USerialize::writeModel(in, &m_csvTableModel);
 
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setBehaviourFlag(CRecModel::BehaviourFlag::Insert);
+    m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
     m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+    m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
 
     USerialize::writeModel(in, &m_dbTableModel);
 

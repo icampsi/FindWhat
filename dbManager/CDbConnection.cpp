@@ -4,6 +4,7 @@
  * =================================================== */
 
 #include "dbManager/CDbConnection.h"
+#include "CSqlMultiTableModel.h"
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRelationalTableModel>
@@ -52,12 +53,13 @@ bool CDbConnection::connectDatabase(const QString& host, const QString& dbName, 
     return db.open();
 }
 
-QSqlRelationalTableModel *CDbConnection::addModel(const QString& tableName, const QString& alias) {
+CSqlMultiTableModel *CDbConnection::addModel(const QString& tableName, const QString& alias) {
     const QString upAlias = alias.isEmpty() ? tableName : alias; // if alias was not provided, we use tableName as alias
 
-    QSqlRelationalTableModel* model = new QSqlRelationalTableModel(this, QSqlDatabase::database(m_dbName));
-    model->setTable(tableName);
-    //model->select();
+    CSqlMultiTableModel* model = new CSqlMultiTableModel(this);
+    model->setMode(CSqlMultiTableModel::Mode::MultiRecord);
+    QSqlDatabase db = QSqlDatabase::database(m_dbName);
+    model->setQuery(QString("SELECT * FROM %1").arg(tableName), db);
 
     if (model) {
         m_models.emplace(upAlias, model);
@@ -67,7 +69,7 @@ QSqlRelationalTableModel *CDbConnection::addModel(const QString& tableName, cons
     return model;
 }
 
-void CDbConnection::deleteModel(std::unordered_map<QString, QSqlRelationalTableModel*>& models, const QString& key) {
+void CDbConnection::deleteModel(std::unordered_map<QString, CSqlMultiTableModel*>& models, const QString& key) {
     auto it = models.find(key);
     if (it != models.end()) {
         // Delete model
@@ -143,7 +145,7 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
     }
 
     if (m_models.find(tableName) != m_models.end()) {
-        m_models.at(tableName)->select();
+        // m_models.at(tableName)->select(); // NEW BOOKMARK - From when using QSqlRelationalTableModel
     }
 
     return true;

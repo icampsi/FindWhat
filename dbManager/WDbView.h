@@ -9,8 +9,9 @@
 #include "WSearcherHeader.h"
 
 #include <QSortFilterProxyModel>
-#include <QSqlRelationalTableModel>
 #include <QWidget>
+
+class CSqlMultiTableModel;
 
 namespace Ui { class WDbView; }
 
@@ -38,7 +39,7 @@ private:
     WSearcherHeader *m_head;
     QVector<QString> insertionOrder;
 
-    QSqlRelationalTableModel *m_activeModel;
+    CSqlMultiTableModel *m_activeModel;
 };
 
 #endif // WDBVIEW_H

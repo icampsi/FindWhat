@@ -10,8 +10,8 @@
 #include <QString>
 
 #ifdef ENABLE_DBMANAGER
-class CRecModel;
-#include "dbManager/WRecEditTable.h"
+class CSqlMultiTableModel;
+#include "dbManager/WSqlMultiTable.h"
 #endif
 
 class InvalidFileName_dlg;
@@ -42,7 +42,7 @@ protected:
 
     QStandardItemModel m_csvTableModel; // Table model for the csv format table
 #ifdef ENABLE_DBMANAGER
-    CRecModel m_dbTableModel;  // Table model for the db format table
+    CSqlMultiTableModel m_dbTableModel;  // Table model for the db format table
 #endif
 
 public:
@@ -70,7 +70,7 @@ public:
 
     QStandardItemModel *getCsvTableModel() { return &m_csvTableModel; }
 #ifdef ENABLE_DBMANAGER
-    CRecModel *getDbTableModel() { return &m_dbTableModel; }
+    CSqlMultiTableModel *getDbTableModel() { return &m_dbTableModel; }
 #endif
 
     // PUBLIC FUNCTIONS
@@ -85,7 +85,7 @@ public:
     // Convert QStandardItemModel to std::vector<std::vector<QString>>
     void convertModelToVector(QAbstractItemModel* model, std::vector<std::vector<QString>>* format);
 
-    void buildStructure(QStandardItemModel* combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
+    void buildStructure(QStandardItemModel *combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;
