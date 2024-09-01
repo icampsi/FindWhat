@@ -38,18 +38,32 @@ namespace UText {
     }
 
     //Replaces text for a placeholder using regex
-    void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<QString(const QString&)> replacer) {
+    void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<std::optional<QString>(const QString)> replacer) {
         QRegularExpression regex(regexStr);
         QRegularExpressionMatchIterator matches = regex.globalMatch(targetString);
+
+        QVector<QPair<int, int>> positions; // Store positions of matches
+        QVector<QString> replacements;      // Store corresponding replacements
 
         while (matches.hasNext()) {
             QRegularExpressionMatch match = matches.next();
             QString capturedString = match.captured(1);
 
-            QString replacement = replacer(capturedString);
+            // Get the replacement value
+            std::optional<QString> replacementOpt = replacer(capturedString);
 
-            targetString.replace(match.capturedStart(0), match.capturedLength(0), replacement);
-            matches = regex.globalMatch(targetString); // Update matches
+            if (replacementOpt.has_value()) {
+                // Store the start position and length of the match
+                positions.push_back(qMakePair(match.capturedStart(0), match.capturedLength(0)));
+                replacements.push_back(*replacementOpt); // Store the replacement string
+            }
+        }
+
+        // Perform the replacements in reverse order to avoid affecting subsequent matches
+        for (int i = positions.size() - 1; i >= 0; --i) {
+            const QPair<int, int>& pos = positions[i];
+            targetString.replace(pos.first, pos.second, replacements[i]);
         }
     }
+
 }

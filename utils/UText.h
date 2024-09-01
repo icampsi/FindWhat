@@ -5,6 +5,7 @@
 
 #ifndef UTEXT_H
 #define UTEXT_H
+#include <optional>
 
 class QString;
 
@@ -19,7 +20,7 @@ namespace UText {
     QString parseToText(const QString& text);
 
     //Replaces text for a placeholder using regex
-    void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<QString(const QString&)> replacer);
+    void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<std::optional<QString>(const QString)> replacer);
 }
 
 #endif // UTEXT_H

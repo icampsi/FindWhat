@@ -32,7 +32,7 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     {
         QString assocEsquemaName("");
         if(exportCSV) {
-            assocEsquemaName = exportCSV->getAsocEsquemaDoc()->getEsquema()->getName();
+            assocEsquemaName = exportCSV->getAsocEsquema()->getName();
             updateFields();
         }
         // Add Esquema names to the combo box
@@ -51,8 +51,8 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     connect(ui->TreeList_files, &WLoadedFilesTreeView::contentChanged, this, &PFormExpToolBoxPage::handlePathContentChanged);
 
     // If there are loaded Esquema documents, associate the first one with the export CSV
-    if (!esquemadocs->empty() && m_exportCSV->getAsocEsquemaDoc() == nullptr) {
-        m_exportCSV->setAsocEsquemaDoc(esquemadocs->front());
+    if (!esquemadocs->empty() && m_exportCSV->getAsocEsquema() == nullptr) {
+        m_exportCSV->setAsocEsquema(esquemadocs->front()->getEsquema());
     }
     
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
@@ -95,7 +95,7 @@ void PFormExpToolBoxPage::onEsquemaListChanged(const std::vector<QString>& updat
 
 void PFormExpToolBoxPage::updateFields() {
     // Esquema Name
-    ui->comboBox_esquemaName->setCurrentText(m_exportCSV->getAsocEsquemaDoc()->getEsquema()->getName());
+    ui->comboBox_esquemaName->setCurrentText(m_exportCSV->getAsocEsquema()->getName());
     // Rename Checkbox
     ui->checkBox_renameDocs->setChecked(m_exportCSV->getRenameParsedPDFFlag());
     // Act only if textBox
@@ -106,10 +106,10 @@ void PFormExpToolBoxPage::updateFields() {
 
 void PFormExpToolBoxPage::on_comboBox_esquemaName_currentIndexChanged(int index) { // Sets the associated esquema to the one that has the same index in loadedEsquemaDocs
     if (index < 0 || static_cast<size_t>(index) > CMDoc::getMDoc().getLoadedEsquemaDocs()->size()) {
-        m_exportCSV->setAsocEsquemaDoc(nullptr);
+        m_exportCSV->setAsocEsquema(nullptr);
     } else {
-        CEsquemaDoc *esquemaDoc = CMDoc::getMDoc().getLoadedEsquemaDocs()->at(index);
-        m_exportCSV->setAsocEsquemaDoc(esquemaDoc);
+        CEsquema *esquema = CMDoc::getMDoc().getLoadedEsquemaDocs()->at(index)->getEsquema();
+        m_exportCSV->setAsocEsquema(esquema);
     }
 }
 

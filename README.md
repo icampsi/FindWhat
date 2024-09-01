@@ -80,7 +80,7 @@ Note: Because of that, serialization temporaly doesen't work properly.
 - Additional functions to enhance capabilities related to extracting variables from the pdf.
 - Implementation of a verification mechanism to ensure the accuracy of extracted variables, with user notification for possible discrepancies.
 - Improvement of the CSV structure definition method to mitigate user errors.
-- Integration of tooltips, text placeholders, and other user-friendly navigation aids.
+- Improvement of tooltips, text placeholders, and other user-friendly navigation aids.
 - Visual enchancing
 
 # Licencing

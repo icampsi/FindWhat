@@ -86,18 +86,6 @@ void CEsquema::addExtractDataFormula(CFormula* formula) {
     m_extractDataFormula.push_back(formula);
 }
 
-void CEsquema::parseDoc(const CPagedText* doc, std::unordered_map<QString, QString> *result) {
-    // Add static data to the map
-    for(CData* data : m_staticData) {
-        result->emplace(data->getDataName(), data->getDataString());
-    }
-
-    // Extract values for each formula and add it to the map
-    for(CFormula* formula : m_extractDataFormula) {
-        result->emplace(formula->getDataName(), formula->applyFormula(doc).result);
-    }
-}
-
 void CEsquema::serialize(std::ofstream& out) const {
     /* - SERIALIZATION ORDER -
      * QString                          m_nameEsquema

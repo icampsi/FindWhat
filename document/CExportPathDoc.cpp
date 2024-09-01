@@ -41,7 +41,7 @@ void CExportPathDoc::deleteExportCSV(size_t index) {
 size_t CExportPathDoc::getFileCount() {
     size_t fileCount = 0;
     for (CExportCSV* it : m_exportCSVs) {
-        fileCount += it->getFilePaths().size();
+        fileCount += it->getFiles().size();
     }
     return fileCount;
 }

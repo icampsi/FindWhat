@@ -48,8 +48,6 @@ public:
 
     void addExtractDataFormula(CFormula* formula);
 
-    void parseDoc(const CPagedText *doc, std::unordered_map<QString, QString> *result);
-
     void setFormulaName(CFormula* formula, const QString &name);
 
     const QString& getName() const    { return m_nameEsquema; }

@@ -24,8 +24,7 @@
 #endif
 
 CExportCSV::CExportCSV()
-    : m_pdfFilePaths(),
-    m_associatedEsquemaDoc(nullptr),
+    : m_associatedEsquema(nullptr),
     m_exportFileRename(),
     m_renameParsedPDFFlag(false),
     m_fileNamePlaceholder(),
@@ -65,21 +64,11 @@ void CExportCSV::convertModelToVector(QAbstractItemModel* model, std::vector<std
     }
 }
 
-
-
 void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser) {
-    CEsquema* esquema = m_associatedEsquemaDoc->getEsquema();
-
     int iteration = 0;
-    for (const QString& filePath : m_pdfFilePaths) {
-        // EXTRACT TEXT FROM PDF
-        CPagedText pagedText;
-        Poppler_interface::loadPdfDocument(filePath, &pagedText);
-        if(pagedText.isEmpty()) continue;
-
-        // EXTRACT DATA FROM TEXT
-        std::unordered_map<QString, QString> extractedData;
-        esquema->parseDoc(&pagedText, &extractedData);
+    for (CParsedFile& file : m_files) {
+        // Parse values
+        file.parseFileValues();
 
         // SETUP FORMAT
         // Define the format for the table
@@ -127,13 +116,8 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
         }
 
         // REPLACE FROMAT PLACEHOLDERS FOR EXTRACTED DATA AND APPEND TO COMBINEDMODEL
-        auto replacer = [&extractedData](const QString& capturedString) -> QString {
-            auto it = extractedData.find(capturedString);
-            if (it != extractedData.end()) {
-                return it->second;
-            } else {
-                return "ERROR_REPLACING_PLACEHOLDER";
-            }
+        auto replacer = [&](const QString& capturedString) -> const std::optional<QString> {
+            return file.getValue(capturedString);
         };
 
         // Add rows from the format to the combined model
@@ -141,13 +125,15 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
             QList<QStandardItem*> newRowItems;
             for (QString cell : row) {
                 UText::replacePlaceholders(cell, "<(.*?)>", replacer);
-                newRowItems.append(new QStandardItem(cell));
+                newRowItems.append(new QStandardItem(std::move(cell)));
             }
             combinedModel->appendRow(newRowItems);
         }
 
         // Rename document
-        if (m_renameParsedPDFFlag) renameFile(filePath);
+        QString newFileName;
+        m_associatedEsquema->createFileName(newFileName, m_fileNamePlaceholder);
+        if (m_renameParsedPDFFlag) qDebug() << file.rename(newFileName);
 
         // Update progress bar
         if (iteration % 2 == 0) progressDialog->updateProgress();
@@ -155,6 +141,15 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
         ++iteration;
     }
     progressDialog->updateProgress(); // Final update to ensure progressbar doesn't get stuck at 99%
+}
+
+void CExportCSV::setFiles(const std::vector<QString>& paths) {
+    for (const QString& filePath : paths) {
+        qDebug() << filePath;
+        CParsedFile file(filePath, &m_associatedEsquema);
+        file.parseFileValues();
+        m_files.push_back(std::move(file));
+    }
 }
 
 void CExportCSV::renameFile(const QString &oldFilePath) {
@@ -165,7 +160,7 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
     }
 
     QString newFileName;
-    if (!m_associatedEsquemaDoc->getEsquema()->createFileName(newFileName, m_fileNamePlaceholder)) {
+    if (!m_associatedEsquema->createFileName(newFileName, m_fileNamePlaceholder)) {
         m_invalidFileNameDlg = new InvalidFileName_dlg(nullptr, &newFileName, oldFilePath);
         if (m_invalidFileNameDlg->exec() == QDialog::Rejected) {
             return;
@@ -203,7 +198,7 @@ void CExportCSV::serialize(std::ofstream &out) const {
 
     // Search associated esquema Index
     const std::vector<CEsquemaDoc*>* esquemaDocs = CMDoc::getMDoc().getLoadedEsquemaDocs();
-    QString assocEsquemaName = m_associatedEsquemaDoc->getEsquema()->getName();
+    QString assocEsquemaName = m_associatedEsquema->getName();
 
     // Search for the object with m_name matching the searchString
     auto it = std::find_if(esquemaDocs->begin(), esquemaDocs->end(), [&assocEsquemaName](const CEsquemaDoc* obj) {
@@ -254,7 +249,7 @@ void CExportCSV::deserialize(std::ifstream &in) {
 
     size_t index;
     in.read(reinterpret_cast<char*>(&index), sizeof(size_t));
-    m_associatedEsquemaDoc = CMDoc::getMDoc().getEsquemaFromIndex(index);
+    m_associatedEsquema = CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema();
 
     USerialize::readQString(in, m_exportFileRename);                 // m_exportFileRename
     in.read(reinterpret_cast<char*>(&m_renameParsedPDFFlag), sizeof(bool));  // m_renameParsedPDFFlag

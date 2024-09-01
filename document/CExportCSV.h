@@ -8,7 +8,8 @@
 
 #include <QStandardItemModel>
 #include <QString>
-
+#include "CParsedFile.h"
+#include "CEsquemaDoc.h"
 #ifdef ENABLE_DBMANAGER
 class CSqlMultiTableModel;
 #include "dbManager/WSqlMultiTable.h"
@@ -29,14 +30,14 @@ public:
     ~CExportCSV() = default;
 
 protected:
-    // MEMBERS    
-    std::vector<QString> m_pdfFilePaths; // File Paths associated with the document
-
-    CEsquemaDoc *m_associatedEsquemaDoc; // Esquema to use
+    // MEMBERS
+    CEsquema    *m_associatedEsquema; // Esquema to use
     QString      m_exportFileRename;     // A string with placeholders for renaming files
     bool         m_renameParsedPDFFlag;  // A flag to state whether a pdf document should be renamed
     QString      m_fileNamePlaceholder;  // { "<data1>_<data2> some_fixed_text <data3> etc." } Use <dataName> for insert value dataName. etc.
     QString      m_idText;               // Text that id's a document so we only act on it if the string is found.
+    // std::unordered_map<QString, QString> m_extractedValues;
+    QVector<CParsedFile> m_files;       // Files associated with the document
 
     InvalidFileName_dlg *m_invalidFileNameDlg;   // Dialog that pops up if the resulting new file name contains invalid characters
 
@@ -47,14 +48,11 @@ protected:
 
 public:
     // GETTERS AND SETTERS
-    CEsquemaDoc* getAsocEsquemaDoc() const    { return m_associatedEsquemaDoc; }
-    void setAsocEsquemaDoc(CEsquemaDoc* pDoc) { m_associatedEsquemaDoc = pDoc; }
+    CEsquema* getAsocEsquema() const    { return m_associatedEsquema; }
+    void setAsocEsquema(CEsquema* pEsq) { m_associatedEsquema = pEsq; }
 
-    const std::vector<QString>& getPathFiles() const { return m_pdfFilePaths; }
-    void setPathFiles(const std::vector<QString>& paths) {
-        m_pdfFilePaths.clear();
-        m_pdfFilePaths = paths;
-    }
+    const QVector<CParsedFile>& getFiles() const { return m_files; }
+    void setFiles(const std::vector<QString>& paths);
 
     const QString& getExportFileRename() const        { return m_exportFileRename; }
     void setExportFileRename(const QString& fileName) { m_exportFileRename = fileName; }
@@ -75,8 +73,7 @@ public:
 
     // PUBLIC FUNCTIONS
     // Functions to add and delete PDF file paths
-    void addPdfFile(const QString& path)             { m_pdfFilePaths.push_back(std::move(path)); }
-    const std::vector<QString>& getFilePaths() const { return m_pdfFilePaths; }
+    void addFileFromPath(const QString& path) { m_files.push_back(CParsedFile(path, &m_associatedEsquema)); }
     void deletePdfFile(int index); // BOOKMARK - Need implementation
 
     // Function to rename in pdf file
@@ -85,6 +82,7 @@ public:
     // Convert QStandardItemModel to std::vector<std::vector<QString>>
     void convertModelToVector(QAbstractItemModel* model, std::vector<std::vector<QString>>* format);
 
+    // // Extract values from the pdf's. Returns false if text couldn't be extracted.
     void buildStructure(QStandardItemModel *combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
 
     // SERIALIZATION
