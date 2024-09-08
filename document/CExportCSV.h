@@ -9,19 +9,16 @@
 #include <QStandardItemModel>
 #include <QString>
 #include "CParsedFile.h"
-#include "CEsquemaDoc.h"
 #ifdef ENABLE_DBMANAGER
-class CSqlMultiTableModel;
 #include "dbManager/WSqlMultiTable.h"
 #endif
 
 class InvalidFileName_dlg;
-class ProgBarExport_dlg;
-class CEsquemaDoc;
+class ProgBar_dlg;
 class CPdfDoc;
 class CPagedText;
-class CExportCSV {
 
+class CExportCSV {
 public:
     // CONSTRUCTORS AND DESTRUCTORS
     explicit CExportCSV();
@@ -52,7 +49,14 @@ public:
     void setAsocEsquema(CEsquema* pEsq) { m_associatedEsquema = pEsq; }
 
     const QVector<CParsedFile>& getFiles() const { return m_files; }
-    void setFiles(const std::vector<QString>& paths);
+    const QVector<CParsedFile>* setFiles(const std::vector<QString>& paths); // NEW BOOKMARK - CHANGED RETURN TYPE. WILL STICK?
+    void deleteFile(int index) {
+        m_files.removeAt(index);
+        for(auto& file : m_files) {
+            qDebug() << m_files.size();
+            qDebug() << file.fileName();
+        }
+    }
 
     const QString& getExportFileRename() const        { return m_exportFileRename; }
     void setExportFileRename(const QString& fileName) { m_exportFileRename = fileName; }
@@ -82,8 +86,10 @@ public:
     // Convert QStandardItemModel to std::vector<std::vector<QString>>
     void convertModelToVector(QAbstractItemModel* model, std::vector<std::vector<QString>>* format);
 
-    // // Extract values from the pdf's. Returns false if text couldn't be extracted.
-    void buildStructure(QStandardItemModel *combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
+    // Parse values for all files stored in m_files
+    bool parseFileValues(int index);
+    // Extract values from the pdf's. Returns false if text couldn't be extracted.
+    void buildStructure(QStandardItemModel *combinedModel, ProgBar_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;

@@ -14,7 +14,7 @@
 #include "PDockPreview.h"
 
 class CMDoc;
-class newEsquema_dlg;
+class NewEsquema_dlg;
 class exportEsquema_dlg;
 
 QT_BEGIN_NAMESPACE
@@ -32,7 +32,7 @@ public:
 protected:
     // Members
     PDockPreview      *m_dockPreview    = nullptr;
-    newEsquema_dlg    *newEsquemadlg    = nullptr;
+    NewEsquema_dlg    *newEsquemadlg    = nullptr;
     exportEsquema_dlg *exportEsquemaDlg = nullptr;
     CMDoc&             m_cmdoc;
     std::vector<size_t> m_observerHandle;

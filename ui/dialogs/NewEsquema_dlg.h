@@ -8,22 +8,22 @@
 
 #include <QDialog>
 
-namespace Ui { class newEsquema_dlg; }
+namespace Ui { class NewEsquema_dlg; }
 
 // Dialog for creating new esquemes and load them
-class newEsquema_dlg : public QDialog {
+class NewEsquema_dlg : public QDialog {
     Q_OBJECT
 
 public:
-    explicit newEsquema_dlg(QWidget *parent, const std::vector<QString>& loadedEsquemaNames);
-    ~newEsquema_dlg();
+    explicit NewEsquema_dlg(QWidget *parent, const std::vector<QString>& loadedEsquemaNames);
+    ~NewEsquema_dlg();
 
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
 private:
-    Ui::newEsquema_dlg *ui;
+    Ui::NewEsquema_dlg *ui;
     std::vector<QString> m_loadedEsquemaNames;
 };
 

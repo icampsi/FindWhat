@@ -25,9 +25,6 @@ public:
     void updateFields();
     void changePageOpt(int index) { ui->stackedWidget_parseOpt->setCurrentIndex(index); }
 
-public slots:
-    void handlePathContentChanged(const std::vector<QString>& paths) { m_exportCSV->setFiles(paths); }
-
 private slots:
     void on_comboBox_esquemaName_currentIndexChanged(int index);
     void on_checkBox_renameDocs_stateChanged(int arg1);

@@ -25,9 +25,17 @@ add_library(${PROJECT_NAME} STATIC
     WSqlMultiTable.h        WSqlMultiTable.cpp
     CSqlMultiTableDelegate.h   CSqlMultiTableDelegate.cpp
     CSqlMultiTableModel.h   CSqlMultiTableModel.cpp
+
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Core)
+
+# Add utils as a subdirectory and link against it
+if(NOT TARGET utils)
+    add_subdirectory(../utils ../utils)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PUBLIC utils)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

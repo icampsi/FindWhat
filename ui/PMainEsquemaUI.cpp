@@ -7,7 +7,7 @@
 
 #include "MainWindow.h"
 #include "ui/dialogs/DDisplayParsedInfo.h"
-#include "ui/dialogs/ProgBarExport_dlg.h"
+#include "ui/dialogs/ProgBar_dlg.h"
 #include "PFormExpToolBoxPage.h"
 #include "ui_PMainEsquemaUI.h"
 
@@ -231,7 +231,7 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
     QStandardItemModel* combinedModel = new QStandardItemModel();
     // Creates progressBar dialog
     if(fileCount > 0) {
-        ProgBarExport_dlg *progressDlg = new ProgBarExport_dlg(fileCount, this);
+        ProgBar_dlg *progressDlg = new ProgBar_dlg(fileCount, "Exporting...", this);
         progressDlg->show();
         QCoreApplication::processEvents(); // Needed to display progress bar
 

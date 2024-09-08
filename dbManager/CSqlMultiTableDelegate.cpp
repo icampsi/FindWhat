@@ -24,7 +24,6 @@ QWidget* CSqlMultiTableDelegate::createEditor(QWidget *parent, const QStyleOptio
     if (comboBoxData.isValid()) {
         QComboBox *comboBox = new QComboBox(parent);
         comboBox->addItems(comboBoxData.toStringList());
-        qDebug() << "USED";
         return comboBox;
     }
 

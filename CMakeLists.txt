@@ -75,7 +75,7 @@ set(MAIN_FILES
 
     ui/dialogs/NewEsquema_dlg.cpp       ui/dialogs/NewEsquema_dlg.h      ui/dialogs/NewEsquema_dlg.ui
     ui/dialogs/exportEsquema_dlg.cpp    ui/dialogs/exportEsquema_dlg.h   ui/dialogs/exportEsquema_dlg.ui
-    ui/dialogs/ProgBarExport_dlg.cpp    ui/dialogs/ProgBarExport_dlg.h   ui/dialogs/ProgBarExport_dlg.ui
+    ui/dialogs/ProgBar_dlg.cpp          ui/dialogs/ProgBar_dlg.h         ui/dialogs/ProgBar_dlg.ui
     ui/dialogs/InvalidFileName_dlg.cpp  ui/dialogs/InvalidFileName_dlg.h ui/dialogs/InvalidFileName_dlg.ui
     ui/dialogs/DDisplayParsedInfo.cpp   ui/dialogs/DDisplayParsedInfo.h  ui/dialogs/DDisplayParsedInfo.ui
 
@@ -90,6 +90,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ui/WEsqView.h ui/WEsqView.cpp
         ui/ExtTabWidget.h ui/ExtTabWidget.cpp
         CParsedFile.h CParsedFile.cpp
+        ui/CHorizontalProxyModel.h ui/CHorizontalProxyModel.cpp
+        CParsedFileModel.h CParsedFileModel.cpp
     )
 else()
     if(ANDROID)

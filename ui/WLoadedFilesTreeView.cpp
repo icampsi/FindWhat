@@ -4,38 +4,37 @@
  * =================================================== */
 
 #include "WLoadedFilesTreeView.h"
+#include "CParsedFileModel.h"
 
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QFileInfo>
+#include "dialogs/ProgBar_dlg.h"
+#include "qcoreapplication.h"
 
-WLoadedFilesTreeView::WLoadedFilesTreeView(QWidget* parent) : QTreeView(parent), m_model() {
-    setModel(&m_model);
+WLoadedFilesTreeView::WLoadedFilesTreeView(QWidget* parent) : QListView(parent) {
     setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 }
 
 void WLoadedFilesTreeView::keyPressEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Delete) {
-        QModelIndexList selIndexes = selectedIndexes();
 
         // Display confirmation dialog
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Delete Item", "Are you sure you want to delete the selected items?",
                                       QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            QStandardItemModel *model = qobject_cast<QStandardItemModel*>(this->model());
+            CParsedFileModel *model = dynamic_cast<CParsedFileModel*>(this->model());
             if (model) {
                 // Remove selected rows from the model
-                for(int i = selIndexes.size() - 1; i >= 0 ; --i) {
-                    model->removeRow(selIndexes.at(i).row());
-                }
-                emitContentOfTreeView();
+                QModelIndexList selIndexes = selectedIndexes();
+                model->removeData(selIndexes);
             }
         }
     }
     else {
-        QTreeView::keyPressEvent(event);
+        QListView::keyPressEvent(event);
     }
 }
 
@@ -62,35 +61,30 @@ void WLoadedFilesTreeView::dragMoveEvent(QDragMoveEvent *event) {
 void WLoadedFilesTreeView::dropEvent(QDropEvent *event) {
     if (event->mimeData()->hasUrls()) {
         QList<QUrl> urls = event->mimeData()->urls();
+        // Show progress bar dlg
+        ProgBar_dlg *pb_dlg = new ProgBar_dlg(urls.size(), "Parsing files...", nullptr);
+        pb_dlg->show();
+        QCoreApplication::processEvents(); // Needed to display progress bar
+
+        // Append filePaths to model
         for (const QUrl &url : urls) {
             QString path = url.toLocalFile();
             QString fileName = QFileInfo(path).fileName();
             qDebug() << "Dropped file:" << fileName << "Path:" << path;
-            // Create a new item with the file name as text and file path as data
-            QStandardItem *newItem = new QStandardItem(fileName);
-            newItem->setData(path, Qt::UserRole); // Set the file path as data
-            m_model.appendRow(newItem);
+            // Drop data tot he model
+            static_cast<CParsedFileModel*>(model())->appendData(path);
+            pb_dlg->updateProgress();
+            QCoreApplication::processEvents(); // Needed to display progress bar
         }
+        delete pb_dlg;
         event->acceptProposedAction(); // Accept the proposed action (copy)
-
-        // Emit the content of all items in the QTreeView
-        emitContentOfTreeView();
     } else {
         // Call base class dropEvent for other types of drops
-        QTreeView::dropEvent(event);
+        QListView::dropEvent(event);
     }
 }
 
-void WLoadedFilesTreeView::emitContentOfTreeView() {
-    std::vector<QString> paths;
-    // Get the number of rows
-    int rowCount = m_model.rowCount();
-
-    // Iterate through each row
-    for (int row = 0; row < rowCount; ++row) {
-        QModelIndex index = m_model.index(row, 0);
-        QVariant itemData = m_model.data(index, Qt::UserRole);
-        paths.push_back(itemData.toString());
-    }
-    emit contentChanged(paths);
+void WLoadedFilesTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) {
+    QListView::currentChanged(current, previous);
+    emit indexChanged(current, previous);
 }

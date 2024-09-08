@@ -9,7 +9,9 @@
 
 #include "document/CMDoc.h"
 #include "document/CEsquemaDoc.h"
+#include "CParsedFileModel.h"
 
+#include <QListWidget>
 #ifdef ENABLE_DBMANAGER
 #include "WSqlMultiTable.h"
 #include "CSqlMultiTableDelegate.h"
@@ -48,7 +50,8 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
      * so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index */
     m_observerHandle.push_back(cmdoc.addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1)));
 
-    connect(ui->TreeList_files, &WLoadedFilesTreeView::contentChanged, this, &PFormExpToolBoxPage::handlePathContentChanged);
+    CParsedFileModel *fileModel = new CParsedFileModel(*m_exportCSV, ui->TreeList_files);
+    ui->TreeList_files->setModel(fileModel);
 
     // If there are loaded Esquema documents, associate the first one with the export CSV
     if (!esquemadocs->empty() && m_exportCSV->getAsocEsquema() == nullptr) {
@@ -57,6 +60,49 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
     // m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills")); new BOOKMARK
+
+
+    ui->tableWidget_fileValues->insertColumn(0);
+    ui->tableWidget_fileValues->insertColumn(1);
+
+    // Set the header items
+    QTableWidgetItem *HField = new QTableWidgetItem("Fields");
+    ui->tableWidget_fileValues->setHorizontalHeaderItem(0, HField);
+
+    QTableWidgetItem *HValues = new QTableWidgetItem("Values");
+    ui->tableWidget_fileValues->setHorizontalHeaderItem(1, HValues);
+
+    // Connect TreeList_files with tableWidget_fileValues so the last reflects contents of file selection form the first.
+    connect(ui->TreeList_files, &WLoadedFilesTreeView::indexChanged, this, [=](const QModelIndex& current, const QModelIndex& previous) {
+        Q_UNUSED(previous);
+
+        // Clear table
+        ui->tableWidget_fileValues->clearContents();
+        ui->tableWidget_fileValues->setRowCount(0);
+
+        // Get data from the model
+        QVector<QString> keys = fileModel->data(current, Qt::UserRole).toStringList().toVector();
+        QVector<QString> values = fileModel->data(current, Qt::UserRole + 1).toStringList().toVector();
+
+        // Check that sizes match
+        int keySize = keys.size();
+        int valueSize = values.size();
+        int rowCount = qMin(keySize, valueSize); // Ensure we don't go out of bounds if sizes differ
+
+        // Insert rows and populate the table
+        for (int i = 0; i < rowCount; ++i) {
+            // Insert a new row
+            ui->tableWidget_fileValues->insertRow(i);
+
+            // Create new QTableWidgetItem for keys and values
+            QTableWidgetItem *kItem = new QTableWidgetItem(keys.at(i));
+            ui->tableWidget_fileValues->setItem(i, 0, kItem); // Add key to column 0
+
+            QTableWidgetItem *vItem = new QTableWidgetItem(values.at(i));
+            ui->tableWidget_fileValues->setItem(i, 1, vItem); // Add value to column 1
+        }
+    });
+
 
 #ifdef ENABLE_DBMANAGER
     // Create CRecTable for sql insertions. Used if parseDB is selected

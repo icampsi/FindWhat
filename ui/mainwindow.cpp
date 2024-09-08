@@ -77,7 +77,7 @@ void MainWindow::action_newEsquema() {
     for(auto it : *m_cmdoc.getLoadedEsquemaDocs()) {
         esquemaNames.push_back(it->getEsquema()->getName());
     }
-    newEsquemadlg = new newEsquema_dlg(this, esquemaNames);
+    newEsquemadlg = new NewEsquema_dlg(this, esquemaNames);
     newEsquemadlg->exec();
 
     checkExortEsquemaActionEnable();

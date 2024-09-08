@@ -1,10 +1,14 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef CPARSEDFILE_H
 #define CPARSEDFILE_H
 
 #include "CPagedText.h"
 
 #include <QFileInfo>
-#include <unordered_map>
 #include <QString>
 #include <optional>
 
@@ -26,10 +30,11 @@ public:
 
     // Using std::optional to handle non-existent fields
     const std::optional<QString> getValue(const QString& fieldName) const;
+    const QHash<QString, QString>& getFields() const { return m_fieldValueMap; }
 
 private:
     QString     m_filePath; // Relation to the pdf document that we are parsing and storing.
-    std::unordered_map<QString, QString> m_fieldValueMap; // Maps field to value
+    QHash<QString, QString> m_fieldValueMap; // Maps field to value
     CEsquema **m_assignedEsquema;
 };
 

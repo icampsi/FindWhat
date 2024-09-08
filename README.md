@@ -37,6 +37,8 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 # Latest updates
 NEW
+- started working towards a more flexible and user friendly way to modify values after parsing
+- Started working on a database module to store extracted values
 - Improved observer design
 - Added "add and delete" rows and columns functionality to the WSpreadSheet class
 - Added a look backward option to find function

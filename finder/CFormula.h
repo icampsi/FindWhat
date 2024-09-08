@@ -9,6 +9,7 @@
 #include "CData.h"
 #include "CFunctionClasses.h"
 #include "CPagedText.h"
+#include <iostream>
 
 // EXTRACTS A DATA FROM GIVEN PARAMETERS (each formula extracts only one value)
 class CFormula {

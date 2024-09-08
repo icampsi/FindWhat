@@ -14,7 +14,7 @@
 #include "utils/UText.h"
 #include "utils/USerialize.h"
 
-#include "ui/dialogs/ProgBarExport_dlg.h"
+#include "ui/dialogs/ProgBar_dlg.h"
 #include "ui/dialogs/InvalidFileName_dlg.h"
 
 #include "../poppler_interface/PdfToText.h"
@@ -36,7 +36,23 @@ CExportCSV::CExportCSV()
 {
 #ifdef ENABLE_DBMANAGER
     m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
-    m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+    m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
+                            "       ru_bills.exp_date, "
+                            "       ru_bills.billing_periode_start, "
+                            "       ru_bills.billing_periode_end, "
+                            "       ru_bills.company_cif, "
+                            "       flats.floor_num, "
+                            "       flats.door_num, "
+                            "       utility.utility_name "
+                            "FROM ru_bills "
+                            "INNER JOIN utility_company "
+                            "ON ru_bills.company_cif = utility_company.company_cif "
+                            "INNER JOIN flats "
+                            "ON ru_bills.flat_ID = flats.flat_id "
+                            "INNER JOIN utility "
+                            "ON ru_bills.utility_id = utility.utility_id",
+                            QSqlDatabase::database("closca"));
+
     m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
 #endif
 }
@@ -64,7 +80,11 @@ void CExportCSV::convertModelToVector(QAbstractItemModel* model, std::vector<std
     }
 }
 
-void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport_dlg* progressDialog, size_t maxColumns, bool dbParser) {
+bool CExportCSV::parseFileValues(int index) {
+    return m_files[index].parseFileValues();
+}
+
+void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBar_dlg* progressDialog, size_t maxColumns, bool dbParser) {
     int iteration = 0;
     for (CParsedFile& file : m_files) {
         // Parse values
@@ -143,13 +163,14 @@ void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBarExport
     progressDialog->updateProgress(); // Final update to ensure progressbar doesn't get stuck at 99%
 }
 
-void CExportCSV::setFiles(const std::vector<QString>& paths) {
+const QVector<CParsedFile>* CExportCSV::setFiles(const std::vector<QString>& paths) {
     for (const QString& filePath : paths) {
         qDebug() << filePath;
         CParsedFile file(filePath, &m_associatedEsquema);
         file.parseFileValues();
         m_files.push_back(std::move(file));
     }
+    return &m_files;
 }
 
 void CExportCSV::renameFile(const QString &oldFilePath) {
@@ -261,24 +282,26 @@ void CExportCSV::deserialize(std::ifstream &in) {
 
 #ifdef ENABLE_DBMANAGER
     m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
-    m_dbTableModel.setQuery("SELECT * FROM members LIMIT 0", QSqlDatabase::database("closca"));
+    m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
+                            "       ru_bills.exp_date, "
+                            "       ru_bills.billing_periode_start, "
+                            "       ru_bills.billing_periode_end, "
+                            "       ru_bills.company_cif, "
+                            "       flats.floor_num, "
+                            "       flats.door_num, "
+                            "       utility.utility_name "
+                            "FROM ru_bills "
+                            "INNER JOIN utility_company "
+                            "ON ru_bills.company_cif = utility_company.company_cif "
+                            "INNER JOIN flats "
+                            "ON ru_bills.flat_ID = flats.flat_id "
+                            "INNER JOIN utility "
+                            "ON ru_bills.utility_id = utility.utility_id",
+                            QSqlDatabase::database("closca"));
     m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
 
     USerialize::writeModel(in, &m_dbTableModel);
 
-    // int rowCount;
-    // int columnCount;
-
-    // in.read(reinterpret_cast<char*>(&rowCount), sizeof(int));
-    // in.read(reinterpret_cast<char*>(&columnCount), sizeof(int));
-
-    // for (int row = 0; row < rowCount; ++row) {
-    //     for (int column = 0; column < columnCount; ++column) {
-    //         QString text;
-    //         USerialize::readQString(in, text);
-    //         m_dbTableModel.setData(m_dbTableModel.index(row, column), QVariant(text));
-    //     }
-    // }
 #endif
 
 }

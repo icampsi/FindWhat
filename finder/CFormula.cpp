@@ -217,8 +217,12 @@ int CFormula::findText(const CPagedText *pagedText, CIndexingFunction* pFunction
         if (textToFind.isEmpty()) continue;
 
         qsizetype textIndex{0};
-        if(!pFunctionToApply->getGoBackwards()) textIndex = text.indexOf(textToFind, indexPos_initial);     // Look forward
-        else                                    textIndex = text.lastIndexOf(textToFind, indexPos_initial); // Look backwards
+        if(!pFunctionToApply->getGoBackwards()) {
+            textIndex = text.indexOf(textToFind, indexPos_initial);     // Look forward
+        } else {
+            size_t i = text.lastIndexOf(textToFind, indexPos_initial);
+            textIndex = i == 0 ? i : i - 1; // Look backwards. We start 1 position before, except if we are at 0.
+        }
         if (textIndex != -1) { // if found
             relativeIndexInitial = textIndex;
 

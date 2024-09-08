@@ -63,7 +63,7 @@ bool CParsedFile::parseFileValues() {
 const std::optional<QString> CParsedFile::getValue(const QString& fieldName) const {
     auto it = m_fieldValueMap.find(fieldName);
     if (it != m_fieldValueMap.end()) {
-        return it->second;
+        return it.value();
     } else {
         qWarning() << "Esquema " << (*m_assignedEsquema)->getName() << " doesn't contain the field " << fieldName;
         return std::nullopt;  // No value found

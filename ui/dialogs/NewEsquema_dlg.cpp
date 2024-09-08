@@ -11,15 +11,15 @@
 #include "ui/MainWindow.h"
 #include "document/CMDoc.h"
 
-newEsquema_dlg::newEsquema_dlg(QWidget *parent, const std::vector<QString>& loadedEsquemaNames)
-    : QDialog(parent), ui(new Ui::newEsquema_dlg), m_loadedEsquemaNames{loadedEsquemaNames}
+NewEsquema_dlg::NewEsquema_dlg(QWidget *parent, const std::vector<QString>& loadedEsquemaNames)
+    : QDialog(parent), ui(new Ui::NewEsquema_dlg), m_loadedEsquemaNames{loadedEsquemaNames}
 {
     ui->setupUi(this);
 }
 
-newEsquema_dlg::~newEsquema_dlg() { delete ui; }
+NewEsquema_dlg::~NewEsquema_dlg() { delete ui; }
 
-void newEsquema_dlg::on_buttonBox_accepted() {
+void NewEsquema_dlg::on_buttonBox_accepted() {
     // Check if a name is been added
     if(ui->lineEdit_nameEsquema->text().isEmpty()) {
         QMessageBox::information(this, "Empty Name", "You need to specify a name for the esquema");
@@ -52,7 +52,7 @@ void newEsquema_dlg::on_buttonBox_accepted() {
     delete this;
 }
 
-void newEsquema_dlg::on_buttonBox_rejected() {
+void NewEsquema_dlg::on_buttonBox_rejected() {
     delete this;
 }
 
