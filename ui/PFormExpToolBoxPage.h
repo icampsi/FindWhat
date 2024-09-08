@@ -11,6 +11,7 @@
 #include <QWidget>
 
 namespace Ui { class PExpFormToolBoxPage; }
+class CHorizontalProxyModel;
 
 class PFormExpToolBoxPage : public QWidget { // Pages for Format Export ToolBox
     Q_OBJECT
@@ -36,6 +37,9 @@ private:
     Ui::PExpFormToolBoxPage *ui;
     CExportCSV *m_exportCSV;
     std::vector<size_t> m_observerHandle;
+#ifdef ENABLE_DBMANAGER
+    CHorizontalProxyModel *m_dbProxyModel; // Proxy model with "this" as parent for the dbFormatTable;
+#endif
 };
 
 #endif // PFORMEXPTOOLBOXPAGE_H

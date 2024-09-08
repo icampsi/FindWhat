@@ -15,6 +15,7 @@
 #ifdef ENABLE_DBMANAGER
 #include "WSqlMultiTable.h"
 #include "CSqlMultiTableDelegate.h"
+#include "CHorizontalProxyModel.h"
 #endif
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
@@ -107,13 +108,14 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
 #ifdef ENABLE_DBMANAGER
     // Create CRecTable for sql insertions. Used if parseDB is selected
     WSqlMultiTable *dbTable = new WSqlMultiTable(ui->stackedWidget_parseOpt);
-
+    m_dbProxyModel = new CHorizontalProxyModel(this);
+    m_dbProxyModel->setSourceModel(m_exportCSV->getDbTableModel());
     // Disable custom widgets in order to only get line edits on every cell.
     CSqlMultiTableDelegate* dbTableDelegate = qobject_cast<CSqlMultiTableDelegate*>(dbTable->itemDelegate());
     dbTableDelegate->disableCustomWidgets(true);
 
     // Set the recModel generated and sotred by the exportCSV as the table model.
-    dbTable->setSqlRecordModel(m_exportCSV->getDbTableModel());
+    dbTable->setModel(m_dbProxyModel);
 
     // Insert table into page 1 of stack widget.
     ui->stackedWidget_parseOpt->insertWidget(1, dbTable);

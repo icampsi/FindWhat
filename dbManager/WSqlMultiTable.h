@@ -22,10 +22,6 @@ public:
     const QString value(int index) const { return sqlRecordModel()->value(index).toString(); }
     CSqlMultiTableModel* sqlRecordModel() const { return dynamic_cast<CSqlMultiTableModel*>(QTableView::model()); }
     // SETTERS
-    void setSqlRecordModel(CSqlMultiTableModel *model);
-
-private:
-    // hide setModel so only setSqlRecordModel is allowed
     void setModel(QAbstractItemModel *model) override;
 };
 

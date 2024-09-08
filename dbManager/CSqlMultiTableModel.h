@@ -76,7 +76,7 @@ public:
     QVariant value    (int index, int role = Qt::DisplayRole) const; // Returns value from index
     QVariant fieldName(int index, int role = Qt::DisplayRole) const; // Returns field name from index
 
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    // QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     // Change the referenced record for edition based on row index of the query results
     void changeRecord(int index);

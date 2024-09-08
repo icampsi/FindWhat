@@ -21,7 +21,7 @@ CSqlMultiTableModel::CSqlMultiTableModel(QObject *parent, int index, QString que
 int CSqlMultiTableModel::rowCount(const QModelIndex &parent) const {
     switch (m_mode) {
     case Mode::SingleRecord:
-        return record().count(); // One row for each field
+        return 2; // "Field" and "Value"
         break;
     case Mode::MultiRecord:
         return QSqlQueryModel::rowCount(parent);
@@ -35,7 +35,7 @@ int CSqlMultiTableModel::rowCount(const QModelIndex &parent) const {
 int CSqlMultiTableModel::columnCount(const QModelIndex &parent) const {
     switch (m_mode) {
     case Mode::SingleRecord:
-        return 2; // "Field" and "Value"
+        return record().count(); // One row for each field
         break;
     case Mode::MultiRecord:
         return QSqlQueryModel::columnCount(parent);
@@ -82,13 +82,13 @@ QVariant CSqlMultiTableModel::data(const QModelIndex &index, int role) const {
             const int recCount = m_selectedRecord->count();
 
             if (row >= 0 && row < recCount) {
-                QString fieldName = m_selectedRecord->fieldName(row); // Now row corresponds to field
-                QString tableName = m_selectedRecord->field(row).tableName();
+                QString fieldName = m_selectedRecord->fieldName(col); // Now row corresponds to field
+                QString tableName = m_selectedRecord->field(col).tableName();
 
                 if (role == Qt::DisplayRole || role == Qt::EditRole) {
                     // Display the field name in the first column, or the value in other columns
-                    return (col == 0) ? processFieldName(fieldName) : m_selectedRecord->value(row);
-                } else if (role == Qt::UserRole + 1 && col == 1) {
+                    return (row == 0) ? processFieldName(fieldName) : m_selectedRecord->value(col);
+                } else if (role == Qt::UserRole + 1 && row == 1) {
                     // Custom role: Check if there's foreign key information for the field
                     const QVector<Field>& fields = m_tables.value(tableName);
                     for (const Field& field : fields) {
@@ -121,20 +121,19 @@ QVariant CSqlMultiTableModel::data(const QModelIndex &index, int role) const {
     }
 }
 
+// QVariant CSqlMultiTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
+//     if (role != Qt::DisplayRole) {
+//         return QVariant();
+//     }
 
-QVariant CSqlMultiTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (role != Qt::DisplayRole) {
-        return QVariant();
-    }
-
-    if (orientation == Qt::Horizontal) {
-        if (section == 0)
-            return "Field";
-        else if (section == 1)
-            return "Value";
-    }
-    return QVariant();
-}
+//     if (orientation == Qt::Horizontal) {
+//         if (section == 0)
+//             return "Field";
+//         else if (section == 1)
+//             return "Value";
+//     }
+//     return QVariant();
+// }
 
 bool CSqlMultiTableModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (!index.isValid() || role != Qt::EditRole || index.column() != 1) {
@@ -254,7 +253,7 @@ CSqlMultiTableModel::Field CSqlMultiTableModel::retrieveForeignKeyInfo(const QSt
                             "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '%1' "
                             "AND COLUMN_NAME = '%2' "
                             "AND REFERENCED_TABLE_NAME IS NOT NULL"
-                            ).arg(tableName).arg(columnName);
+                            ).arg(tableName, columnName);
 
     QSqlQuery query(db);
     if (query.exec(queryInfo)) {
@@ -266,7 +265,7 @@ CSqlMultiTableModel::Field CSqlMultiTableModel::retrieveForeignKeyInfo(const QSt
             field.m_fkColumnName = referencedColumn;
 
             // fetch and store values from the referenced column
-            QSqlQuery queryValues(QString("SELECT %1 FROM %2").arg(referencedColumn).arg(referencedTable), db);
+            QSqlQuery queryValues(QString("SELECT %1 FROM %2").arg(referencedColumn, referencedTable), db);
             if (queryValues.exec()) {
                 while (queryValues.next()) {
                     QString pkValue = queryValues.value(0).toString();
@@ -323,10 +322,10 @@ void CSqlMultiTableModel::formUpsertQuery() {
 
         // Construct the final INSERT ... ON DUPLICATE KEY UPDATE query string
         QString upsertQuery = QString("INSERT INTO %1 (%2) VALUES (%3) ON DUPLICATE KEY UPDATE %4")
-                                  .arg(tableName)
-                                  .arg(fieldNamesStr)
-                                  .arg(placeholdersStr)
-                                  .arg(updateClauseStr);
+                                  .arg(tableName,
+                                  fieldNamesStr,
+                                  placeholdersStr,
+                                  updateClauseStr);
         // Prepare and execute the query
         QSqlQuery upsertQry(QSqlDatabase::database("closca"));
         upsertQry.prepare(upsertQuery);

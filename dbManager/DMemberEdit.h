@@ -12,6 +12,7 @@
 #include <QDialog>
 
 #include "WSqlMultiTable.h"
+#include "ui/CHorizontalProxyModel.h"
 
 class DMemberEdit : public QDialog {
     Q_OBJECT
@@ -31,6 +32,8 @@ private:
     const QModelIndex           &m_index;
     
     CSqlMultiTableModel                   m_recModel;
+    CHorizontalProxyModel                 m_hProxyModel;
+
 };
 
 #endif // DMEMBEREDIT_H

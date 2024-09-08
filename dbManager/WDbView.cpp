@@ -102,6 +102,7 @@ bool WDbView::openEditDlg(const QModelIndex &index) {
     // Create and show the dialog
     const QString& tableName = ui->comboBox_tables->currentText();
     DMemberEdit *dialog = new DMemberEdit(QString("SELECT * FROM %1").arg(tableName), QSqlDatabase::database("closca"), proxyIndex, this);
+
     // If accepted requery to update the data
     if (dialog->exec() == QDialog::Accepted) {
         m_activeModel->requery();

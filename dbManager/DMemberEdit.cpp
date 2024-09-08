@@ -12,15 +12,20 @@
 #include <QSqlError>
 
 DMemberEdit::DMemberEdit(const QString& query, const QSqlDatabase& db, const QModelIndex &modelIndex, QWidget *parent)
-    : QDialog(parent), m_index{modelIndex}, m_recModel(this, modelIndex.row(), query, db)
+    : QDialog(parent), m_index{modelIndex}, m_recModel(this, modelIndex.row(), query, db), m_hProxyModel(this)
 {
-    m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
     QBoxLayout *Layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     setLayout(Layout);
 
+    // Model and proxy
+    m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
+    m_hProxyModel.setSourceModel(&m_recModel);
     // Initialize the table widget
     m_table = new WSqlMultiTable(this);
-    m_table->setSqlRecordModel(&m_recModel);
+    m_table->setModel(&m_hProxyModel);
+
+    m_recModel.setHeaderData(0, Qt::Horizontal, "Field");
+    m_recModel.setHeaderData(1, Qt::Horizontal, "Value");
 
     // Add the table to layout
     Layout->addWidget(m_table);
@@ -33,7 +38,7 @@ DMemberEdit::DMemberEdit(const QString& query, const QSqlDatabase& db, const QMo
     Layout->addWidget(buttonBox);
 
     // Calculate the appropriate maximum height for the table
-    int rowCount = m_recModel.rowCount();
+    int rowCount = m_hProxyModel.rowCount();
 
     int rowHeight       = m_table->verticalHeader()->defaultSectionSize();
     int headerHeight    = m_table->horizontalHeader()->height();

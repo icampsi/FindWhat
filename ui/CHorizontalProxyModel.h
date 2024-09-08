@@ -38,11 +38,7 @@ public:
     }
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation == Qt::Horizontal) {
-            return sourceModel()->headerData(section, Qt::Vertical, role);
-        } else {
-            return sourceModel()->headerData(section, Qt::Horizontal, role);
-        }
+        return sourceModel()->headerData(section, orientation, role);
     }
 
     QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override {
