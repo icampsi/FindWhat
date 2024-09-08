@@ -1,3 +1,8 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef CHORIZONTALPROXYMODEL_H
 #define CHORIZONTALPROXYMODEL_H
 
@@ -6,50 +11,25 @@
 #include <QTableView>
 #include <QStandardItemModel>
 
+/*
+ * This Proxy Model has the only function of changing the view direction,
+ * so rows become columns and columns become rows.
+*/
+
 class CHorizontalProxyModel : public QAbstractProxyModel {
 public:
-    CHorizontalProxyModel(QObject* parent = nullptr)
-        : QAbstractProxyModel(parent) {}
+    CHorizontalProxyModel(QObject* parent = nullptr);
 
-    QModelIndex mapToSource(const QModelIndex& proxyIndex) const override {
-        return sourceModel()->index(proxyIndex.column(), proxyIndex.row());
-    }
+    QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
+    QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
 
-    QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override {
-        return index(sourceIndex.column(), sourceIndex.row());
-    }
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override {
-        Q_UNUSED(parent);
-        return sourceModel() ? sourceModel()->columnCount() : 0;
-    }
-
-    int columnCount(const QModelIndex& parent = QModelIndex()) const override {
-        Q_UNUSED(parent);
-        return sourceModel() ? sourceModel()->rowCount() : 0;
-    }
-
-    QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override {
-        if (!proxyIndex.isValid())
-            return QVariant();
-
-        QModelIndex sourceIndex = mapToSource(proxyIndex);
-        return sourceModel()->data(sourceIndex, role);
-    }
-
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        return sourceModel()->headerData(section, orientation, role);
-    }
-
-    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override {
-        Q_UNUSED(parent);
-        return createIndex(row, column);
-    }
-
-    QModelIndex parent(const QModelIndex& child) const override {
-        Q_UNUSED(child);
-        return QModelIndex();
-    }
+    QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex& child) const override;
 };
 
 #endif // CHORIZONTALPROXYMODEL_H
