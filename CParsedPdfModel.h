@@ -83,8 +83,10 @@ public:
     }
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        if (!index.isValid() || index.row() >= m_data.size() || index.column() >= m_data.at(index.row()).second.size())
+        if (!index.isValid() || index.row() >= m_data.size() || index.column() >= m_data.at(index.row()).second.size()) {
+           qDebug() << "Set data fail. \n Column: " << index.column() << "\nRow: " << index.row();
             return false;
+        }
 
         int row = index.row();
         int column = index.column();
