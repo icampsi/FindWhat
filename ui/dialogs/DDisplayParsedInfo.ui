@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="WSpreadSheet" name="spreadSheet"/>
+    <widget class="QTableView" name="spreadSheet"/>
    </item>
    <item>
     <widget class="QFrame" name="frame">
@@ -64,13 +64,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>WSpreadSheet</class>
-   <extends>QTableView</extends>
-   <header>ui/WSpreadSheet.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

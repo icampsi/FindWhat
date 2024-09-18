@@ -36,7 +36,14 @@ The program is not yet intuitive and does not provide much guidance on how to us
 - You'll get a .csv file with 20 rows, each with 3 cells, stating "F12345", "Whatever-Total-was-extracted-from-the-pdf", and "Some Fixed Text".
 
 # Latest updates
-NEW
+
+18/09/24
+- Finished first step towards storing pdf info into mysql database: 
+    - Database module is accessible, browsable, manually edditable (with still some missing functionality like manually deleting rows).
+    - User can now set up a table format to define how parsed values form the pdf will be uploaded to the db
+    - Parsed values are already uploadable. I'm now working on a way to upload the files as binary data.
+
+**/07/24
 - started working towards a more flexible and user friendly way to modify values after parsing
 - Started working on a database module to store extracted values
 - Improved observer design

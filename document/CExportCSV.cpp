@@ -35,7 +35,6 @@ CExportCSV::CExportCSV()
 #endif
 {
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
     m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
                             "       ru_bills.exp_date, "
                             "       ru_bills.billing_periode_start, "
@@ -43,17 +42,19 @@ CExportCSV::CExportCSV()
                             "       ru_bills.company_cif, "
                             "       flats.floor_num, "
                             "       flats.door_num, "
-                            "       utility.utility_name "
+                            "       utility.utility_name, "
+                            "       ru_bills.iva, "
+                            "       ru_bills.bi, "
+                            "       ru_bills.total "
                             "FROM ru_bills "
                             "INNER JOIN utility_company "
                             "ON ru_bills.company_cif = utility_company.company_cif "
                             "INNER JOIN flats "
                             "ON ru_bills.flat_ID = flats.flat_id "
                             "INNER JOIN utility "
-                            "ON ru_bills.utility_id = utility.utility_id",
+                            "ON ru_bills.utility_id = utility.utility_id limit 0",
                             QSqlDatabase::database("closca"));
-
-    m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
+    m_dbTableModel.insertRows(0, 1);
 #endif
 }
 
@@ -84,80 +85,46 @@ bool CExportCSV::parseFileValues(int index) {
     return m_files[index].parseFileValues();
 }
 
-void CExportCSV::buildStructure(QStandardItemModel* combinedModel, ProgBar_dlg* progressDialog, size_t maxColumns, bool dbParser) {
+void CExportCSV::buildStructure(QAbstractItemModel* combinedModel, ProgBar_dlg* progressDialog, bool CSVParser) {
     int iteration = 0;
+    QAbstractItemModel *pFormatModel = nullptr; // will refer to m_dbTableModel or m_csvTableModel depending on the used parser
+    if(!CSVParser) {
+#ifdef ENABLE_DBMANAGER
+        pFormatModel = &m_dbTableModel;
+#endif
+    } else {
+        pFormatModel = &m_csvTableModel;
+    }
+
+    combinedModel->insertRows(combinedModel->rowCount(), m_files.size());
+    // if(combinedModel->columnCount() < this->m_dbTableModel.columnCount()) {
+    //     int colDiff = this->m_dbTableModel.columnCount() - combinedModel->columnCount();
+    //     combinedModel->insertColumns(combinedModel->columnCount(), colDiff);
+    // }
     for (CParsedFile& file : m_files) {
         // Parse values
         file.parseFileValues();
 
-        // SETUP FORMAT
-        // Define the format for the table
-        std::vector<std::vector<QString>> format;
-        if(!dbParser) {
-            convertModelToVector(&m_csvTableModel, &format);
-        } else {
-#ifdef ENABLE_DBMANAGER
-            // Note: m_csvTableModel has rows where columns should be!
-            int rowCount = m_dbTableModel.rowCount();
-            format.reserve(1);  // Reserve space for rows
+        {
+            // REPLACE FROMAT PLACEHOLDERS FOR EXTRACTED DATA AND APPEND TO COMBINEDMODEL
+            auto replacer = [&](const QString& capturedString) -> const std::optional<QString> {
+                return file.getValue(capturedString);
+            };
 
-            // Reserve space for columns
-            std::vector<QString> rowVector;
-            rowVector.reserve(rowCount);
-            std::vector<QString> header;
-            header.reserve(rowCount);
-
-            for (int col = 0; col < rowCount; ++col) {
-                QString value = m_dbTableModel.value(col).toString();
-                if(combinedModel->rowCount() <= 0) {
-                    QString fieldName = m_dbTableModel.fieldName(col).toString();
-                    header.emplace_back(std::move(fieldName));
-                }
-                rowVector.emplace_back(std::move(value));
-            }
-            // First time, append header
-            if(combinedModel->rowCount() <= 0) {
-                QList<QStandardItem*> newHeaderItems;
-                for (const QString& cell : header) {
-                    newHeaderItems.append(new QStandardItem(cell));
-                }
-                combinedModel->appendRow(newHeaderItems);
-            }
-
-            format.emplace_back(std::move(rowVector));
-#endif
-        }
-
-        // Ensure each row in format has at least maxColumns columns
-        if (!format.empty() && format[0].size() < maxColumns) {
-            for (std::vector<QString>& row : format) {
-                row.resize(maxColumns, "");  // Add empty QStrings to the row if necessary
+            for (int i = 0; i < file.getFields().size(); ++i) {
+                QModelIndex index = pFormatModel->index(0, i);
+                QString data = pFormatModel->data(index).toString();
+                UText::replacePlaceholders(data, "<(.*?)>", replacer);
+                combinedModel->setData(combinedModel->index(iteration, i), data);
             }
         }
 
-        // REPLACE FROMAT PLACEHOLDERS FOR EXTRACTED DATA AND APPEND TO COMBINEDMODEL
-        auto replacer = [&](const QString& capturedString) -> const std::optional<QString> {
-            return file.getValue(capturedString);
-        };
-
-        // Add rows from the format to the combined model
-        for (const std::vector<QString>& row : format) {
-            QList<QStandardItem*> newRowItems;
-            for (QString cell : row) {
-                UText::replacePlaceholders(cell, "<(.*?)>", replacer);
-                newRowItems.append(new QStandardItem(std::move(cell)));
-            }
-            combinedModel->appendRow(newRowItems);
-        }
-
-        // Rename document
+        // RENAME DOCUMENT
         QString newFileName;
         m_associatedEsquema->createFileName(newFileName, m_fileNamePlaceholder);
-        if (m_renameParsedPDFFlag) qDebug() << file.rename(newFileName);
 
-        // Update progress bar
+        // UPDATE PROGRESSBAR
         if (iteration % 2 == 0) progressDialog->updateProgress();
-
         ++iteration;
     }
     progressDialog->updateProgress(); // Final update to ensure progressbar doesn't get stuck at 99%
@@ -281,7 +248,6 @@ void CExportCSV::deserialize(std::ifstream &in) {
     USerialize::writeModel(in, &m_csvTableModel);
 
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setBehaviourFlag(CSqlMultiTableModel::BehaviourFlag::Insert);
     m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
                             "       ru_bills.exp_date, "
                             "       ru_bills.billing_periode_start, "
@@ -289,19 +255,20 @@ void CExportCSV::deserialize(std::ifstream &in) {
                             "       ru_bills.company_cif, "
                             "       flats.floor_num, "
                             "       flats.door_num, "
-                            "       utility.utility_name "
+                            "       utility.utility_name, "
+                            "       ru_bills.iva, "
+                            "       ru_bills.bi, "
+                            "       ru_bills.total "
                             "FROM ru_bills "
                             "INNER JOIN utility_company "
                             "ON ru_bills.company_cif = utility_company.company_cif "
                             "INNER JOIN flats "
                             "ON ru_bills.flat_ID = flats.flat_id "
                             "INNER JOIN utility "
-                            "ON ru_bills.utility_id = utility.utility_id",
+                            "ON ru_bills.utility_id = utility.utility_id limit 0",
                             QSqlDatabase::database("closca"));
-    m_dbTableModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
 
     USerialize::writeModel(in, &m_dbTableModel);
-
 #endif
 
 }

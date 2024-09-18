@@ -14,9 +14,12 @@ public:
     ~DDisplayParsedInfo();
     // Exports the struct to a .csv
     bool exportToCSV();
+#ifdef ENABLE_DBMANAGER
+    bool commitTable();
+#endif
 
 private slots:
-    void on_pushButton_save_clicked() { if(exportToCSV()) { accept(); } }
+    void on_pushButton_save_clicked();
 
 private:
     Ui::DDisplayParsedInfo *ui;

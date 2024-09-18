@@ -57,7 +57,6 @@ CSqlMultiTableModel *CDbConnection::addModel(const QString& tableName, const QSt
     const QString upAlias = alias.isEmpty() ? tableName : alias; // if alias was not provided, we use tableName as alias
 
     CSqlMultiTableModel* model = new CSqlMultiTableModel(this);
-    model->setMode(CSqlMultiTableModel::Mode::MultiRecord);
     QSqlDatabase db = QSqlDatabase::database(m_dbName);
     model->setQuery(QString("SELECT * FROM %1").arg(tableName), db);
 

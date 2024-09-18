@@ -9,18 +9,20 @@
 #include <QObject>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
-
+#include <QSqlRecord>
 /*
- * This model is specialized on displaying a single record on a query displayed in a two vertical column way,
- * where the left column shows fields and right column values. It is able to display AND UPDATE information
- * from multiple tables at the same time, by maping its fields with the table they come from.
- * However, no sql operations or aliases should be used on the SELECT query.
+ * This model is specialized on displaying and editing records from complex querys. Is not fast for big data sources
+ * since to acomplish the complex edition it keeps track to the table related to every cell and then queryes each one
+ * individually. It has a Single record setup where you can display a single record individually for easy query.
+ * No sql operations or aliases should be used on the SELECT query, otherwise it can't edit the cell.
+ * It's also heavier than models based on QSqlQuery since this model copies the queried data instead of using the
+ * fetching-when-needed capabilities of QSqlQuery.
  *
  * Use BehaviourFlag::Insert to display an empty record that you can then use to insert a new record instead of
  * just updating an existing one.
 */
 
-class CSqlMultiTableModel : public QSqlQueryModel { // BOOKMARK - Should rename it to CSqlMultiTableModel
+class CSqlMultiTableModel : public QAbstractTableModel { // BOOKMARK - Should rename it to CSqlMultiTableModel
     Q_OBJECT
 
 private:
@@ -53,30 +55,24 @@ private:
     };
 
 public:
-    enum class BehaviourFlag { Update, Insert };
-    enum class Mode { SingleRecord, MultiRecord };
-
     // CONSTURCTORS & DESTRUCTORS
     explicit CSqlMultiTableModel(QObject *parent = nullptr, int index = 0, QString query = "", QSqlDatabase db = QSqlDatabase());
     ~CSqlMultiTableModel() {}
 
     // PUBLIC METHODS
-    void setBehaviourFlag(BehaviourFlag flag) { m_behaviourFlag = flag; }
-    BehaviourFlag getBehaviourFlag() const    { return m_behaviourFlag; }
-
-    void setMode(Mode flag) { m_mode = flag; }
-    Mode getMode() const    { return m_mode; }
-
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
+        Q_UNUSED(parent);
+        return createIndex(row, column);
+    }
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    QVariant value    (int index, int role = Qt::DisplayRole) const; // Returns value from index
-    QVariant fieldName(int index, int role = Qt::DisplayRole) const; // Returns field name from index
+    QVariant fieldName(int index) const; // Returns field name from index
 
-    // QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     // Change the referenced record for edition based on row index of the query results
     void changeRecord(int index);
@@ -86,33 +82,34 @@ public:
     void setQuery(QSqlQuery &&query);
 
     // Query again in order to update data.
-    void requery(const QSqlDatabase &db = QSqlDatabase::database("closca")) { QSqlQueryModel::setQuery(query().lastQuery(), db); }
+    void requery(const QSqlDatabase &db = QSqlDatabase::database("closca")) { setQuery(m_query.lastQuery(), db); }
 
     // Parse field names to change _ and camel letters for spaces
     QString processFieldName(const QString &fieldName) const;
 
     // Binds values to the current update querries and submits the record on the database
-    bool submitRecord();
+    bool commitRecord(const int row);
+    bool commitTable();
 
-    // Made Non-functional. Not deleting it in order to avoid troubles when using QAbstractItemModel*
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override {
-        Q_UNUSED(row); Q_UNUSED(count); Q_UNUSED(parent);
-        return false;
-    }
+    // Appends empty records
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
-    // Made Non-functional. Not deleting it in order to avoid troubles when using QAbstractItemModel*
+    // Made Non-functional
     bool insertColumns(int col, int count, const QModelIndex &parent = QModelIndex()) override {
         Q_UNUSED(col); Q_UNUSED(count); Q_UNUSED(parent);
         return false;
     }
 
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    // Retrieves the string used in setQuery();
+    const QString lastQuery() const { return this->m_query.lastQuery(); }
 protected:
-    // Retrieves the record information based on the index of m_activeRecordIndex
-    void retrieveRecord();
     // Gets the different table names used from the db and maps them to their fields: m_tables
     void extractTables();
-    // Automatically creates an update query for every table referenced on the model
-    // and every field on this table.
+    /*
+     * Automatically creates an update query for every table referenced on the model
+     * and every field on this table.
+    */
     void formUpsertQuery();
 
     // Properties that would make a field value non editable. For now only one is specified:
@@ -135,20 +132,16 @@ signals:
 
     // MEMBERS
 private:
-    QMap<QString, QVector<Field>>   m_tables; // Map each field with it's used table
-    QSqlRecord                      *m_selectedRecord;
+    QMap<QString, QVector<Field>>   m_tables; // Map tableName->it's fields
     QVector<QSqlQuery>              m_updateQuerys;
+    QVector<QSqlRecord>             m_records;
+    QSqlQuery                       m_query;
     int                             m_activeRecordIndex;
     /*
      * Used to set the behaviour of the model as an update model (that will display an existing record based on m-.recordIndex)
      * or as an Insert model (which would display a newly generated empty record for you to insert)
     */
-    BehaviourFlag                   m_behaviourFlag;
-    /*
-     * Sets the Functionality of the table as a single record table for single record edits and insertions
-     * or as a tipical multirecord table.
-    */
-    Mode                            m_mode;
+    int                             m_rowCount;
 };
 
 #endif // CSQLMULTITABLEMODEL_H

@@ -11,21 +11,20 @@
 #include <QHeaderView>
 #include <QSqlError>
 
-DMemberEdit::DMemberEdit(const QString& query, const QSqlDatabase& db, const QModelIndex &modelIndex, QWidget *parent)
-    : QDialog(parent), m_index{modelIndex}, m_recModel(this, modelIndex.row(), query, db), m_hProxyModel(this)
+DMemberEdit::DMemberEdit(CSqlMultiTableModel *sourceModel, const int rowToEdit, QWidget *parent)
+    : QDialog(parent), m_recModel{sourceModel}, m_hProxyModel(this), m_rowIndex{rowToEdit}
 {
     QBoxLayout *Layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     setLayout(Layout);
-
+    qDebug() << rowToEdit;
     // Model and proxy
-    m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
-    m_hProxyModel.setSourceModel(&m_recModel);
+    // m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
+    m_hProxyModel.setMode(CHorizontalProxyModel::Mode::SingleRow,  rowToEdit);
+    m_hProxyModel.setSourceModel(sourceModel);
+
     // Initialize the table widget
     m_table = new WSqlMultiTable(this);
     m_table->setModel(&m_hProxyModel);
-
-    m_recModel.setHeaderData(0, Qt::Horizontal, "Field");
-    m_recModel.setHeaderData(1, Qt::Horizontal, "Value");
 
     // Add the table to layout
     Layout->addWidget(m_table);
@@ -58,11 +57,11 @@ DMemberEdit::~DMemberEdit() {
 
 bool DMemberEdit::updateRecord() {
     // Submit changes to the database
-    if(m_recModel.submitRecord()) {
+    if(m_recModel->commitRecord(m_rowIndex)) {
         qDebug() << "Row modified successfully!";
         return true;
     } else {
-        qDebug() << "Error modifying row:" << m_recModel.lastError().text();
+        qDebug() << "Error modifying row";/* << m_recModel.lastError().text();*/
         return false;
     }
 }

@@ -11,7 +11,7 @@
 #include <QSqlRecord>
 
 CSqlMultiTableModel::CSqlMultiTableModel(QObject *parent, int index, QString query, QSqlDatabase db)
-    : QSqlQueryModel(parent), m_selectedRecord{nullptr}, m_activeRecordIndex(index), m_behaviourFlag { BehaviourFlag::Update }, m_mode { Mode::MultiRecord }
+    : QAbstractTableModel(parent), m_activeRecordIndex(index), m_rowCount{ 0 }
 {
     if(!query.isEmpty()) {
         setQuery(query, db);
@@ -19,32 +19,15 @@ CSqlMultiTableModel::CSqlMultiTableModel(QObject *parent, int index, QString que
 }
 
 int CSqlMultiTableModel::rowCount(const QModelIndex &parent) const {
-    switch (m_mode) {
-    case Mode::SingleRecord:
-        return 2; // "Field" and "Value"
-        break;
-    case Mode::MultiRecord:
-        return QSqlQueryModel::rowCount(parent);
-        break;
-    default:
-        return QSqlQueryModel::rowCount(parent);
-        break;
-    }
+    Q_UNUSED(parent);
+    return m_rowCount;
 }
 
 int CSqlMultiTableModel::columnCount(const QModelIndex &parent) const {
-    switch (m_mode) {
-    case Mode::SingleRecord:
-        return record().count(); // One row for each field
-        break;
-    case Mode::MultiRecord:
-        return QSqlQueryModel::columnCount(parent);
-        break;
-    default:
-        return QSqlQueryModel::columnCount(parent);
-        break;
-    }
+    Q_UNUSED(parent);
+    return m_query.record().count();
 }
+
 
 QString CSqlMultiTableModel::processFieldName(const QString& fieldName) const {
     QString result;
@@ -73,86 +56,57 @@ QVariant CSqlMultiTableModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) {
         return QVariant();
     }
+    int recIndex = index.row();
 
-    switch (m_mode) {
-        case Mode::SingleRecord: {
-            // Retrieve the record for the current field (row) and attribute/column
-            const int col = index.column(); // Attribute or other aspect
-            const int row = index.row();    // Field corresponding to the row
-            const int recCount = m_selectedRecord->count();
+    // Retrieve the record for the current field (column) and attribute/row
+    const int col = index.column();
 
-            if (row >= 0 && row < recCount) {
-                QString fieldName = m_selectedRecord->fieldName(col); // Now row corresponds to field
-                QString tableName = m_selectedRecord->field(col).tableName();
+    QString fieldName = m_records.at(recIndex).fieldName(col);
+    QString tableName = m_records.at(recIndex).field(col).tableName();
 
-                if (role == Qt::DisplayRole || role == Qt::EditRole) {
-                    // Display the field name in the first column, or the value in other columns
-                    return (row == 0) ? processFieldName(fieldName) : m_selectedRecord->value(col);
-                } else if (role == Qt::UserRole + 1 && row == 1) {
-                    // Custom role: Check if there's foreign key information for the field
-                    const QVector<Field>& fields = m_tables.value(tableName);
-                    for (const Field& field : fields) {
-                        if (field.m_fieldName == fieldName) {
-                            if (field.m_hasFk) {
-                                // Return foreign key values as a QVariantList
-                                return QVariant::fromValue(field.m_fkColumnValues);
-                            }
-                            break;
-                        }
-                    }
-                } else {
-                    return QSqlQueryModel::data(index, role);
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
+        return m_records.at(recIndex).value(col);
+    } else if (role == Qt::UserRole + 1) {
+        // Custom role: Check if there's foreign key information for the field
+        const QVector<Field>& fields = m_tables.value(tableName);
+        for (const Field& field : fields) {
+            if (field.m_fieldName == fieldName) {
+                if (field.m_hasFk) {
+                    // Return foreign key values as a QVariantList
+                    return QVariant::fromValue(field.m_fkColumnValues);
                 }
+                break;
             }
-
-            return QVariant();
-            break;
-        }
-
-        case Mode::MultiRecord: {
-            return QSqlQueryModel::data(index, role);
-            break;
-        }
-
-        default: {
-            return QSqlQueryModel::data(index, role);
-            break;
         }
     }
+
+    return QVariant();
 }
 
-// QVariant CSqlMultiTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-//     if (role != Qt::DisplayRole) {
-//         return QVariant();
-//     }
-
-//     if (orientation == Qt::Horizontal) {
-//         if (section == 0)
-//             return "Field";
-//         else if (section == 1)
-//             return "Value";
-//     }
-//     return QVariant();
-// }
+QVariant CSqlMultiTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    Q_UNUSED(orientation); Q_UNUSED(role);
+    if(role == Qt::DisplayRole && orientation == Qt::Horizontal) {
+        return processFieldName(m_query.record().fieldName(section));
+    }
+    else return QVariant();
+}
 
 bool CSqlMultiTableModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if (!index.isValid() || role != Qt::EditRole || index.column() != 1) {
+    if (!index.isValid() || role != Qt::EditRole) {
         return false;
     }
 
     // Get the row and column indices
+    const int col = index.column();
     const int row = index.row();
 
-    // Obtain the field name from the record
-    const QString fieldName = m_selectedRecord->field(row).name();
-
-    if (row >= 0 && row < m_selectedRecord->count()) {
+    if (col >= 0 && col < m_query.record().count()) {
         // Update the record with the new value
-        m_selectedRecord->setValue(fieldName, value);
+        m_records[row].setValue(col, value);
 
         // Notify that the data has changed
         emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
-        emit cellValueChanged(row);
+        emit cellValueChanged(col);
         return true;
     }
 
@@ -160,58 +114,21 @@ bool CSqlMultiTableModel::setData(const QModelIndex &index, const QVariant &valu
 }
 
 Qt::ItemFlags CSqlMultiTableModel::flags(const QModelIndex &index) const {
-    Qt::ItemFlags defaultFlags = QAbstractTableModel::flags(index);
-    switch (m_mode) {
-        case Mode::SingleRecord: {
-            if (index.column() == 0) {
-                return defaultFlags & ~Qt::ItemIsEditable; // Field non-editable
-            }
-            return (editableCheck(index)) ? (defaultFlags & Qt::ItemIsEditable) : (defaultFlags | Qt::ItemIsEditable); // Value editable
-        }
-        case Mode::MultiRecord: {
-            return defaultFlags;
-        }
+    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
 
-        default: {
-            return defaultFlags;
-        }
-    }
+    return (editableCheck(index)) ? (defaultFlags & Qt::ItemIsEditable) : (defaultFlags | Qt::ItemIsEditable); // Value editable
 }
 
-QVariant CSqlMultiTableModel::value(int index, int role) const {
-    const int recCount = m_selectedRecord->count();
-
-    if (index < 0 || index >= recCount || role != Qt::DisplayRole) {
+QVariant CSqlMultiTableModel::fieldName(int index) const {
+    const int recCount = m_query.record().count();
+    if (index < 0 || index >= recCount) {
         return QVariant();
     }
-    return m_selectedRecord->value(index); // Field values
-}
-
-QVariant CSqlMultiTableModel::fieldName(int index, int role) const {
-    const int recCount = m_selectedRecord->count();
-    if (index < 0 || index >= recCount || role != Qt::DisplayRole) {
-        return QVariant();
-    }
-    return m_selectedRecord->fieldName(index); // Field names
+    return m_query.record().fieldName(index); // Field names
 }
 
 void CSqlMultiTableModel::changeRecord(int index) {
     m_activeRecordIndex = index;
-    retrieveRecord();
-}
-
-void CSqlMultiTableModel::retrieveRecord() {
-    if (m_behaviourFlag == BehaviourFlag::Insert) {
-        // Create an empty record based on the table schema
-        QSqlRecord emptyRecord = query().record();
-        for (int i = 0; i < emptyRecord.count(); ++i) {
-            emptyRecord.setNull(i);  // Set all fields to NULL
-        }
-        m_selectedRecord = new QSqlRecord(emptyRecord);
-    } else {
-        const_cast<QSqlQuery&>(query()).seek(m_activeRecordIndex);
-        m_selectedRecord = new QSqlRecord(query().record());
-    }
 }
 
 void CSqlMultiTableModel::setQuery(const QString &query, const QSqlDatabase &db) {
@@ -220,10 +137,25 @@ void CSqlMultiTableModel::setQuery(const QString &query, const QSqlDatabase &db)
         return;
     }
 
-    QSqlQueryModel::setQuery(query, db);
-    retrieveRecord();
+    // Clear data
+    m_records.clear();
+    // Build and execute query
+    m_query = QSqlQuery(db);
+    m_query.prepare(query);
+    m_query.exec();
+
+    // Copy query data into local vector
+    m_records.reserve(m_query.size());
+    while(m_query.next()) {
+        m_records.append(m_query.record());
+    }
+
     extractTables();
     formUpsertQuery();
+
+    // Assaign table size
+    int qSize = m_query.size();
+    qSize >= 0 ? m_rowCount = qSize : m_rowCount = 0;
 }
 
 void CSqlMultiTableModel::setQuery(QSqlQuery &&query) {
@@ -233,12 +165,25 @@ void CSqlMultiTableModel::setQuery(QSqlQuery &&query) {
         return;
     }
 
-    QSqlQueryModel::setQuery(std::move(query));
-    retrieveRecord();
+    // Clear data
+    m_records.clear();
+    // Build and execute query
+    m_query = std::move(query);
+    m_query.exec();
+
+    // Copy query data into local vector
+    m_records.reserve(m_query.size());
+    while(m_query.next()) {
+        m_records.append(m_query.record());
+    }
+
     extractTables();
     formUpsertQuery();
-}
 
+    // Assaign table size
+    int qSize = m_query.size();
+    qSize >= 0 ? m_rowCount = qSize : m_rowCount = 0;
+}
 
 CSqlMultiTableModel::Field CSqlMultiTableModel::retrieveForeignKeyInfo(const QString& tableName, const QString& columnName) {
     QSqlDatabase db = QSqlDatabase::database("closca");
@@ -272,20 +217,21 @@ CSqlMultiTableModel::Field CSqlMultiTableModel::retrieveForeignKeyInfo(const QSt
                     field.m_fkColumnValues.append(pkValue);
                 }
             } else {
-                qDebug() << "Query for retreaving pk values failed:" << queryValues.lastError().text();
+                qWarning() << "Query for retreaving pk values failed:" << queryValues.lastError().text();
             }
         }
     } else {
-        qDebug() << "Error executing query:" << query.lastError().text();
+        qWarning() << "Error executing query:" << query.lastError().text();
     }
     return field;
 }
 
 void CSqlMultiTableModel::extractTables() {
-    for (int i = 0; i < m_selectedRecord->count(); ++i) {
-        QString tableName = m_selectedRecord->field(i).tableName();
+    m_tables.clear();
+    for (int i = 0; i < m_query.record().count(); ++i) {
+        QString tableName = m_query.record().field(i).tableName();
         if (!tableName.isEmpty()) { // Check if the tableName is valid (non-empty)
-            const Field field = retrieveForeignKeyInfo(tableName, m_selectedRecord->field(i).name());
+            const Field field = retrieveForeignKeyInfo(tableName,m_query.record().field(i).name());
             if (m_tables.contains(tableName)) {
                 // If the table already exists in the map, append the field to the vector
                 m_tables[tableName].append(field);
@@ -298,6 +244,8 @@ void CSqlMultiTableModel::extractTables() {
 }
 
 void CSqlMultiTableModel::formUpsertQuery() {
+    m_updateQuerys.clear();
+
     for (const QString& tableName : m_tables.keys()) {
         QStringList fieldNames;
         QStringList placeholders;
@@ -312,7 +260,7 @@ void CSqlMultiTableModel::formUpsertQuery() {
             if (fieldName != QSqlDatabase::database("closca").primaryIndex(tableName).fieldName(0)) {
                 updateClauses.append(QString("%1 = VALUES(%1)").arg(fieldName));
             }
-            values.append(m_selectedRecord->value(fieldName));
+            values.append(m_query.record().value(fieldName));
         }
 
         // Join the lists into a single string
@@ -330,17 +278,11 @@ void CSqlMultiTableModel::formUpsertQuery() {
         QSqlQuery upsertQry(QSqlDatabase::database("closca"));
         upsertQry.prepare(upsertQuery);
 
-        // Bind the values to the query
-        for (const Field& field : m_tables.value(tableName)) {
-            const QString& fieldName = field.m_fieldName;
-            upsertQry.bindValue(QString(":%1").arg(fieldName), m_selectedRecord->value(fieldName));
-        }
-
         m_updateQuerys.append(std::move(upsertQry));
     }
 }
 
-bool CSqlMultiTableModel::submitRecord() {
+bool CSqlMultiTableModel::commitRecord(const int row) {
     QSqlDatabase db = QSqlDatabase::database("closca");
 
     // Start a transaction
@@ -349,31 +291,18 @@ bool CSqlMultiTableModel::submitRecord() {
         return false;
     }
 
-    // Iterate through all update queries
+    // Iterate through all update queries for the row
     for (int i = 0; i < m_updateQuerys.size(); ++i) {
         QSqlQuery& query = m_updateQuerys[i];
         const QString tableName = m_tables.keys().at(i);  // Get the table name from the map
-        const QVector<Field>& fields = m_tables.value(tableName);  // Get the fields for this table
 
-        // Get the primary key field and value
-        QString pkName = db.primaryIndex(tableName).fieldName(0);  // BOOKMARK - Only works if primary key is the first field
-        QVariant pkValue = m_selectedRecord->value(pkName);
-
-        if (pkValue.isNull()) {
-            qWarning() << "Primary key value is null for table" << tableName;
-            db.rollback();
-            return false;
-        }
-
-        // Bind the field values to the query
-        for (const Field& field : fields) {
+        // Bind the values to the query
+        for (const Field& field : m_tables.value(tableName)) {
             const QString& fieldName = field.m_fieldName;
-            query.bindValue(QString(":").append(fieldName), m_selectedRecord->value(fieldName));
+            query.bindValue(QString(":%1").arg(fieldName), m_records.at(row).value(fieldName));
         }
-        // Bind the primary key value
-        query.bindValue(":pkV", pkValue);
 
-        // Execute the query
+        // Execute the pre-bound query
         if (!query.exec()) {
             qWarning() << "Failed to execute update query for table" << tableName << ":" << query.lastError().text();
             db.rollback();
@@ -390,7 +319,57 @@ bool CSqlMultiTableModel::submitRecord() {
     return true;
 }
 
+bool CSqlMultiTableModel::commitTable() {
+    QSqlDatabase db = QSqlDatabase::database("closca");
+
+    // Start a transaction
+    if (!db.transaction()) {
+        qWarning() << "Failed to start database transaction:" << db.lastError().text();
+        return false;
+    }
+
+    for(int recIndex{0}; recIndex < m_rowCount; ++recIndex) {
+        // Iterate through all update queries for each row
+        for (int i = 0; i < m_updateQuerys.size(); ++i) {
+            QSqlQuery& query = m_updateQuerys[i];
+            const QString tableName = m_tables.keys().at(i);  // Get the table name from the map
+
+            // Bind the values to the query
+            for (const Field& field : m_tables.value(tableName)) {
+                const QString& fieldName = field.m_fieldName;
+                query.bindValue(QString(":%1").arg(fieldName), m_records.at(recIndex).value(fieldName));
+            }
+
+            // Execute the pre-bound query
+            if (!query.exec()) {
+                qWarning() << "\nFailed to execute update query:\n" << m_updateQuerys[i].executedQuery() << "\nFor table" << tableName << "\n Error is:\n" << query.lastError().text();
+                db.rollback();
+                return false;
+            }
+        }
+    }
+
+    // Commit the transaction if all queries succeeded
+    if (!db.commit()) {
+        qWarning() << "Failed to commit database transaction:" << db.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+bool CSqlMultiTableModel::insertRows(int row, int count, const QModelIndex &parent) {
+    if(!(count > 0)) return false;
+    m_rowCount += count;
+    beginInsertRows(parent, row, row + count - 1);
+    for(int i{0}; i < count; i++) {
+        m_records.append(QSqlRecord(m_query.record()));
+    }
+    endInsertRows();
+    return true;
+}
+
 bool CSqlMultiTableModel::editableCheck(const QModelIndex &index) const {
     // tableName being empty means that we can't reference it on the query
-    return (m_selectedRecord->field(index.row()).tableName().isEmpty());
+    return (m_query.record().field(index.row()).tableName().isEmpty());
 }

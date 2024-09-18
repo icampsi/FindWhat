@@ -43,13 +43,13 @@ WDbView::WDbView(QWidget *parent)
     connect(m_head, &WSearcherHeader::filterChanged, this, &WDbView::filterChanged);
 
     changeTable("Members");
+    // m_activeModel->insertRows(m_activeModel->rowCount(), 2);
 }
 
 void WDbView::changeTable(const QString& tableName) {
     // Sets the new table, performs the select statement and hides/shows columns custimized
     m_activeModel = CDbConnection::getConnection().getModel(tableName);
     m_proxyModel->setSourceModel(m_activeModel);
-
     if(tableName == "Occupancy") {
         // ui->treeView->hideColumn(1);
         // ui->treeView->hideColumn(2);
@@ -100,8 +100,7 @@ bool WDbView::openEditDlg(const QModelIndex &index) {
     QModelIndex proxyIndex = m_proxyModel->mapToSource(index);
 
     // Create and show the dialog
-    const QString& tableName = ui->comboBox_tables->currentText();
-    DMemberEdit *dialog = new DMemberEdit(QString("SELECT * FROM %1").arg(tableName), QSqlDatabase::database("closca"), proxyIndex, this);
+    DMemberEdit *dialog = new DMemberEdit(m_activeModel, proxyIndex.row(), this);
 
     // If accepted requery to update the data
     if (dialog->exec() == QDialog::Accepted) {

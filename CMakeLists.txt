@@ -92,6 +92,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         CParsedFile.h CParsedFile.cpp
         ui/CHorizontalProxyModel.h ui/CHorizontalProxyModel.cpp
         CParsedFileModel.h CParsedFileModel.cpp
+        CParsedPdfModel.h CParsedPdfModel.cpp
     )
 else()
     if(ANDROID)

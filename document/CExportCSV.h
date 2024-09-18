@@ -89,7 +89,7 @@ public:
     // Parse values for all files stored in m_files
     bool parseFileValues(int index);
     // Extract values from the pdf's. Returns false if text couldn't be extracted.
-    void buildStructure(QStandardItemModel *combinedModel, ProgBar_dlg* progressDialog, size_t maxColumns, bool dbParser = false);
+    void buildStructure(QAbstractItemModel *combinedModel, ProgBar_dlg* progressDialog, bool CSVParser = false);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;

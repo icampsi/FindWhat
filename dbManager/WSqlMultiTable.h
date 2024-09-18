@@ -19,7 +19,6 @@ public:
     explicit WSqlMultiTable(QWidget* parent = nullptr);
 
     // GETTERS
-    const QString value(int index) const { return sqlRecordModel()->value(index).toString(); }
     CSqlMultiTableModel* sqlRecordModel() const { return dynamic_cast<CSqlMultiTableModel*>(QTableView::model()); }
     // SETTERS
     void setModel(QAbstractItemModel *model) override;

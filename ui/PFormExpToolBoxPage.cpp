@@ -46,9 +46,10 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
             ui->comboBox_esquemaName->setCurrentText(assocEsquemaName);
         }
     }
-
-    /* Set up observer for changes in the esquema list,
-     * so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index */
+    /*
+     * Set up observer for changes in the esquema list,
+     * so the combobox can display the correct esquemes in the correct order for axessing them later simply through its index
+    */
     m_observerHandle.push_back(cmdoc.addObserver(std::bind(&PFormExpToolBoxPage::onEsquemaListChanged, this, std::placeholders::_1)));
 
     CParsedFileModel *fileModel = new CParsedFileModel(*m_exportCSV, ui->TreeList_files);
@@ -108,8 +109,11 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
 #ifdef ENABLE_DBMANAGER
     // Create CRecTable for sql insertions. Used if parseDB is selected
     WSqlMultiTable *dbTable = new WSqlMultiTable(ui->stackedWidget_parseOpt);
+    // Setup HORIZONTAL PROXY MODEL
     m_dbProxyModel = new CHorizontalProxyModel(this);
+    m_dbProxyModel->setMode(CHorizontalProxyModel::Mode::SingleRow, 0);
     m_dbProxyModel->setSourceModel(m_exportCSV->getDbTableModel());
+
     // Disable custom widgets in order to only get line edits on every cell.
     CSqlMultiTableDelegate* dbTableDelegate = qobject_cast<CSqlMultiTableDelegate*>(dbTable->itemDelegate());
     dbTableDelegate->disableCustomWidgets(true);

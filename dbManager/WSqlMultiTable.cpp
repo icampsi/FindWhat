@@ -4,7 +4,7 @@
  * =================================================== */
 
 #include "WSqlMultiTable.h"
-#include "CSqlmultitableModel.h"
+#include "CSqlMultiTableModel.h"
 #include "CSqlMultiTableDelegate.h"
 #include "qabstractproxymodel.h"
 
@@ -16,7 +16,7 @@ WSqlMultiTable::WSqlMultiTable(QWidget *parent)
     // CONFIGURATION
     setEditTriggers(QAbstractItemView::AllEditTriggers);
     horizontalHeader()->setStretchLastSection(true);
-    verticalHeader()->setVisible(false);
+    horizontalHeader()->setVisible(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -26,17 +26,12 @@ WSqlMultiTable::WSqlMultiTable(QWidget *parent)
 }
 
 void WSqlMultiTable::setModel(QAbstractItemModel *model) {
-    if (dynamic_cast<CSqlMultiTableModel*>(model)) {
+    if (dynamic_cast<CSqlMultiTableModel*>(model) || dynamic_cast<QAbstractProxyModel*>(model)) {
         // If the model is of type CSqlRecordModel, set it
         QTableView::setModel(model);
         return;
-    } else {
-        QAbstractProxyModel *pModel = dynamic_cast<QAbstractProxyModel*>(model);
-        if(pModel) {
-            QTableView::setModel(model);
-            return;
-        }
     }
     // Log an error or handle it as needed
     qWarning() << "Error: Only CSqlRecordModel or proxy models with it as source are accepted.";
+    return;
 }

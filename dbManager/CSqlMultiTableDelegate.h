@@ -9,7 +9,8 @@
 #include <QStyledItemDelegate>
 #include <QWidget>
 
-/* Delegate that automatically handles the editor widget for CSqlMultiTableModel, assignin dropboxes with values on
+/*
+ * Delegate that automatically handles the editor widget for CSqlMultiTableModel, assignin dropboxes with values on
  * on foregin key relations.
 */
 class CSqlMultiTableDelegate : public QStyledItemDelegate {

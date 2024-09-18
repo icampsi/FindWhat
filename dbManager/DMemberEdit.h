@@ -18,7 +18,7 @@ class DMemberEdit : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DMemberEdit(const QString& query, const QSqlDatabase& db, const QModelIndex &modelIndex, QWidget *parent = nullptr);
+    explicit DMemberEdit(CSqlMultiTableModel *sourceModel, const int rowToEdit, QWidget *parent = nullptr);
     ~DMemberEdit();
 
 private:
@@ -28,12 +28,10 @@ private slots:
     void submit();
 
 private:
-    WSqlMultiTable               *m_table;
-    const QModelIndex           &m_index;
-    
-    CSqlMultiTableModel                   m_recModel;
-    CHorizontalProxyModel                 m_hProxyModel;
-
+    WSqlMultiTable          *m_table;
+    CSqlMultiTableModel     *m_recModel;
+    CHorizontalProxyModel    m_hProxyModel;
+    int                      m_rowIndex;
 };
 
 #endif // DMEMBEREDIT_H
