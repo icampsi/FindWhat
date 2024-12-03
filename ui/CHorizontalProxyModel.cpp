@@ -37,13 +37,11 @@ QVariant CHorizontalProxyModel::data(const QModelIndex& proxyIndex, int role) co
     if (!proxyIndex.isValid())
         return QVariant();
 
-    if(role ==  Qt::DisplayRole) {
-        int sourceRow = proxyIndex.row();
-        int sourceColumn = m_mode == Mode::SingleRow ? m_targetRow : proxyIndex.column();
-        QModelIndex sourceIndex = mapToSource(createIndex(sourceRow, sourceColumn));
-        return sourceModel()->data(sourceIndex, role);
-    }
-    return QVariant();
+    int sourceRow = proxyIndex.row();
+    int sourceColumn = m_mode == Mode::SingleRow ? m_targetRow : proxyIndex.column();
+    QModelIndex sourceIndex = mapToSource(createIndex(sourceRow, sourceColumn));
+
+    return sourceModel()->data(sourceIndex, role);
 }
 
 bool CHorizontalProxyModel::setData(const QModelIndex &index, const QVariant &value, int role) {

@@ -70,7 +70,7 @@ void WLoadedFilesTreeView::dropEvent(QDropEvent *event) {
         for (const QUrl &url : urls) {
             QString path = url.toLocalFile();
             QString fileName = QFileInfo(path).fileName();
-            qDebug() << "Dropped file:" << fileName << "Path:" << path;
+            qDebug() << "\nDropped file:" << fileName << "\nPath:" << path;
             // Drop data tot he model
             static_cast<CParsedFileModel*>(model())->appendData(path);
             pb_dlg->updateProgress();

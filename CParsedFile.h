@@ -11,6 +11,7 @@
 #include <QFileInfo>
 #include <QString>
 #include <optional>
+#include <QCryptographicHash>
 
 class CEsquema;
 class QSString;
@@ -32,10 +33,19 @@ public:
     const std::optional<QString> getValue(const QString& fieldName) const;
     const QHash<QString, QString>& getFields() const { return m_fieldValueMap; }
 
+
+    QString computePdfHash(const QString &pdfText) {
+        QByteArray byteArray = pdfText.toUtf8();  // Convert QString to QByteArray using UTF-8 encoding
+        return QCryptographicHash::hash(byteArray, QCryptographicHash::Sha256).toHex();
+    }
+
+    const QString& getPdfHash() const { return m_pdfHash; }
+
 private:
     QString     m_filePath; // Relation to the pdf document that we are parsing and storing.
     QHash<QString, QString> m_fieldValueMap; // Maps field to value
     CEsquema **m_assignedEsquema;
+    QString     m_pdfHash;
 };
 
 #endif // CPARSEDFILE_H

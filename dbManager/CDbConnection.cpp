@@ -5,9 +5,11 @@
 
 #include "dbManager/CDbConnection.h"
 #include "CSqlMultiTableModel.h"
+
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QSqlRelationalTableModel>
+
+#include "sql_queries.h"
 
 bool CDbConnection::isInitialized = false;
 
@@ -16,7 +18,7 @@ CDbConnection& CDbConnection::getConnection(const QString &host, const QString &
 
     if (!isInitialized && !host.isEmpty() && !db.isEmpty() && !user.isEmpty() && !pass.isEmpty()) {
         instance.connectDatabase(host, db, user, pass);
-        instance.addModel("Members");
+        instance.addModel("Members", "Members"); // Table name, alias
         instance.addModel("Flats", "Flats");
         instance.addModel("ru_bills", "Utility Bills");
         instance.addModel("occupancy", "Occupancy");
@@ -58,13 +60,12 @@ CSqlMultiTableModel *CDbConnection::addModel(const QString& tableName, const QSt
 
     CSqlMultiTableModel* model = new CSqlMultiTableModel(this);
     QSqlDatabase db = QSqlDatabase::database(m_dbName);
-    model->setQuery(QString("SELECT * FROM %1").arg(tableName), db);
 
-    if (model) {
-        m_models.emplace(upAlias, model);
-    } else {
-        delete model;
-    }
+    const QString selQuery = retrieveSelQuery(tableName);
+
+    model->setQuery(selQuery, db);
+
+    m_models.emplace(upAlias, model);
     return model;
 }
 
@@ -143,9 +144,19 @@ bool CDbConnection::bulkInsert(const QString& tableName, const std::vector<std::
         return false;
     }
 
-    if (m_models.find(tableName) != m_models.end()) {
-        // m_models.at(tableName)->select(); // NEW BOOKMARK - From when using QSqlRelationalTableModel
-    }
-
     return true;
+}
+
+const QString CDbConnection::retrieveSelQuery(const QString& tableName) const {
+    return  (tableName == "Members")   ? SqlQueries::GetMembers   :
+            (tableName == "Flats")     ? SqlQueries::GetFlats     :
+            (tableName == "ru_bills")  ? SqlQueries::GetRuBills   :
+            (tableName == "occupancy") ? SqlQueries::GetOccupancy :
+            throw std::invalid_argument("CDbConnection::addModel -> Invalid table name");
+}
+
+void CDbConnection::refreshModel(const QString& tableName) {
+    CSqlMultiTableModel *model = getModel(tableName);
+    QSqlDatabase db = QSqlDatabase::database(m_dbName);
+    model->setQuery(model->lastQuery(), db);
 }

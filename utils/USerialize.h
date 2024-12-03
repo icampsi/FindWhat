@@ -64,9 +64,12 @@ namespace USerialize {
             container.push_back(std::move(tempStr));
         }
     }
+    
+    void writeModel(std::ofstream &out, const QAbstractItemModel* model);
+    void readModel(std::ifstream &in, QAbstractItemModel* model);
 
-    void readModel(std::ofstream &out, const QAbstractItemModel* model);
-    void writeModel(std::ifstream &in, QAbstractItemModel* model);
+    // Writes a QByteArray to a file using QFile. Filepath must include extension
+    void fileFromBinary(const QString &filePath, QByteArray &fileData) ;
 }
 
 #endif // USERIALIZE_H

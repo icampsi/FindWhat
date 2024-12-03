@@ -16,9 +16,8 @@ DMemberEdit::DMemberEdit(CSqlMultiTableModel *sourceModel, const int rowToEdit, 
 {
     QBoxLayout *Layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     setLayout(Layout);
-    qDebug() << rowToEdit;
+
     // Model and proxy
-    // m_recModel.setMode(CSqlMultiTableModel::Mode::SingleRecord);
     m_hProxyModel.setMode(CHorizontalProxyModel::Mode::SingleRow,  rowToEdit);
     m_hProxyModel.setSourceModel(sourceModel);
 

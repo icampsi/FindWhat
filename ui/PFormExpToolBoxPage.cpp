@@ -14,8 +14,8 @@
 #include <QListWidget>
 #ifdef ENABLE_DBMANAGER
 #include "WSqlMultiTable.h"
-#include "CSqlMultiTableDelegate.h"
 #include "CHorizontalProxyModel.h"
+#include "CSqlMultiTableDelegate.h"
 #endif
 
 PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
@@ -61,8 +61,6 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
     }
     
     ui->spreadSheet_formatTable->setModel(m_exportCSV->getCsvTableModel());
-    // m_exportCSV->getDbTableModel()->updateFields(CDbConnection::getConnection().getModel("Utility Bills")); new BOOKMARK
-
 
     ui->tableWidget_fileValues->insertColumn(0);
     ui->tableWidget_fileValues->insertColumn(1);
@@ -105,9 +103,8 @@ PFormExpToolBoxPage::PFormExpToolBoxPage(QWidget *parent, CExportCSV *exportCSV)
         }
     });
 
-
 #ifdef ENABLE_DBMANAGER
-    // Create CRecTable for sql insertions. Used if parseDB is selected
+    // Create WSqlMultiTable for sql insertions. Used if parseDB is selected
     WSqlMultiTable *dbTable = new WSqlMultiTable(ui->stackedWidget_parseOpt);
     // Setup HORIZONTAL PROXY MODEL
     m_dbProxyModel = new CHorizontalProxyModel(this);

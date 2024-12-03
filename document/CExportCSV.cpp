@@ -10,6 +10,7 @@
 
 #include "CMDoc.h"
 #include "CEsquemaDoc.h"
+#include "CParsedPdfModel.h"
 #include "finder/CEsquema.h"
 #include "utils/UText.h"
 #include "utils/USerialize.h"
@@ -21,6 +22,7 @@
 
 #ifdef ENABLE_DBMANAGER
 #include "dbManager/CDbConnection.h"
+#include "dbManager/sql_queries.h"
 #endif
 
 CExportCSV::CExportCSV()
@@ -35,28 +37,35 @@ CExportCSV::CExportCSV()
 #endif
 {
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
-                            "       ru_bills.exp_date, "
-                            "       ru_bills.billing_periode_start, "
-                            "       ru_bills.billing_periode_end, "
-                            "       ru_bills.company_cif, "
-                            "       flats.floor_num, "
-                            "       flats.door_num, "
-                            "       utility.utility_name, "
-                            "       ru_bills.iva, "
-                            "       ru_bills.bi, "
-                            "       ru_bills.total "
-                            "FROM ru_bills "
-                            "INNER JOIN utility_company "
-                            "ON ru_bills.company_cif = utility_company.company_cif "
-                            "INNER JOIN flats "
-                            "ON ru_bills.flat_ID = flats.flat_id "
-                            "INNER JOIN utility "
-                            "ON ru_bills.utility_id = utility.utility_id limit 0",
-                            QSqlDatabase::database("closca"));
-    m_dbTableModel.insertRows(0, 1);
+    // QString query = SqlQueries::GetRuBills + " LIMIT 0";
+    // m_dbTableModel.setQuery(query, QSqlDatabase::database("closca"));
+    // m_dbTableModel.insertRows(0, 1);
+
+    setupDbFormatTable();
 #endif
 }
+
+#ifdef ENABLE_DBMANAGER
+void CExportCSV::setupDbFormatTable() {
+    const QVector<QString> colNames {
+        "Bill Number",
+        "Expedition Date",
+        "Billing Periode Start",
+        "Billing Periode End",
+        "Company CIF",
+        "Floor",
+        "Door",
+        "Utility Name",
+        "IVA",
+        "BI",
+        "Total"
+    };
+    if(m_dbTableModel.rowCount() < 1) {
+        m_dbTableModel.insertRows(0, 1);
+    }
+    m_dbTableModel.setHorizontalHeaderLabels(colNames);
+}
+#endif
 
 void CExportCSV::convertModelToVector(QAbstractItemModel* model, std::vector<std::vector<QString>>* format) {
     int rowCount = model->rowCount();
@@ -85,8 +94,9 @@ bool CExportCSV::parseFileValues(int index) {
     return m_files[index].parseFileValues();
 }
 
-void CExportCSV::buildStructure(QAbstractItemModel* combinedModel, ProgBar_dlg* progressDialog, bool CSVParser) {
+void CExportCSV::buildStructure(CParsedPdfModel* combinedModel, ProgBar_dlg* progressDialog, bool CSVParser) {
     int iteration = 0;
+    int firstEmptyRow = combinedModel->rowCount(); // To track where to start inserting data
     QAbstractItemModel *pFormatModel = nullptr; // will refer to m_dbTableModel or m_csvTableModel depending on the used parser
     if(!CSVParser) {
 #ifdef ENABLE_DBMANAGER
@@ -96,12 +106,27 @@ void CExportCSV::buildStructure(QAbstractItemModel* combinedModel, ProgBar_dlg* 
         pFormatModel = &m_csvTableModel;
     }
 
-    combinedModel->insertRows(combinedModel->rowCount(), m_files.size());
-    // if(combinedModel->columnCount() < this->m_dbTableModel.columnCount()) {
-    //     int colDiff = this->m_dbTableModel.columnCount() - combinedModel->columnCount();
-    //     combinedModel->insertColumns(combinedModel->columnCount(), colDiff);
-    // }
-    for (CParsedFile& file : m_files) {
+    combinedModel->insertRows(combinedModel->rowCount(), m_files.size()); // Insert enough blanck rows to the model
+
+    if(!m_files.isEmpty()) {
+        // Add columns if the table model is bigger than the previous ones
+        if(combinedModel->columnCount() < pFormatModel->columnCount()) {
+            int colDiff = pFormatModel->columnCount() - combinedModel->columnCount();
+            combinedModel->insertColumns(combinedModel->columnCount(), colDiff);
+        }
+#ifdef ENABLE_DBMANAGER
+        // Add column name as header data for dbParser
+        if(!CSVParser) {
+            for(int i{0}; i < pFormatModel->columnCount(); ++i) {
+                combinedModel->setHeaderData(i, Qt::Horizontal, pFormatModel->headerData(i, Qt::Horizontal));
+            }
+        }
+#endif
+    }
+
+    // Iterate through all m_files
+    for (int i{0}; i < m_files.size(); ++i) {
+        CParsedFile& file = m_files[i];
         // Parse values
         file.parseFileValues();
 
@@ -111,17 +136,25 @@ void CExportCSV::buildStructure(QAbstractItemModel* combinedModel, ProgBar_dlg* 
                 return file.getValue(capturedString);
             };
 
-            for (int i = 0; i < file.getFields().size(); ++i) {
-                QModelIndex index = pFormatModel->index(0, i);
+            // Iterate over every column in the format model to insert the correponding data in each cell
+            for (int j = 0; j < pFormatModel->columnCount(); ++j) {
+                QModelIndex index = pFormatModel->index(0, j);
                 QString data = pFormatModel->data(index).toString();
                 UText::replacePlaceholders(data, "<(.*?)>", replacer);
-                combinedModel->setData(combinedModel->index(iteration, i), data);
+
+                if(!combinedModel->setData(combinedModel->index(iteration + firstEmptyRow, j), data)) {
+                    qWarning() << "CExportCSV::buildStructure:\nError setting data for row " << iteration << " and column " << j;
+                }
             }
         }
 
+        // Add file path as metadata on each row of the table
+        combinedModel->setFileMetadata(i, &m_files[i]);
+
         // RENAME DOCUMENT
-        QString newFileName;
-        m_associatedEsquema->createFileName(newFileName, m_fileNamePlaceholder);
+        if(m_renameParsedPDFFlag) {
+         renameFile(m_files[i].filePath());
+        }
 
         // UPDATE PROGRESSBAR
         if (iteration % 2 == 0) progressDialog->updateProgress();
@@ -132,7 +165,6 @@ void CExportCSV::buildStructure(QAbstractItemModel* combinedModel, ProgBar_dlg* 
 
 const QVector<CParsedFile>* CExportCSV::setFiles(const std::vector<QString>& paths) {
     for (const QString& filePath : paths) {
-        qDebug() << filePath;
         CParsedFile file(filePath, &m_associatedEsquema);
         file.parseFileValues();
         m_files.push_back(std::move(file));
@@ -143,7 +175,7 @@ const QVector<CParsedFile>* CExportCSV::setFiles(const std::vector<QString>& pat
 void CExportCSV::renameFile(const QString &oldFilePath) {
     QFileInfo fileInfo(oldFilePath);
     if (!fileInfo.exists()) {
-        qDebug() << "Source file does not exist:" << oldFilePath;
+        qWarning() << "Source file does not exist:" << oldFilePath;
         return;
     }
 
@@ -161,9 +193,9 @@ void CExportCSV::renameFile(const QString &oldFilePath) {
     QFile newFile(newFilePath);
     if(oldFile.fileName() != newFile.fileName() && oldFile.rename(newFilePath)) {
         if (oldFile.rename(newFilePath)) {
-            qDebug() << "File: " + oldFile.fileName() + " renamed successfully to: " + newFile.fileName();
+            qWarning() << "File: " + oldFile.fileName() + " renamed successfully to: " + newFile.fileName();
         } else {
-            qDebug() << "Failed to rename file:" << oldFile.errorString();
+            qWarning() << "Failed to rename file:" << oldFile.errorString();
         }
     }
 }
@@ -202,22 +234,13 @@ void CExportCSV::serialize(std::ofstream &out) const {
     USerialize::writeQString(out, m_fileNamePlaceholder);                       // m_fileNamePlaceholder
     USerialize::writeQString(out, m_idText);                                    // m_idText
 
-    // Serialize the QStandardItemModel
-    USerialize::readModel(out, &m_csvTableModel);
+    // Serialize the m_csvTableModel (QStandarditemModel)
+    USerialize::writeModel(out, &m_csvTableModel);
 
-    int rowCount    = m_dbTableModel.rowCount();
-    int columnCount = m_dbTableModel.columnCount();
-
-    out.write(reinterpret_cast<const char*>(&rowCount), sizeof(int));
-    out.write(reinterpret_cast<const char*>(&columnCount), sizeof(int));
-
-    for (int row = 0; row < rowCount; ++row) {
-        for (int column = 0; column < columnCount; ++column) {
-            QString item = m_dbTableModel.data(m_dbTableModel.index(row, column)).toString();
-            USerialize::writeQString(out, item);
-        }
-    }
-
+#ifdef ENABLE_DBMANAGER
+    // Serialize m_dbTableModel (QStandarditemModel)
+    USerialize::writeModel(out, &m_dbTableModel);
+#endif
 }
 
 void CExportCSV::deserialize(std::ifstream &in) {
@@ -235,40 +258,21 @@ void CExportCSV::deserialize(std::ifstream &in) {
      * m_pdfFilePaths
      */
 
-    size_t index;
-    in.read(reinterpret_cast<char*>(&index), sizeof(size_t));
-    m_associatedEsquema = CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema();
-
+    {
+        size_t index;
+        in.read(reinterpret_cast<char*>(&index), sizeof(size_t));
+        m_associatedEsquema = CMDoc::getMDoc().getEsquemaFromIndex(index)->getEsquema();
+    }
     USerialize::readQString(in, m_exportFileRename);                 // m_exportFileRename
     in.read(reinterpret_cast<char*>(&m_renameParsedPDFFlag), sizeof(bool));  // m_renameParsedPDFFlag
     USerialize::readQString(in, m_fileNamePlaceholder);              // m_fileNamePlaceholder
     USerialize::readQString(in, m_idText);                           // m_idText
 
     // Deserialize the QStandardItemModel
-    USerialize::writeModel(in, &m_csvTableModel);
+    USerialize::readModel(in, &m_csvTableModel);
 
 #ifdef ENABLE_DBMANAGER
-    m_dbTableModel.setQuery(        "SELECT ru_bills.bill_num, "
-                            "       ru_bills.exp_date, "
-                            "       ru_bills.billing_periode_start, "
-                            "       ru_bills.billing_periode_end, "
-                            "       ru_bills.company_cif, "
-                            "       flats.floor_num, "
-                            "       flats.door_num, "
-                            "       utility.utility_name, "
-                            "       ru_bills.iva, "
-                            "       ru_bills.bi, "
-                            "       ru_bills.total "
-                            "FROM ru_bills "
-                            "INNER JOIN utility_company "
-                            "ON ru_bills.company_cif = utility_company.company_cif "
-                            "INNER JOIN flats "
-                            "ON ru_bills.flat_ID = flats.flat_id "
-                            "INNER JOIN utility "
-                            "ON ru_bills.utility_id = utility.utility_id limit 0",
-                            QSqlDatabase::database("closca"));
-
-    USerialize::writeModel(in, &m_dbTableModel);
+    USerialize::readModel(in, &m_dbTableModel);
 #endif
 
 }

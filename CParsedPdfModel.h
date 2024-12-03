@@ -1,6 +1,12 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #ifndef CPARSEDPDFMODEL_H
 #define CPARSEDPDFMODEL_H
 
+#include "CParsedFile.h"
 #include <QAbstractTableModel>
 #include <QVector>
 #include <QString>
@@ -50,7 +56,7 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override {
         Q_UNUSED(parent);
 
-        if (row < 0 || row >= m_data.size() || count <= 0) {
+        if (row < 0 || row > m_data.size() || count <= 0) {
             return false; // Invalid row index or invalid count
         }
 
@@ -58,7 +64,7 @@ public:
 
         beginInsertRows(parent, row, row + count - 1); // Ensure that (row + count - 1) >= row
         for (int i = 0; i < count; ++i) {
-            m_data.insert(row, qMakePair(QString(), emptyRow));
+            m_data.insert(row, qMakePair(nullptr, emptyRow));
         }
         endInsertRows();
 
@@ -71,20 +77,15 @@ public:
         int row = index.row();
         int column = index.column();
         if (role == Qt::DisplayRole) {
-            qDebug() << m_data.at(row).second.at(column);
             return m_data.at(row).second.at(column);
 
-        } else if (role == Qt::UserRole) {
-            // Return the file path metadata
-            return m_data.at(row).first;
         }
 
         return QVariant();
     }
 
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        if (!index.isValid() || index.row() >= m_data.size() || index.column() >= m_data.at(index.row()).second.size()) {
-           qDebug() << "Set data fail. \n Column: " << index.column() << "\nRow: " << index.row();
+        if (!index.isValid() || index.row() >= m_data.size() || index.column() >= m_columnCount) {
             return false;
         }
 
@@ -94,24 +95,92 @@ public:
         if (role == Qt::EditRole) {
             // Update cell value
             m_data[row].second[column] = value;
-            qDebug() << "Value: " << value;
-            qDebug() << "cell: " << m_data[row].second[column];
-            qDebug() << "Column: " << column;
-            qDebug() << "Row: " << row;
+
             // Notify views that the data has changed
             emit dataChanged(index, index);
-            return true;
-        } else if( role == Qt::UserRole) { // use userRole to set filePath
-            m_data[row].first = value.toString();
             return true;
         }
 
         return false;
     }
 
+    const CParsedFile* getFileMetadata(const int row) const {
+        if(row > m_data.size() || row < 0) return nullptr;
+        return m_data[row].first;
+
+    }
+
+    bool setFileMetadata(const int row, const CParsedFile* data) {
+        if(row > m_data.size() || row < 0) return false;
+        m_data[row].first = data;
+        return true;
+    }
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override{
+        Q_UNUSED(parent);
+        return createIndex(row, column);
+    }
+
+    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override {
+        if (role != Qt::EditRole || section < 0) {
+            return false;
+        }
+
+        if (orientation == Qt::Horizontal) {
+            // Handle horizontal header
+            if (section >= m_hHeaderData.size()) {
+                // Resize if section index is out of bounds
+                m_hHeaderData.resize(section + 1);
+            }
+            m_hHeaderData[section] = value; // Store the value for the horizontal header
+        } else if (orientation == Qt::Vertical) {
+            // Handle vertical header
+            if (section >= m_vHeaderData.size()) {
+                // Resize if section index is out of bounds
+                m_vHeaderData.resize(section + 1);
+            }
+            m_vHeaderData[section] = value; // Store the value for the vertical header
+        } else {
+            return false; // Invalid orientation
+        }
+
+        emit headerDataChanged(orientation, section, section);
+
+        return true;
+    }
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+        if (role != Qt::DisplayRole) {
+            return QVariant(); // Only return data for the DisplayRole
+        }
+
+        if (section < 0) {
+            return QVariant(); // Invalid section index
+        }
+
+        if (orientation == Qt::Horizontal) {
+            // Return data for horizontal header
+            if (section < m_hHeaderData.size()) {
+                return m_hHeaderData[section];
+            }
+        } else if (orientation == Qt::Vertical) {
+            // Return data for vertical header
+            if (section < m_vHeaderData.size()) {
+                return m_vHeaderData[section];
+            }
+        }
+
+        // No data is available. Return the section index (row or column number)
+        return section + 1;
+    }
+
 private:
-    QVector<QPair<QString, QVector<QVariant>>> m_data; // Flat table of data with file path related to each row
-    int m_columnCount = 0;
+    QVector<QPair<const CParsedFile*, QVector<QVariant>>> m_data; // Flat table of data with file path related to each row
+
+    QVector<QVariant> m_hHeaderData; // Horizontal header data
+    QVector<QVariant> m_vHeaderData; // Vertical header data
+
+    int m_columnCount = 0; // Column count
 };
 
 #endif // CPARSEDPDFMODEL_H

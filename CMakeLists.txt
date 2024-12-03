@@ -79,6 +79,14 @@ set(MAIN_FILES
     ui/dialogs/InvalidFileName_dlg.cpp  ui/dialogs/InvalidFileName_dlg.h ui/dialogs/InvalidFileName_dlg.ui
     ui/dialogs/DDisplayParsedInfo.cpp   ui/dialogs/DDisplayParsedInfo.h  ui/dialogs/DDisplayParsedInfo.ui
 
+    ui/WExtViews/WTreeView.h
+    ui/WExtViews/WTreeWidget.h
+    ui/WExtViews/WListView.h
+    ui/WExtViews/WListWidget.h
+    ui/WExtViews/WTableView.h
+    ui/WExtViews/WTableWidget.h
+    ui/WExtViews/WColumnView.h
+
     # RESOURCE
     res/icons.qrc
 )

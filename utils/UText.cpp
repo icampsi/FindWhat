@@ -66,4 +66,29 @@ namespace UText {
         }
     }
 
+    double trimCurrency(const QString& value) {
+        // Remove currency symbols and trim whitespace
+        QString cleanedValue = value.trimmed();
+
+        // Use a regex to remove common currency symbols
+        cleanedValue.remove(QRegularExpression("[€$£¥]")); // Add more symbols as needed
+
+        // Replace commas with dots
+        cleanedValue.replace(QRegularExpression(","), ".");
+
+        // Remove any extra spaces
+        cleanedValue.replace(QRegularExpression("\\s+"), "");
+
+        // Convert to double
+        bool ok;
+        double result = cleanedValue.toDouble(&ok);
+
+        // Handle the case where conversion failed
+        if (!ok) {
+            qDebug() << "Conversion failed for value:" << value;
+            return 0.0; // or handle error as needed
+        }
+
+        return result;
+    }
 }

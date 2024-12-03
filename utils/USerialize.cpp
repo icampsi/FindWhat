@@ -5,6 +5,7 @@
 
 #include "USerialize.h"
 #include "QAbstractItemModel"
+#include <QFile>
 
 namespace USerialize {
     void writeQString(std::ofstream& out, const QString& str) {
@@ -23,13 +24,21 @@ namespace USerialize {
         str = QString::fromUtf8(utf8Data);
     }
 
-    void readModel(std::ofstream &out, const QAbstractItemModel* model) {
+    void writeModel(std::ofstream &out, const QAbstractItemModel* model) {
         int rowCount = model->rowCount();
         int columnCount = model->columnCount();
 
+        // Write row and column counts
         out.write(reinterpret_cast<const char*>(&rowCount), sizeof(int));
         out.write(reinterpret_cast<const char*>(&columnCount), sizeof(int));
 
+        // Write header labels
+        for (int column = 0; column < columnCount; ++column) {
+            QString header = model->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+            USerialize::writeQString(out, header);
+        }
+
+        // Write model data
         for (int row = 0; row < rowCount; ++row) {
             for (int column = 0; column < columnCount; ++column) {
                 QModelIndex index = model->index(row, column);
@@ -39,16 +48,26 @@ namespace USerialize {
         }
     }
 
-    void writeModel(std::ifstream &in, QAbstractItemModel* model) {
+
+    void readModel(std::ifstream &in, QAbstractItemModel* model) {
         int rowCount;
         int columnCount;
 
         in.read(reinterpret_cast<char*>(&rowCount), sizeof(int));
         in.read(reinterpret_cast<char*>(&columnCount), sizeof(int));
 
+        // Insert rows and columns in the model
         model->insertRows(0, rowCount);
         model->insertColumns(0, columnCount);
 
+        // Read header labels
+        for (int column = 0; column < columnCount; ++column) {
+            QString header;
+            USerialize::readQString(in, header);
+            model->setHeaderData(column, Qt::Horizontal, header);
+        }
+
+        // Read model data
         for (int row = 0; row < rowCount; ++row) {
             for (int column = 0; column < columnCount; ++column) {
                 QString text;
@@ -56,6 +75,18 @@ namespace USerialize {
                 QModelIndex index = model->index(row, column);
                 model->setData(index, text);
             }
+        }
+    }
+
+
+    void fileFromBinary(const QString &filePath, QByteArray &fileData) {
+        QFile pdfFile(filePath);
+        if (pdfFile.open(QIODevice::WriteOnly)) {
+            pdfFile.write(fileData);
+            pdfFile.close();
+            qDebug() << "PDF file successfully reconstructed at: " << filePath;
+        } else {
+            qWarning() << "Failed to open file for writing: " << pdfFile.errorString();
         }
     }
 }

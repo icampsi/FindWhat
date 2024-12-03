@@ -21,6 +21,9 @@ namespace UText {
 
     //Replaces text for a placeholder using regex
     void replacePlaceholders(QString& targetString, const QString& regexStr, std::function<std::optional<QString>(const QString)> replacer);
+
+    // Trims typical currency formating simbols (€$£¥), changes "," to "." and removes possible whitespaces
+    double trimCurrency(const QString& value);
 }
 
 #endif // UTEXT_H

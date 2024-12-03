@@ -17,6 +17,7 @@ class InvalidFileName_dlg;
 class ProgBar_dlg;
 class CPdfDoc;
 class CPagedText;
+class CParsedPdfModel;
 
 class CExportCSV {
 public:
@@ -40,7 +41,7 @@ protected:
 
     QStandardItemModel m_csvTableModel; // Table model for the csv format table
 #ifdef ENABLE_DBMANAGER
-    CSqlMultiTableModel m_dbTableModel;  // Table model for the db format table
+    QStandardItemModel m_dbTableModel;  // Table model for the db format table
 #endif
 
 public:
@@ -50,13 +51,7 @@ public:
 
     const QVector<CParsedFile>& getFiles() const { return m_files; }
     const QVector<CParsedFile>* setFiles(const std::vector<QString>& paths); // NEW BOOKMARK - CHANGED RETURN TYPE. WILL STICK?
-    void deleteFile(int index) {
-        m_files.removeAt(index);
-        for(auto& file : m_files) {
-            qDebug() << m_files.size();
-            qDebug() << file.fileName();
-        }
-    }
+    void deleteFile(int index) { m_files.removeAt(index); }
 
     const QString& getExportFileRename() const        { return m_exportFileRename; }
     void setExportFileRename(const QString& fileName) { m_exportFileRename = fileName; }
@@ -72,7 +67,8 @@ public:
 
     QStandardItemModel *getCsvTableModel() { return &m_csvTableModel; }
 #ifdef ENABLE_DBMANAGER
-    CSqlMultiTableModel *getDbTableModel() { return &m_dbTableModel; }
+    QStandardItemModel *getDbTableModel() { return &m_dbTableModel; }
+    void setupDbFormatTable();
 #endif
 
     // PUBLIC FUNCTIONS
@@ -89,7 +85,7 @@ public:
     // Parse values for all files stored in m_files
     bool parseFileValues(int index);
     // Extract values from the pdf's. Returns false if text couldn't be extracted.
-    void buildStructure(QAbstractItemModel *combinedModel, ProgBar_dlg* progressDialog, bool CSVParser = false);
+    void buildStructure(CParsedPdfModel *combinedModel, ProgBar_dlg* progressDialog, bool CSVParser);
 
     // SERIALIZATION
     void serialize(std::ofstream &out) const;

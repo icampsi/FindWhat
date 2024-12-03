@@ -39,19 +39,6 @@ private:
         QString          m_fkTableName    = "";
         QString          m_fkColumnName   = "";
         QVector<QString> m_fkColumnValues;
-
-        void print() const {
-            qDebug() << "===============\t\t";
-            qDebug() << "Field Name:\t\t"      << m_fieldName;
-            qDebug() << "Has FK:\t\t\t"        << m_hasFk;
-            qDebug() << "FK Table Name:\t\t"   << m_fkTableName;
-            qDebug() << "FK Column Name:\t\t"  << m_fkColumnName;
-
-            for(const QString& value : m_fkColumnValues) {
-                qDebug() << "Column value:\t\t" << value;
-            }
-            qDebug() << "\n\n";
-        }
     };
 
 public:
@@ -74,9 +61,9 @@ public:
     QVariant fieldName(int index) const; // Returns field name from index
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
     // Change the referenced record for edition based on row index of the query results
     void changeRecord(int index);
-    void updateData();
 
     void setQuery(const QString &query, const QSqlDatabase &db = QSqlDatabase());
     void setQuery(QSqlQuery &&query);
@@ -100,9 +87,14 @@ public:
         return false;
     }
 
+    bool removeRows(int row, int count, const QModelIndex &parent) override;
+
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     // Retrieves the string used in setQuery();
     const QString lastQuery() const { return this->m_query.lastQuery(); }
+
+    const QMap<QString, QVector<Field>>& getTableMap() { return m_tables; }
+
 protected:
     // Gets the different table names used from the db and maps them to their fields: m_tables
     void extractTables();
@@ -112,10 +104,13 @@ protected:
     */
     void formUpsertQuery();
 
-    // Properties that would make a field value non editable. For now only one is specified:
-    bool editableCheck(const QModelIndex &index) const;
+    // // Properties that would make a field value non editable.
+    // bool editableCheck(const QModelIndex &index) const;
 
     Field retrieveForeignKeyInfo(const QString& tableName, const QString& columnName);
+
+    // The shared part of the setQuery function for each overload
+    void doQuery();
 
     // - NOT USED YET
     // void CRecModel::copyRecordsToVector() {

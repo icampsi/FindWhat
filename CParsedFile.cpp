@@ -47,6 +47,8 @@ bool CParsedFile::parseFileValues() {
     Poppler_interface::loadPdfDocument(m_filePath, &pagedText);
     if(pagedText.isEmpty()) return false;
 
+    m_pdfHash = computePdfHash(pagedText.getFullText());
+
     // Add static data to the map
     for(const CData* data : (*m_assignedEsquema)->getStaticData()) {
         m_fieldValueMap.emplace(data->getDataName(), data->getDataString());

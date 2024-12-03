@@ -24,22 +24,28 @@ public:
 
     void changeTable(const QString& tableName);
 
+protected:
+    void reconstructPDFFile(const QModelIndex &index);
+    bool removeSelectedTreeViewRows();
+
 private slots:
     void on_comboBox_tables_currentIndexChanged(int index);
     void on_treeView_doubleClicked(const QModelIndex &index);
     bool openEditDlg(const QModelIndex &index);
     void filterChanged(int column, const QString& text);
+    void showTreeContextMenu(const QPoint &point);
 
 signals:
     void queryChanged();
 
-private:
-    Ui::WDbView *ui;
-    QSortFilterProxyModel *m_proxyModel;
-    WSearcherHeader *m_head;
-    QVector<QString> insertionOrder;
+protected:
+    Ui::WDbView             *ui;
 
-    CSqlMultiTableModel *m_activeModel;
+    QSortFilterProxyModel   *m_proxyModel;
+    WSearcherHeader         *m_head;
+    QVector<QString>         m_insertionOrder;
+
+    CSqlMultiTableModel     *m_activeModel;
 };
 
 #endif // WDBVIEW_H

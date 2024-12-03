@@ -25,6 +25,7 @@ add_library(${PROJECT_NAME} STATIC
     WSqlMultiTable.h        WSqlMultiTable.cpp
     CSqlMultiTableDelegate.h   CSqlMultiTableDelegate.cpp
     CSqlMultiTableModel.h   CSqlMultiTableModel.cpp
+    sql_queries.h
 
 )
 

@@ -5,6 +5,7 @@
 
 #include "PMainEsquemaUI.h"
 
+#include "CParsedPdfModel.h"
 #include "MainWindow.h"
 #include "ui/dialogs/DDisplayParsedInfo.h"
 #include "ui/dialogs/ProgBar_dlg.h"
@@ -228,72 +229,37 @@ void PMainEsquemaUI::on_pushButton_parse_clicked() {
 
     // Checks the ammount of work that will be needed to set up the progress bar dialog
     const size_t fileCount = exportPathDoc.getFileCount();
-    QAbstractItemModel* combinedModel = nullptr;
+    CParsedPdfModel* combinedModel = new CParsedPdfModel(this);
     // Creates progressBar dialog
     if(fileCount > 0) {
         ProgBar_dlg *progressDlg = new ProgBar_dlg(fileCount, "Exporting...", this);
         progressDlg->show();
         QCoreApplication::processEvents(); // Needed to display progress bar
 
-        // Counts the max ammount of columns there are in any format table
-        bool CSVParser = ui->radioButton_csvParse->isChecked(); // Which parser is required
-        size_t maxColumns{ 1 }; // 1 if dbParser is checked. Iterate through exportCSVs to count otherwise
-        if(!CSVParser) {
-#ifdef ENABLE_DBMANAGER
-            combinedModel = new CSqlMultiTableModel();
-            static_cast<CSqlMultiTableModel*>(combinedModel)->  // BOOKMARK - This is not the best way and maybe nor the place to do this. This stirng is repeated identical at CExportCSV. should store it somewhere
-                setQuery(        "SELECT ru_bills.bill_num, "
-                         "       ru_bills.exp_date, "
-                         "       ru_bills.billing_periode_start, "
-                         "       ru_bills.billing_periode_end, "
-                         "       ru_bills.company_cif, "
-                         "       flats.floor_num, "
-                         "       flats.door_num, "
-                         "       utility.utility_name, "
-                         "       ru_bills.iva, "
-                         "       ru_bills.bi, "
-                         "       ru_bills.total "
-                         "FROM ru_bills "
-                         "INNER JOIN utility_company "
-                         "ON ru_bills.company_cif = utility_company.company_cif "
-                         "INNER JOIN flats "
-                         "ON ru_bills.flat_ID = flats.flat_id "
-                         "INNER JOIN utility "
-                         "ON ru_bills.utility_id = utility.utility_id LIMIT 0",
-                         QSqlDatabase::database("closca"));
-#endif
-        } else {
-            combinedModel = new QStandardItemModel();
-        }
+        bool useCSVParser = ui->radioButton_csvParse->isChecked(); // Which parser is required
 
+        // DOING THE ACTUAL WORK: Build the structure
         for (CExportCSV* it : exportCSVs) {
-            QAbstractItemModel *model = it->getCsvTableModel();
-            if(!model) continue;
-            size_t columnCount = model->columnCount();
-            if(columnCount > maxColumns) maxColumns = columnCount;
-        }
-        /*
-         * Insert as many columns as the biggest format table has. Has no effect on CSqlMultiTableModel
-         * since it's been converted to a no-op function there
-         */
-        combinedModel->insertColumns(combinedModel->columnCount(), static_cast<int>(maxColumns));
-
-        std::vector<std::vector<QString>> newData;
-        for (CExportCSV* it : exportCSVs) {
-            newData.clear();
-            // DOING THE ACTUAL WORK: Build the structure
-            it->buildStructure(combinedModel, progressDlg, CSVParser);
+            it->buildStructure(combinedModel, progressDlg, useCSVParser);
         }
 
         // Delete progress dialog
         delete progressDlg;
         progressDlg = nullptr;
 
-        // Display Table DIalog
-        DDisplayParsedInfo *piDialog = new DDisplayParsedInfo(combinedModel, this);
-        piDialog->exec();
+        // Display Table Dialog
+        DDisplayParsedInfo *piDialog = new DDisplayParsedInfo(combinedModel, useCSVParser, this);
+        if (piDialog->exec() == QDialog::Accepted) {
+#ifdef ENABLE_DBMANAGER
+            if(!useCSVParser) {
+
+            }
+#endif
+        }
     }
+
     if(combinedModel) delete combinedModel;
+    combinedModel = nullptr;
     ui->pushButton_parse->setEnabled(true);
 }
 

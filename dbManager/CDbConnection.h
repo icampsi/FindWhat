@@ -41,6 +41,10 @@ public:
     CSqlMultiTableModel *addModel(const QString& tableName, const QString& alias = "");
     void deleteModel(std::unordered_map<QString, CSqlMultiTableModel*>& models, const QString& key);
     bool bulkInsert(const QString& tableName, const std::vector<std::vector<QString>>& data);
+    void refreshModel(const QString& tableName);
+
+protected:
+    const QString retrieveSelQuery(const QString& tableName) const;
 
 signals:
     void queryChanged();

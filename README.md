@@ -37,11 +37,18 @@ The program is not yet intuitive and does not provide much guidance on how to us
 
 # Latest updates
 
+*NEW
+- Added a way to store and retrieve pdf files as binary into the database.
+- Fixed an issue with CHorizontalProxyModel that wouldn't allow for correct data edition
+- Moved querie strings to a separat file
+- Added a check on upserting new bills to the database. If it's already there asks user wether to update it.
+- Added mechanism to delete entries from the db tables.
+
 18/09/24
 - Finished first step towards storing pdf info into mysql database: 
     - Database module is accessible, browsable, manually edditable (with still some missing functionality like manually deleting rows).
     - User can now set up a table format to define how parsed values form the pdf will be uploaded to the db
-    - Parsed values are already uploadable. I'm now working on a way to upload the files as binary data.
+    - Parsed values are already uploadable. I'm now working on a way to upload the files as binary data
 
 **/07/24
 - started working towards a more flexible and user friendly way to modify values after parsing

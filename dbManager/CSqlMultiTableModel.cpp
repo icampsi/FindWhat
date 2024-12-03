@@ -116,7 +116,8 @@ bool CSqlMultiTableModel::setData(const QModelIndex &index, const QVariant &valu
 Qt::ItemFlags CSqlMultiTableModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
 
-    return (editableCheck(index)) ? (defaultFlags & Qt::ItemIsEditable) : (defaultFlags | Qt::ItemIsEditable); // Value editable
+    // return (editableCheck(index)) ? (defaultFlags & Qt::ItemIsEditable) : (defaultFlags | Qt::ItemIsEditable); // Value editable
+    return defaultFlags | Qt::ItemIsEditable;
 }
 
 QVariant CSqlMultiTableModel::fieldName(int index) const {
@@ -131,17 +132,12 @@ void CSqlMultiTableModel::changeRecord(int index) {
     m_activeRecordIndex = index;
 }
 
-void CSqlMultiTableModel::setQuery(const QString &query, const QSqlDatabase &db) {
-    if(query.contains("AS")) {
-        qWarning() << "CSqlMultiTableModel::setQuery: Query shouldn't contain aliases";
-        return;
-    }
+void CSqlMultiTableModel::doQuery() {
+    emit beginResetModel();
 
     // Clear data
     m_records.clear();
-    // Build and execute query
-    m_query = QSqlQuery(db);
-    m_query.prepare(query);
+    // Execute query
     m_query.exec();
 
     // Copy query data into local vector
@@ -149,40 +145,29 @@ void CSqlMultiTableModel::setQuery(const QString &query, const QSqlDatabase &db)
     while(m_query.next()) {
         m_records.append(m_query.record());
     }
-
     extractTables();
     formUpsertQuery();
 
     // Assaign table size
     int qSize = m_query.size();
     qSize >= 0 ? m_rowCount = qSize : m_rowCount = 0;
+
+    emit endResetModel();
+}
+
+void CSqlMultiTableModel::setQuery(const QString &query, const QSqlDatabase &db) {
+    // Build query
+    m_query = QSqlQuery(db);
+    m_query.prepare(query);
+    // Exeute all setQuery logic
+    doQuery();
 }
 
 void CSqlMultiTableModel::setQuery(QSqlQuery &&query) {
-    // Block aliases in queries
-    if(query.lastQuery().contains("AS")) {
-        qWarning() << "CSqlMultiTableModel::setQuery: Query shouldn't contain aliases";
-        return;
-    }
-
-    // Clear data
-    m_records.clear();
-    // Build and execute query
+    // Build query
     m_query = std::move(query);
-    m_query.exec();
-
-    // Copy query data into local vector
-    m_records.reserve(m_query.size());
-    while(m_query.next()) {
-        m_records.append(m_query.record());
-    }
-
-    extractTables();
-    formUpsertQuery();
-
-    // Assaign table size
-    int qSize = m_query.size();
-    qSize >= 0 ? m_rowCount = qSize : m_rowCount = 0;
+    // Exeute all setQuery logic
+    doQuery();
 }
 
 CSqlMultiTableModel::Field CSqlMultiTableModel::retrieveForeignKeyInfo(const QString& tableName, const QString& columnName) {
@@ -315,7 +300,6 @@ bool CSqlMultiTableModel::commitRecord(const int row) {
         qWarning() << "Failed to commit database transaction:" << db.lastError().text();
         return false;
     }
-
     return true;
 }
 
@@ -369,7 +353,25 @@ bool CSqlMultiTableModel::insertRows(int row, int count, const QModelIndex &pare
     return true;
 }
 
-bool CSqlMultiTableModel::editableCheck(const QModelIndex &index) const {
-    // tableName being empty means that we can't reference it on the query
-    return (m_query.record().field(index.row()).tableName().isEmpty());
+bool CSqlMultiTableModel::removeRows(int row, int count, const QModelIndex &parent) {
+    // Check for valid boundaries
+    if (row < 0 || row + count > m_rowCount || count <= 0) {
+        return false;
+    }
+
+    // Begin removing rows from the model
+    beginRemoveRows(parent, row, row + count - 1);
+
+    // Remove the specified rows from m_records backwards
+    for (int i = count - 1; i >= 0; --i) {
+        m_records.removeAt(row + i);
+    }
+
+    // Update the internal row count
+    m_rowCount -= count;
+
+    // End row removal
+    endRemoveRows();
+
+    return true;
 }

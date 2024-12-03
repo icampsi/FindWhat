@@ -1,47 +1,45 @@
+/* =================================================== *
+ * ====        Copyright (c) 2024 icampsi         ==== *
+ * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
+ * =================================================== */
+
 #include "DDisplayParsedInfo.h"
+#include "ui/dialogs/ui_DDisplayParsedInfo.h"
 
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
 #include <QFileDialog>
-#include "document/CMDoc.h"
-#include "qsqlerror.h"
-#ifdef ENABLE_DBMANAGER
-#include "dbManager/CSqlMultiTableModel.h"
-#include <QCryptographicHash>
-#endif
-#include "ui/dialogs/ui_DDisplayParsedInfo.h"
+#include <QMessageBox>
 
-DDisplayParsedInfo::DDisplayParsedInfo(QAbstractItemModel *combinedModel,  QWidget *parent)
-    : QDialog(parent), ui(new Ui::DDisplayParsedInfo), m_combinedModel{combinedModel}
+#include "document/CMDoc.h"
+#include "CParsedPdfModel.h"
+
+#ifdef ENABLE_DBMANAGER
+#include <QSqlError>
+#include "sql_queries.h"
+#include "utils/UText.h"
+#include "CDbConnection.h"
+#endif
+
+DDisplayParsedInfo::DDisplayParsedInfo(CParsedPdfModel *combinedModel, bool isCSVParser, QWidget *parent)
+    : QDialog(parent), ui(new Ui::DDisplayParsedInfo), m_combinedModel{combinedModel}, m_isCSVParser{isCSVParser}
 {
     ui->setupUi(this);
-
     // Create a menu bar
     QMenuBar *menuBar = new QMenuBar(this);
-
-    // Create a File menu
     QMenu *fileMenu = menuBar->addMenu(tr("File"));
 
-    // Add actions to the File menu
     QAction *exportCSVAction = new QAction(tr("Export to csv"), this);
     fileMenu->addAction(exportCSVAction);
-
     QAction *exportDBAction = new QAction(tr("Export to Database"), this);
     fileMenu->addAction(exportDBAction);
 
-    // Connect actions to slots
-    CSqlMultiTableModel *pSqlModel = dynamic_cast<CSqlMultiTableModel*>(m_combinedModel);
-    if (pSqlModel) {
-        connect(exportCSVAction, &QAction::triggered, this, &DDisplayParsedInfo::commitTable);
-    } else {
-        connect(exportCSVAction, &QAction::triggered, this, &DDisplayParsedInfo::exportToCSV);
-    }
+    connect(exportCSVAction, &QAction::triggered, this, &DDisplayParsedInfo::commitTable);
     connect(exportDBAction, &QAction::triggered, this, [this]() {
-        QMessageBox::information(this, "Not Implemented", "Not implemented yet"); // BOOKMARK - Needs implementation
+        QMessageBox::information(this, "Not Implemented", "Not implemented yet");
     });
 
-    // Set up the layout
     this->layout()->setMenuBar(menuBar);
     ui->spreadSheet->setModel(m_combinedModel);
 }
@@ -51,25 +49,14 @@ DDisplayParsedInfo::~DDisplayParsedInfo() {
 }
 
 bool DDisplayParsedInfo::exportToCSV() {
-    // Create .csv File from the structure
-    // FILE BROWSE DIALOG FOR NAMING EXPORTED FILE
-    // Open a file dialog for saving exported csv file
-    QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Coma separated values (*.csv)");
-    qDebug() << saveCSVFileName;
-    if (saveCSVFileName.isEmpty()) { return false; } // Return if canceled
-    ///////////////////////////////////////////////
+    QString saveCSVFileName = QFileDialog::getSaveFileName(nullptr, "Save File", QDir::homePath(), "Comma separated values (*.csv)");
+    if (saveCSVFileName.isEmpty()) { return false; }
     CMDoc& cmdoc = CMDoc::getMDoc();
     cmdoc.getExportPathDoc().modelToFile(saveCSVFileName, m_combinedModel);
-    qDebug() << "exported";
     return true;
 }
 
 #ifdef ENABLE_DBMANAGER
-
-
-QString computePdfHash(const QByteArray &pdfData) {
-    return QCryptographicHash::hash(pdfData, QCryptographicHash::Sha256).toHex();
-}
 
 QByteArray readPdfFile(const QString &filePath) {
     QFile file(filePath);
@@ -80,108 +67,161 @@ QByteArray readPdfFile(const QString &filePath) {
     return file.readAll();
 }
 
-
-
 bool DDisplayParsedInfo::commitTable() {
-    CSqlMultiTableModel *pSqlModel = dynamic_cast<CSqlMultiTableModel*>(m_combinedModel);
     QSqlDatabase db = QSqlDatabase::database("closca");
-    if(pSqlModel) {
-        // Start a transaction
-        if (!db.transaction()) {
-            qWarning() << "Failed to start database transaction:" << db.lastError().text();
-            return false;
-        }
-    } else return false;
+    auto& model = *m_combinedModel;
 
-    for (int row = 0; row < pSqlModel->rowCount(); ++row) {
-        // Collect metadata from the table model
-        QString bill_num = pSqlModel->data(pSqlModel->index(row, 0)).toString();
-        QString exp_date = pSqlModel->data(pSqlModel->index(row, 1)).toString();
-        QString billing_periode_start = pSqlModel->data(pSqlModel->index(row, 2)).toString();
-        QString billing_periode_end = pSqlModel->data(pSqlModel->index(row, 3)).toString();
+    if (!db.transaction()) {
+        qWarning() << "Failed to start database transaction:" << db.lastError().text();
+        return false;
+    }
 
-        QString floor_num = pSqlModel->data(pSqlModel->index(row, 5)).toString();
-        QString door_num = pSqlModel->data(pSqlModel->index(row, 6)).toString();
-        QString utility_name = pSqlModel->data(pSqlModel->index(row, 7)).toString();
-        QString company_cif = pSqlModel->data(pSqlModel->index(row, 4)).toString();
-        double iva = pSqlModel->data(pSqlModel->index(row, 8)).toDouble();
-        double bi = pSqlModel->data(pSqlModel->index(row, 9)).toDouble();
-        double total = pSqlModel->data(pSqlModel->index(row, 10)).toDouble();
+    qDebug() << "Start transaction";
 
-        // Fetch flat_id and utility_id based on floor_num, door_num, utility_name
-        // Lambda to get flat_id based on floor_num and door_num
-        auto getFlatID = [&](const QString& floor_num, const QString& door_num) -> int {
-            QSqlQuery query(db);
-            query.prepare("SELECT flat_id FROM flats WHERE floor_num = :floor_num AND door_num = :door_num");
-            query.bindValue(":floor_num", floor_num);
-            query.bindValue(":door_num", door_num);
+    QStringList existingBills;
+    QStringList newEntries;
 
-            if (query.exec() && query.next()) {
-                return query.value(0).toInt();  // Return flat_id
-            } else {
-                // Handle case where flat_id is not found, return a sentinel value, or insert a new row
-                qWarning() << "Flat "<< QString("%1-%2").arg(floor_num).arg(door_num) << "  not found.";
-                return -1;
-            }
-        };
+    for (int row = 0; row < model.rowCount(); ++row) {
+        QString pdfHash = model.getFileMetadata(row)->getPdfHash();
 
-        // Lambda to get utility_id based on utility_name
-        auto getUtilityID = [&](const QString& utility_name) -> int {
-            QSqlQuery query(db);
-            query.prepare("SELECT utility_id FROM utility WHERE utility_name = :utility_name");
-            query.bindValue(":utility_name", utility_name);
+        // Check if the PDF hash already exists
+        QSqlQuery checkQuery(db);
+        checkQuery.prepare("SELECT bill_num FROM ru_bills WHERE pdf_hash = :pdf_hash");
+        checkQuery.bindValue(":pdf_hash", pdfHash);
 
-            if (query.exec() && query.next()) {
-                return query.value(0).toInt();  // Return utility_id
-            } else {
-                // Handle case where utility_id is not found, return a sentinel value, or insert a new row
-                qWarning() << "Utility not found";
-                return -1;
-            }
-        };
-
-        int flat_id = getFlatID(floor_num, door_num);
-        int utility_id = getUtilityID(utility_name);
-
-        // Insert into ru_bills
-        QSqlQuery query(db);
-        query.prepare("INSERT INTO ru_bills (bill_num, exp_date, flat_id, billing_periode_start, billing_periode_end, company_cif, utility_id, iva, bi, total) "
-                      "VALUES (:bill_num, :exp_date, :flat_id, :billing_periode_start, :billing_periode_end, :company_cif, :utility_id, :iva, :bi, :total)");
-
-        query.bindValue(":bill_num", bill_num);
-        query.bindValue(":exp_date", exp_date);
-        query.bindValue(":flat_id", flat_id);
-        query.bindValue(":billing_periode_start", billing_periode_start);
-        query.bindValue(":billing_periode_end", billing_periode_end);
-        query.bindValue(":company_cif", company_cif);
-        query.bindValue(":utility_id", utility_id);
-        query.bindValue(":iva", iva);
-        query.bindValue(":bi", bi);
-        query.bindValue(":total", total);
-
-        if (!query.exec()) {
-            qWarning() << "Failed to insert into ru_bills:" << query.lastError().text();
-            db.rollback();
-            return false;
-        }
-
-        // Commit the transaction if all queries succeeded
-        if (!db.commit()) {
-            qWarning() << "Failed to commit database transaction:" << db.lastError().text();
-            return false;
+        if (checkQuery.exec() && checkQuery.next()) {
+            existingBills.append(checkQuery.value(0).toString());
+        } else {
+            newEntries.append(pdfHash);
         }
     }
 
+    if (!existingBills.isEmpty()) {
+        QMessageBox::StandardButton reply;
+        QString msg = QString("The following bills already exist:\n%1\n\nDo you want to update them?")
+                          .arg(existingBills.join("\n"));
+        reply = QMessageBox::question(this, "Existing Bills", msg,
+                                      QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::No) {
+            // Only insert new entries
+            insertEntries(db, model, newEntries);
+            db.commit();
+            return true;
+        }
+    }
+
+    // Proceed with upsert for all entries
+    for (int row = 0; row < model.rowCount(); ++row) {
+        QString pdfHash = model.getFileMetadata(row)->getPdfHash();
+        newEntries.append(pdfHash);
+    }
+
+    // Upsert all entries (including existing)
+    insertEntries(db, model, newEntries);
+
+    if (!db.commit()) {
+        qWarning() << "Failed to commit database transaction:" << db.lastError().text();
+        return false;
+    }
+
+    qDebug() << "Transaction committed successfully";
     return true;
 }
+
+void DDisplayParsedInfo::insertEntries(QSqlDatabase &db, CParsedPdfModel &model, const QStringList &pdfHashes) {
+    for (const QString &pdfHash : pdfHashes) {
+        int row = -1;
+        for (int r = 0; r < model.rowCount(); ++r) {
+            if (model.getFileMetadata(r)->getPdfHash() == pdfHash) {
+                row = r;
+                break;
+            }
+        }
+
+        if (row == -1) {
+            continue; // Skip if not found
+        }
+
+        // Collect metadata for the entry
+        QString bill_num                = model.data(model.index(row, 0)).toString();
+        QString exp_date                = model.data(model.index(row, 1)).toString();
+        QString billing_periode_start   = model.data(model.index(row, 2)).toString();
+        QString billing_periode_end     = model.data(model.index(row, 3)).toString();
+        QString floor_num               = model.data(model.index(row, 5)).toString();
+        QString door_num                = model.data(model.index(row, 6)).toString();
+        QString utility_name            = model.data(model.index(row, 7)).toString();
+        QString company_cif             = model.data(model.index(row, 4)).toString();
+        double iva                      = UText::trimCurrency(model.data(model.index(row, 8)).toString());
+        double bi                       = UText::trimCurrency(model.data(model.index(row, 9)).toString());
+        double total                    = UText::trimCurrency(model.data(model.index(row, 10)).toString());
+
+        QByteArray pdfData  = readPdfFile(model.getFileMetadata(row)->filePath());
+        int flat_id         = getFlatID(db, floor_num, door_num);
+        int utility_id      = getUtilityID(db, utility_name);
+
+        // Prepare the insert query
+        QSqlQuery insertQuery(db);
+        insertQuery.prepare(SqlQueries::UpsertRuBills);
+        insertQuery.bindValue(":pdf_hash",  pdfHash);
+        insertQuery.bindValue(":bill_num",  bill_num);
+        insertQuery.bindValue(":exp_date",  exp_date);
+        insertQuery.bindValue(":flat_id" ,  flat_id);
+        insertQuery.bindValue(":pdf_bill",  pdfData);
+        insertQuery.bindValue(":billing_periode_start", billing_periode_start);
+        insertQuery.bindValue(":billing_periode_end",   billing_periode_end);
+        insertQuery.bindValue(":company_cif", company_cif);
+        insertQuery.bindValue(":utility_id" , utility_id);
+        insertQuery.bindValue(":iva", iva);
+        insertQuery.bindValue(":bi" , bi);
+        insertQuery.bindValue(":total", total);
+
+        // Execute the insert query
+        if (!insertQuery.exec()) {
+            qWarning() << "Failed to insert new entry into ru_bills:" << insertQuery.lastError().text();
+            db.rollback();
+            return;
+        }
+    }
+}
+
+int DDisplayParsedInfo::getFlatID(QSqlDatabase &db, const QString &floor_num, const QString &door_num) {
+    QSqlQuery query(db);
+    query.prepare("SELECT flat_id FROM flats WHERE floor_num = :floor_num AND door_num = :door_num");
+    query.bindValue(":floor_num", floor_num);
+    query.bindValue(":door_num", door_num);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    } else {
+        qWarning() << "Flat " << QString("%1-%2").arg(floor_num, door_num) << " not found.";
+        return -1;
+    }
+}
+
+int DDisplayParsedInfo::getUtilityID(QSqlDatabase &db, const QString &utility_name) {
+    QSqlQuery query(db);
+    query.prepare("SELECT utility_id FROM utility WHERE utility_name = :utility_name");
+    query.bindValue(":utility_name", utility_name);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    } else {
+        qWarning() << "Utility not found";
+        return -1;
+    }
+}
+
 #endif
 
 void DDisplayParsedInfo::on_pushButton_save_clicked() {
 #ifdef ENABLE_DBMANAGER
-    CSqlMultiTableModel *pSqlModel = dynamic_cast<CSqlMultiTableModel*>(m_combinedModel);
-    if (pSqlModel && commitTable()) {
+    if(m_isCSVParser) {
+        if(exportToCSV()) accept();
+    } else if (commitTable()) {
+        CDbConnection &conn = CDbConnection::getConnection("closca");
+        conn.refreshModel("Utility Bills");
         accept();
     }
 #endif
-    // if(exportToCSV()) { accept(); }
 }
