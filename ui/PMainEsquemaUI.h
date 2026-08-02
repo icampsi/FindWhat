@@ -11,11 +11,14 @@
 
 #include "WToolBarEsquema.h"
 #include "PEsquemaPage.h"
+
 #include "ui_PMainEsquemaUI.h"
 
 class CExportCSV;
 
+QT_BEGIN_NAMESPACE
 namespace Ui { class PMainEsquemaUI; }
+QT_END_NAMESPACE
 
 // Edition interface for esquema. Each esquema would have it's own instance of this widget
 class PMainEsquemaUI : public QWidget {

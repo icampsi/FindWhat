@@ -3,14 +3,13 @@
  * ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
  * =================================================== */
 
+#include "MainWindow.h"
 #include "PMainEsquemaUI.h"
 
 #include "CParsedPdfModel.h"
-#include "MainWindow.h"
 #include "ui/dialogs/DDisplayParsedInfo.h"
 #include "ui/dialogs/ProgBar_dlg.h"
 #include "PFormExpToolBoxPage.h"
-#include "ui_PMainEsquemaUI.h"
 
 #include <QToolBox>
 #include <QtPreprocessorSupport>
@@ -24,6 +23,8 @@
 #include "document/CExportPathDoc.h"
 
 #include "utils/USystem.h"
+#include "ui_PMainEsquemaUI.h"
+
 
 #ifdef ENABLE_DBMANAGER
 #include "dbManager/WDbView.h"

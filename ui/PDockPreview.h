@@ -7,11 +7,13 @@
 #define PDOCKPREVIEW_H
 
 #include <QDockWidget>
-#include "ui_PDockPreview.h"
 #include "finder/CFormula.h"
 #include "document/CPdfDoc.h"
+#include "WToolBarPreview.h"
 
+QT_BEGIN_NAMESPACE
 namespace Ui { class PDockPreview; }
+QT_END_NAMESPACE
 
 class PDockPreview : public QDockWidget {
     Q_OBJECT

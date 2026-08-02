@@ -24,9 +24,10 @@
  * as published by the Free Software Foundation. See https://poppler.freedesktop.org/ for more information.
 */
 
-#include "ui/mainwindow.h"
+#include "ui/MainWindow.h"
 #include <QApplication>
 #include "utils/USystem.h"
+#include <QTableView>
 
 #ifdef ENABLE_DBMANAGER
 #include "CSqlMultiTableModel.h"
@@ -61,13 +62,14 @@ void debug(QWidget &window) {
 #endif
 
 int main(int argc, char *argv[]) {
+    QApplication a(argc, argv);
+
     SystemUtils::setEndianness();
 
 // FIRST INSTANCE GETTER TO SETUP CONNECTION
 #ifdef ENABLE_DBMANAGER
     CDbConnection::getConnection("localhost", "closca", "user", "password");
 #endif
-    QApplication a(argc, argv);
 
     MainWindow w;
     w.showMaximized();
