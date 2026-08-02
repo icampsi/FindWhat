@@ -71,7 +71,9 @@ jobs:
           file build/bin/FindWhat
           ldd build/bin/FindWhat
 
-      - name: Check installation
-        run: |
-          DESTDIR="$PWD/package" cmake --install build
-          find package -type f -print
+      - name: Upload installed package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FindWhat-${{ matrix.name }}
+          path: package/usr/
+          if-no-files-found: error
