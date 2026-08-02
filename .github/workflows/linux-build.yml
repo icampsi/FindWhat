@@ -39,7 +39,9 @@ jobs:
             pkg-config \
             qt6-base-dev \
             qt6-base-dev-tools \
-            libpoppler-qt6-dev
+            libpoppler-qt6-dev \
+            libxkbcommon-dev \
+            catch2
 
       - name: Check installed versions
         run: |
