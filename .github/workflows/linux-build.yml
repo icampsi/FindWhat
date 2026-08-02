@@ -14,10 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
-          - debian:12
           - debian:13
-          - ubuntu:22.04
-          - ubuntu:24.04
 
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
@@ -35,6 +32,8 @@ jobs:
             build-essential \
             ca-certificates \
             cmake \
+            git \
+            file \
             ninja-build \
             pkg-config \
             qt6-base-dev \
@@ -68,9 +67,9 @@ jobs:
 
       - name: Inspect executable
         run: |
-          test -x build/FindWhat
-          file build/FindWhat
-          ldd build/FindWhat
+          test -x build/bin/FindWhat
+          file build/bin/FindWhat
+          ldd build/bin/FindWhat
 
       - name: Check installation
         run: |
