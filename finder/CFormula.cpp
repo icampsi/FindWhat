@@ -585,7 +585,7 @@ void CFormula::addFunction(CFunction* function) {
 
 void CFormula::deleteFunction(const size_t index) {
     // Check if the index is within bounds
-    if (index index < m_formulaPath.size()) {
+    if (index < m_formulaPath.size()) {
         // Check if the pointer at the specified index is valid
         if (m_formulaPath[index]) {
             // Delete function from vector
