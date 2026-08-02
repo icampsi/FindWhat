@@ -41,6 +41,7 @@ jobs:
             qt6-base-dev-tools \
             libpoppler-cpp-dev \
             libxkbcommon-dev \
+            libpoppler-qt6-dev \
             catch2
 
       - name: Check installed versions
