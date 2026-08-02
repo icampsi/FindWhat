@@ -39,7 +39,7 @@ jobs:
             pkg-config \
             qt6-base-dev \
             qt6-base-dev-tools \
-            libpoppler-qt6-dev \
+            libpoppler-cpp-dev \
             libxkbcommon-dev \
             catch2
 
