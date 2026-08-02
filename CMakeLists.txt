@@ -3,7 +3,7 @@
 # ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
 # =================================================== */
 
-cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 project(FindWhat VERSION 0.2.0 LANGUAGES CXX)
 
 # Warning level
