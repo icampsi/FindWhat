@@ -52,4 +52,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC utils)
 # Enable testing and add the test directory
 include(CTest)
 enable_testing()
-add_subdirectory(test)
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()

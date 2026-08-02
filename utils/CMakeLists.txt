@@ -45,5 +45,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 include(CTest)
 enable_testing()
 
-add_subdirectory(test)
-
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
