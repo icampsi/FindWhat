@@ -33,6 +33,7 @@ jobs:
             ca-certificates \
             cmake \
             git \
+            file \
             ninja-build \
             pkg-config \
             qt6-base-dev \
