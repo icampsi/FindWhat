@@ -1,0 +1,77 @@
+name: Linux builds
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-test:
+    name: FindWhat — ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - debian:12
+          - debian:13
+          - ubuntu:22.04
+          - ubuntu:24.04
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            build-essential \
+            ca-certificates \
+            cmake \
+            ninja-build \
+            pkg-config \
+            qt6-base-dev \
+            qt6-base-dev-tools \
+            libpoppler-qt6-dev
+
+      - name: Check installed versions
+        run: |
+          cmake --version
+          pkg-config --modversion Qt6Core
+          pkg-config --modversion poppler-qt6
+
+      - name: Configure
+        run: |
+          cmake \
+            -S . \
+            -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+        if: ${{ hashFiles('tests/**', 'test/**') != '' }}
+
+      - name: Inspect executable
+        run: |
+          test -x build/FindWhat
+          file build/FindWhat
+          ldd build/FindWhat
+
+      - name: Check installation
+        run: |
+          DESTDIR="$PWD/package" cmake --install build
+          find package -type f -print
