@@ -3,7 +3,7 @@
 # ==== SPDX-License-Identifier: GPL-3.0-or-later ==== *
 # =================================================== */
 
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
 
 # Locate Catch2 (Assuming Catch2 is already installed or provided by vcpkg)
 find_package(Catch2 REQUIRED)
