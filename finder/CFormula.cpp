@@ -260,7 +260,7 @@ void CFormula::moveIndex(const QString& text, CIndexingFunction* pFunctionToAppl
     // Perform an initial check for index position. If final > initial means last function was extracting function and indexes need to be brought together now.
     size_t newIndex = m_result.indexPosition.initial + pFunctionToApply->getNum();
     // Check if the new index is within bounds
-    if (newIndex >= 0 && newIndex < static_cast<size_t>(text.size())) {
+    if (newIndex < static_cast<size_t>(text.size())) {
         m_result.indexPosition.initial = newIndex;
         m_result.indexPosition.final   = m_result.indexPosition.initial;
     }
@@ -585,7 +585,7 @@ void CFormula::addFunction(CFunction* function) {
 
 void CFormula::deleteFunction(const size_t index) {
     // Check if the index is within bounds
-    if (index >= 0 && index < m_formulaPath.size()) {
+    if (index < m_formulaPath.size()) {
         // Check if the pointer at the specified index is valid
         if (m_formulaPath[index]) {
             // Delete function from vector
