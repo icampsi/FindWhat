@@ -188,6 +188,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/ui/dialogs
+        ${CMAKE_CURRENT_SOURCE_DIR}/ui/WExtViews
+        ${CMAKE_CURRENT_SOURCE_DIR}/document
+        ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 
 # LINK LIBRARIES
