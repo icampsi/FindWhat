@@ -35,6 +35,7 @@ jobs:
             build-essential \
             ca-certificates \
             cmake \
+            git \
             ninja-build \
             pkg-config \
             qt6-base-dev \
